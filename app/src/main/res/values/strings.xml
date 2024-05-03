@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">temi_elevator</string>
+    <string name="confirm">Confirm</string>
+    <string name="top_view_text">Bitte wählen Sie einen Raum und Temi wird sie dort hin bringen!</string>
+    <string name="ja">Ja</string>
+    <string name="vielen_dank_temi">Vielen Dank Temi</string>
+    <string-array name="spinner_items">
+        <item>Default</item>
+    </string-array>
+
+    <string name="take_photo">Transport Modus</string>
+    <string name="i_want_to_scan_a_qr_code">I want to scan a QR Code</string>
+    <string name="quit">Quit</string>
+    <string name="button">Button</string>
+    <string name="listen">Listen</string>
+
+
+</resources>
