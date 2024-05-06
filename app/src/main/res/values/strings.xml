@@ -13,6 +13,7 @@
     <string name="quit">Quit</string>
     <string name="button">Button</string>
     <string name="listen">Listen</string>
+    <string name="TranscriptionText">TranscriptionText</string>
 
 
 </resources>
