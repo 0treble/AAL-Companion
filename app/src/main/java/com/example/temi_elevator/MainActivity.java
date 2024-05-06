@@ -86,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
     private String ttsWelcome = TtsWelcome.getLanguageByNumber(1); // 1 = GERMAN as default language
     private String ttsFollow = TtsFollow.getLanguageByNumber(1);
     private int ttsLanguage = 0;
-
+    private TextView transcription;
     //test
 
     private enum TtsWelcome {
@@ -178,7 +178,23 @@ public class MainActivity extends AppCompatActivity {
         instance = this;
         myMQTT.connect();
         transportMode();
+        setContentView(R.layout.activity_main);
+        transcription = findViewById(R.id.transcription);
+        findViewById(R.id.listen).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                transcription.setText("Ready... Temi should listen now");
+                temi.wakeup();
+            }
+        });
     }
+
+
+    /**************************************************************************************
+     * ************************************************************************************
+     * ************************************************************************************
+      */
+
 
     private void transportMode() {
         Log.i(TAG, "Entered transportMode");
@@ -190,7 +206,8 @@ public class MainActivity extends AppCompatActivity {
                 refreshTemiUi();
                 fillDropdownMenu();
                 temi.setHardButtonsDisabled(true);
-                temi.setGoToSpeed(SpeedLevel.HIGH);
+                temi.setGoToSpeed(SpeedLevel.SLOW);
+                temi.hideTopBar();
             }
         });
 
