@@ -61,6 +61,10 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+
+import java.util.Collections;
+
+
 public class MainActivity extends AppCompatActivity {
 
     // Member variables
@@ -184,7 +188,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 transcription.setText("Ready... Temi should listen now");
-                temi.wakeup();
+                temi.wakeup(Collections.singletonList(SttLanguage.SYSTEM));
             }
         });
     }
