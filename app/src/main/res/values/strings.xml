@@ -14,6 +14,8 @@
     <string name="button">Button</string>
     <string name="listen">Listen</string>
     <string name="TranscriptionText">TranscriptionText</string>
+    <string name="endTranscriptionButton">endTranscriptionButton</string>
+    <string name="end_transcription">End Transcription</string>
 
 
 </resources>

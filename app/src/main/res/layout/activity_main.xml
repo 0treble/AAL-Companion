@@ -52,6 +52,7 @@
             tools:ignore="VisualLintButtonSize" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraintLayout"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_marginTop="100dp"
@@ -136,12 +137,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/listen"
-                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintBottom_toBottomOf="@+id/QRCodeButton"
                 app:layout_constraintEnd_toStartOf="@+id/MenuButton"
-                app:layout_constraintHorizontal_bias="0.473"
-                app:layout_constraintStart_toEndOf="@+id/QRCodeButton"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.916" />
+                app:layout_constraintStart_toEndOf="@+id/QRCodeButton" />
 
             <TextView
                 android:id="@+id/transcription"
@@ -158,6 +156,17 @@
                 tools:ignore="LabelFor,VisualLintTextFieldSize,VisualLintBounds" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <Button
+            android:id="@+id/endTranscription"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/end_transcription"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.154" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
