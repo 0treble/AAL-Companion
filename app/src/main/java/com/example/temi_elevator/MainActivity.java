@@ -40,6 +40,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.OptIn;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.camera.core.CameraSelector;
 import androidx.camera.core.ExperimentalGetImage;
 import androidx.camera.core.ImageAnalysis;
@@ -166,8 +167,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
-
     static {
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
             REQUIRED_PERMISSIONS = Arrays.copyOf(REQUIRED_PERMISSIONS, REQUIRED_PERMISSIONS.length + 1);
@@ -175,6 +174,10 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**************************************************************************************
+     * ************************************************************************************
+     * ************************************************************************************
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -182,8 +185,10 @@ public class MainActivity extends AppCompatActivity {
         instance = this;
         myMQTT.connect();
         transportMode();
+        transcriptMode();
         setContentView(R.layout.activity_main);
         transcription = findViewById(R.id.transcription);
+
         findViewById(R.id.listen).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -193,12 +198,33 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private void transcriptMode() {
+        Log.i(TAG, "Entered transcriptMode");
+        setContentView(R.layout.activity_main);
 
-    /**************************************************************************************
-     * ************************************************************************************
-     * ************************************************************************************
-      */
+        transcription = findViewById(R.id.transcription);
 
+        Button listen = findViewById(R.id.confirmLocationButton);
+        listen.setOnClickListener(v -> temiWakeUp());
+    }
+
+    private void toggleDarkMode() {
+        Log.i(TAG, "Toggled Dark Mode");
+
+        Button themeButton = findViewById(R.id.themeButton);
+        themeButton.setOnClickListener(v -> enable_menu());
+
+        int currentNightMode = getResources().getConfiguration().uiMode
+                & android.content.res.Configuration.UI_MODE_NIGHT_MASK;
+        if (currentNightMode == android.content.res.Configuration.UI_MODE_NIGHT_NO) {
+            // Night mode is not active, activate it
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        } else {
+            // Night mode is active, deactivate it
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+        }
+        //recreate(); // Recreate activity to apply theme change
+    }
 
     private void transportMode() {
         Log.i(TAG, "Entered transportMode");
@@ -247,6 +273,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void enable_menu() {
+        temi.startPage(Page.HOME);
+        /*
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Enter a Number");
         final EditText input = new EditText(this);
@@ -266,6 +294,8 @@ public class MainActivity extends AppCompatActivity {
         });
         builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
         builder.show();
+        */
+
     }
 
     private void QRCodeMode() {
@@ -341,6 +371,24 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    @SuppressLint("SetTextI18n")
+    public void receivedFloor(int number) {
+        runOnUiThread(() -> {
+            TextView textView = findViewById(R.id.elevatorTextView);
+            textView.setText("Der Raum befindet sich auf dem Stockwerk: " + number);
+            this.waitingForFloor = false;
+            this.waitingForReset = true;
+
+            // If nothing happens after 1 min go home anyways
+            waitHandler.postDelayed(() -> {
+                if (this.waitingForFinish) {
+                    Log.w(TAG, "no button was pressed");
+                    reset();
+                }
+            }, 60000);
+        });
+    }
+
     // confirming the destination choice
     @SuppressLint("SetTextI18n")
     private void confirm() {
@@ -378,21 +426,9 @@ public class MainActivity extends AppCompatActivity {
 
     // received the floor number to display on the message
     @SuppressLint("SetTextI18n")
-    public void receivedFloor(int number) {
-        runOnUiThread(() -> {
-            TextView textView = findViewById(R.id.elevatorTextView);
-            textView.setText("Der Raum befindet sich auf dem Stockwerk: " + number);
-            this.waitingForFloor = false;
-            this.waitingForReset = true;
-
-            // If nothing happens after 1 min go home anyways
-            waitHandler.postDelayed(() -> {
-                if (this.waitingForFinish) {
-                    Log.w(TAG, "no button was pressed");
-                    reset();
-                }
-            }, 60000);
-        });
+    private void temiWakeUp() {
+        transcription.setText("Ready... Temi should listen now");
+        temi.wakeup(Collections.singletonList(SttLanguage.SYSTEM));
     }
 
     // is used to bring the guest to his destination when he's coming from a different floor
@@ -698,5 +734,4 @@ public class MainActivity extends AppCompatActivity {
         // Return a default language or handle the case when no matching language is found
         return TtsRequest.Language.SYSTEM; // You can change this to another default if needed
     }
-
 }
