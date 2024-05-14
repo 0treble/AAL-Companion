@@ -32,6 +32,7 @@ import com.google.zxing.Result;
 import com.google.zxing.common.HybridBinarizer;
 import com.google.zxing.qrcode.QRCodeReader;
 import com.robotemi.sdk.*;
+import com.robotemi.sdk.Robot;
 import com.robotemi.sdk.constants.Page;
 import com.robotemi.sdk.navigation.model.SpeedLevel;
 
@@ -66,7 +67,7 @@ import java.util.concurrent.Executors;
 import java.util.Collections;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements Robot.AsrListener{
 
     // Member variables
     private final String TAG = "MainActivity";
@@ -196,6 +197,12 @@ public class MainActivity extends AppCompatActivity {
                 temi.wakeup(Collections.singletonList(SttLanguage.SYSTEM));
             }
         });
+    }
+    private String myAsrResultString = "nixxx";     // here we want the transcribed string to be in
+    @Override
+    public void onAsrResult(String asrResult, SttLanguage sttLanguage) {
+        myAsrResultString = asrResult;
+        transcription.setText(myAsrResultString);
     }
 
     private void transcriptMode() {
