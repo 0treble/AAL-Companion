@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <manifest
     xmlns:android="http://schemas.android.com/apk/res/android">
 
@@ -49,6 +50,13 @@
             android:value="com.robotemi.permission.settings,
                            com.robotemi.permission.sequence,
                            com.robotemi.permission.map" />
+
+        <meta-data
+            android:name="com.robotemi.sdk.metadata.KIOSK" android:value="true" />
+
+        <meta-data
+            android:name="com.robotemi.sdk.metadata.OVERRIDE_NLU" android:value="true"/>
+
 
         <service
             android:name="org.eclipse.paho.android.service.MqttService"/>
