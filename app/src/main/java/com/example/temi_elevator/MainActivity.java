@@ -2,6 +2,7 @@ package com.example.temi_elevator;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.media.Image;
@@ -15,6 +16,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -50,6 +52,10 @@ import androidx.camera.core.Preview;
 import androidx.camera.lifecycle.ProcessCameraProvider;
 import androidx.core.content.ContextCompat;
 
+import android.speech.RecognitionListener;
+import android.speech.RecognizerIntent;
+import android.speech.SpeechRecognizer;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -58,16 +64,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-
 import java.util.Collections;
 
-
-public class MainActivity extends AppCompatActivity implements Robot.AsrListener{
+public class MainActivity extends AppCompatActivity /*implements Robot.AsrListener*/{
 
     // Member variables
     private final String TAG = "MainActivity";
@@ -93,7 +98,8 @@ public class MainActivity extends AppCompatActivity implements Robot.AsrListener
     private String ttsFollow = TtsFollow.getLanguageByNumber(1);
     private int ttsLanguage = 0;
     private TextView transcription;
-    //test
+
+    private SpeechRecognizer speechRecognizer;
 
     private enum TtsWelcome {
         // using languages already implemented in TemiSDK
@@ -182,14 +188,110 @@ public class MainActivity extends AppCompatActivity implements Robot.AsrListener
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         instance = this;
         myMQTT.connect();
         transportMode();
-        transcriptMode();
+        //transcriptMode();
         setContentView(R.layout.activity_main);
         transcription = findViewById(R.id.transcription);
 
+        transcription.setText("Ready... Press the Listen Button to start the transcription");
+
+        speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
+        final Intent speechRecognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        speechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+        speechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
+        speechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_MINIMUM_LENGTH_MILLIS, 100000);
+
+        findViewById(R.id.listen).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                transcription.setText("Ready... Temi should listen now");
+                temi.wakeup(Collections.singletonList(SttLanguage.SYSTEM));
+                startRecording(speechRecognizerIntent);
+            }
+        });
+
+        findViewById(R.id.endTranscription).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                transcription.setText("Transcription ended.");
+                temi.wakeup(Collections.singletonList(SttLanguage.SYSTEM));
+                stopRecording();
+            }
+        });
+
+        findViewById(R.id.MenuButton).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                enable_menu();
+            }
+        });
+
+        speechRecognizer.setRecognitionListener(new RecognitionListener() {
+            @Override
+            public void onReadyForSpeech(Bundle bundle) {
+                transcription.setText("");
+            }
+
+            @Override
+            public void onBeginningOfSpeech() {
+                //state.setText("Listening...");
+            }
+
+            @Override
+            public void onRmsChanged(float v) {}
+
+            @Override
+            public void onBufferReceived(byte[] bytes) {}
+
+            @Override
+            public void onEndOfSpeech() {
+                //state.setText("Ready...");
+            }
+
+            @Override
+            public void onError(int i) {}
+
+            @Override
+            public void onResults(Bundle results) {}
+
+            @Override
+            public void onPartialResults(Bundle bundle) {
+                if (bundle != null) {
+                    List<String> data = bundle.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
+                    if (data != null && !data.isEmpty()) {
+                        String result = data.get(0); // Get the first recognized result
+                        result = result.trim();
+                        result = result.substring(0, 1).toUpperCase() + result.substring(1);
+                        if (!result.isEmpty()) {
+                            transcription.append(result);
+                            transcription.append("\n");
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onEvent(int i, Bundle bundle) {}
+        });
+
+    }
+    private void startRecording(Intent speechRecognizerIntent) {
+        try {
+            speechRecognizer.startListening(speechRecognizerIntent);
+            transcription.setText("");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void stopRecording() {
+        speechRecognizer.stopListening();
+        speechRecognizer.cancel();
+    }
+
+        /*
         findViewById(R.id.listen).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -213,7 +315,7 @@ public class MainActivity extends AppCompatActivity implements Robot.AsrListener
 
         Button listen = findViewById(R.id.confirmLocationButton);
         listen.setOnClickListener(v -> temiWakeUp());
-    }
+    }*/
 
     private void toggleDarkMode() {
         Log.i(TAG, "Toggled Dark Mode");
@@ -244,8 +346,8 @@ public class MainActivity extends AppCompatActivity implements Robot.AsrListener
                 fillDropdownMenu();
                 temi.setHardButtonsDisabled(true);
                 temi.setGoToSpeed(SpeedLevel.SLOW);
-                temi.hideTopBar();
             }
+
         });
 
         // Add click listener for confirm button
@@ -276,12 +378,11 @@ public class MainActivity extends AppCompatActivity implements Robot.AsrListener
                 Log.e(TAG, "Nothing is selected");
             }
         });
-
     }
 
     private void enable_menu() {
         temi.startPage(Page.HOME);
-        /*
+
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Enter a Number");
         final EditText input = new EditText(this);
@@ -290,7 +391,7 @@ public class MainActivity extends AppCompatActivity implements Robot.AsrListener
             String numberString = input.getText().toString();
             try {
                 int number = Integer.parseInt(numberString);
-                if (number == 4115) {
+                if (true) {
                     temi.startPage(Page.HOME);
                 } else {
                     Log.i(TAG, "Wrong password entered");
@@ -300,8 +401,8 @@ public class MainActivity extends AppCompatActivity implements Robot.AsrListener
             }
         });
         builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
-        builder.show();
-        */
+        //builder.show();
+
 
     }
 
