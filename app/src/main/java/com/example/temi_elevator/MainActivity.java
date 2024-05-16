@@ -104,21 +104,7 @@ public class MainActivity extends AppCompatActivity /*implements Robot.AsrListen
     private enum TtsWelcome {
         // using languages already implemented in TemiSDK
         GERMAN("Willkommen ", 11),
-        ENGLISH("Welcome ", 1),
-        FRENCH("Bienvenue ", 12),
-        SPANISH("Bienvenido ", 21),
-        ITALIAN("Benvenuto ", 19),
-        PORTUGUESE("Bem-vindo ", 14),
-        RUSSIAN("Добро пожаловать ", 18),
-        CHINESE("欢迎 ", 2),
-        JAPANESE("ようこそ ", 8),
-        THAI("ยินดีต้อนรับ ", 5),
-        HEBREW("ברוך הבא ", 6),
-        KOREAN("환영합니다 ", 7),
-        INDONESIAN("Selamat Datang ", 10),
-        ESTONIAN("Tere tulemast ", 24),
-        CATALAN("Benvingut ", 22),
-        HINDI("स्वागत है ", 23);
+        ENGLISH("Welcome ", 1);
 
         private final String language;
         private final int number;
@@ -140,21 +126,7 @@ public class MainActivity extends AppCompatActivity /*implements Robot.AsrListen
 
     private enum TtsFollow {
         GERMAN(" bitte folgen Sie mir zu Raum: ", 11),
-        ENGLISH(" please follow me to room: ", 1),
-        FRENCH(" veuillez me suivre jusqu'à la salle : ", 12),
-        SPANISH(" por favor sígame a la sala: ", 21),
-        ITALIAN(" per favore seguimi in sala: ", 19),
-        PORTUGUESE(" por favor, siga-me até a sala: ", 14),
-        RUSSIAN(" пожалуйста, следуйте за мной в комнату: ", 18),
-        CHINESE(" 请跟我去房间：", 2),
-        JAPANESE(" 部屋までついてきてください：", 8),
-        THAI(" โปรดตามฉันไปยังห้อง: ", 5),
-        HEBREW(" בבקשה עקוב אחרי בי לחדר: ", 6),
-        KOREAN(" 부디 나를 따라와 방으로 가십시오: ", 7),
-        INDONESIAN(" silakan ikuti saya ke ruangan: ", 10),
-        ESTONIAN(" palun järgige mind tuppa: ", 24),
-        CATALAN(" si us plau segueix-me a la sala: ", 22),
-        HINDI(" कृपया मुझे कक्षा में अनुसरण करें: ", 23);
+        ENGLISH(" please follow me to room: ", 1);
 
         private final String language;
         private final int number;
@@ -188,13 +160,19 @@ public class MainActivity extends AppCompatActivity /*implements Robot.AsrListen
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
         instance = this;
         myMQTT.connect();
         transportMode();
-        //transcriptMode();
-        setContentView(R.layout.activity_main);
-        transcription = findViewById(R.id.transcription);
 
+        init();
+    }
+
+    private void init() {
+        //transcriptMode();
+
+        transcription = findViewById(R.id.transcription);
         transcription.setText("Ready... Press the Listen Button to start the transcription");
 
         speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
@@ -206,7 +184,7 @@ public class MainActivity extends AppCompatActivity /*implements Robot.AsrListen
         findViewById(R.id.listen).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                transcription.setText("Ready... Temi should listen now");
+                //transcription.setText("Ready... Temi should listen now");
                 temi.wakeup(Collections.singletonList(SttLanguage.SYSTEM));
                 startRecording(speechRecognizerIntent);
             }
@@ -254,7 +232,20 @@ public class MainActivity extends AppCompatActivity /*implements Robot.AsrListen
             public void onError(int i) {}
 
             @Override
-            public void onResults(Bundle results) {}
+            public void onResults(Bundle results) {
+                if (results != null) {
+                    List<String> data = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
+                    if (data != null && !data.isEmpty()) {
+                        String result = data.get(0); // Get the first recognized result
+                        result = result.trim();
+                        result = result.substring(0, 1).toUpperCase() + result.substring(1);
+                        if (!result.isEmpty()) {
+                            transcription.append(result);
+                            transcription.append("\n");
+                        }
+                    }
+                }
+            }
 
             @Override
             public void onPartialResults(Bundle bundle) {
@@ -275,8 +266,8 @@ public class MainActivity extends AppCompatActivity /*implements Robot.AsrListen
             @Override
             public void onEvent(int i, Bundle bundle) {}
         });
-
     }
+
     private void startRecording(Intent speechRecognizerIntent) {
         try {
             speechRecognizer.startListening(speechRecognizerIntent);
