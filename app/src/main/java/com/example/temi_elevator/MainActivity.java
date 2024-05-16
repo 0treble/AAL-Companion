@@ -5,68 +5,36 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
-import android.media.Image;
 import android.os.Build;
 import android.os.Handler;
 import android.util.Log;
 import android.os.Bundle;
-import android.util.Size;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import com.example.temi_elevator.databinding.CameraMainBinding;
-import com.example.temi_elevator.mqtt.MQTT;
-import com.google.common.util.concurrent.ListenableFuture;
-import com.google.zxing.BinaryBitmap;
-import com.google.zxing.ChecksumException;
-import com.google.zxing.FormatException;
-import com.google.zxing.NotFoundException;
-import com.google.zxing.RGBLuminanceSource;
-import com.google.zxing.Reader;
-import com.google.zxing.Result;
-import com.google.zxing.common.HybridBinarizer;
-import com.google.zxing.qrcode.QRCodeReader;
 import com.robotemi.sdk.*;
 import com.robotemi.sdk.Robot;
 import com.robotemi.sdk.constants.Page;
 import com.robotemi.sdk.navigation.model.SpeedLevel;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.OptIn;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
-import androidx.camera.core.CameraSelector;
-import androidx.camera.core.ExperimentalGetImage;
-import androidx.camera.core.ImageAnalysis;
-import androidx.camera.core.ImageProxy;
-import androidx.camera.core.Preview;
-import androidx.camera.lifecycle.ProcessCameraProvider;
-import androidx.core.content.ContextCompat;
 
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -82,47 +50,15 @@ public class MainActivity extends AppCompatActivity /*implements Robot.AsrListen
     private static MainActivity instance;
     private final Robot temi = Robot.getInstance();
     private List<String> otherLocations = new ArrayList<>();
-    private final MQTT myMQTT = MQTT.getInstance(this);
     private int myfloorNumber = 0;
     private boolean waitingForFloor = false;
     private boolean waitingForReset = false;
     private boolean waitingForFinish = false;
     private final Handler waitHandler = new Handler();
-    private CameraMainBinding viewBinding;
-    private ExecutorService cameraExecutor;
-    ImageAnalysis imageAnalysis;
-    private static String[] REQUIRED_PERMISSIONS = new String[]{android.Manifest.permission.CAMERA, android.Manifest.permission.RECORD_AUDIO};
-    private boolean isCheckingForQrCode = false;
-    private String displayName = "";
-    private String ttsWelcome = TtsWelcome.getLanguageByNumber(1); // 1 = GERMAN as default language
-    private String ttsFollow = TtsFollow.getLanguageByNumber(1);
-    private int ttsLanguage = 0;
+    private static String[] REQUIRED_PERMISSIONS = new String[]{android.Manifest.permission.RECORD_AUDIO};
     private TextView transcription;
-
+    private ExecutorService myExecutorService;
     private SpeechRecognizer speechRecognizer;
-
-    private enum TtsWelcome {
-        // using languages already implemented in TemiSDK
-        GERMAN("Willkommen ", 11),
-        ENGLISH("Welcome ", 1);
-
-        private final String language;
-        private final int number;
-
-        TtsWelcome(String language, int number) {
-            this.language = language;
-            this.number = number;
-        }
-
-        public static String getLanguageByNumber(int number) {
-            for (TtsWelcome ttsWelcome : values()) {
-                if (ttsWelcome.number == number) {
-                    return ttsWelcome.language;
-                }
-            }
-            return null; // Return null if the number doesn't match any language
-        }
-    }
 
     private enum TtsFollow {
         GERMAN(" bitte folgen Sie mir zu Raum: ", 11),
@@ -134,15 +70,6 @@ public class MainActivity extends AppCompatActivity /*implements Robot.AsrListen
         TtsFollow(String language, int number) {
             this.language = language;
             this.number = number;
-        }
-
-        public static String getLanguageByNumber(int number) {
-            for (TtsFollow ttsFollow : values()) {
-                if (ttsFollow.number == number) {
-                    return ttsFollow.language;
-                }
-            }
-            return null; // Return null if the number doesn't match any language
         }
     }
 
@@ -163,15 +90,67 @@ public class MainActivity extends AppCompatActivity /*implements Robot.AsrListen
         setContentView(R.layout.activity_main);
 
         instance = this;
-        myMQTT.connect();
         transportMode();
+
+        myExecutorService = Executors.newSingleThreadExecutor();
 
         init();
     }
 
     private void init() {
-        //transcriptMode();
+        transcriptMode();
+        setupThemeButton();
+    }
 
+    private void setupThemeButton() {
+        try {
+            Button themeButton = findViewById(R.id.themeButton);
+            if (themeButton != null) {
+                themeButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        toggleDarkMode();
+                    }
+                });
+            } else {
+                Log.e(TAG, "themeButton is null");
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error setting up theme button: ", e);
+        }
+    }
+
+    private void startRecording(Intent speechRecognizerIntent) {
+        try {
+            speechRecognizer.startListening(speechRecognizerIntent);
+            transcription.setText("");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void stopRecording() {
+        speechRecognizer.stopListening();
+        speechRecognizer.cancel();
+    }
+
+        /*
+        findViewById(R.id.listen).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                transcription.setText("Ready... Temi should listen now");
+                temi.wakeup(Collections.singletonList(SttLanguage.SYSTEM));
+            }
+        });
+    }
+    private String myAsrResultString = "nixxx";     // here we want the transcribed string to be in
+    @Override
+    public void onAsrResult(String asrResult, SttLanguage sttLanguage) {
+        myAsrResultString = asrResult;
+        transcription.setText(myAsrResultString);
+    }*/
+
+    private void transcriptMode() {
         transcription = findViewById(R.id.transcription);
         transcription.setText("Ready... Press the Listen Button to start the transcription");
 
@@ -268,54 +247,10 @@ public class MainActivity extends AppCompatActivity /*implements Robot.AsrListen
         });
     }
 
-    private void startRecording(Intent speechRecognizerIntent) {
-        try {
-            speechRecognizer.startListening(speechRecognizerIntent);
-            transcription.setText("");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void stopRecording() {
-        speechRecognizer.stopListening();
-        speechRecognizer.cancel();
-    }
-
-        /*
-        findViewById(R.id.listen).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                transcription.setText("Ready... Temi should listen now");
-                temi.wakeup(Collections.singletonList(SttLanguage.SYSTEM));
-            }
-        });
-    }
-    private String myAsrResultString = "nixxx";     // here we want the transcribed string to be in
-    @Override
-    public void onAsrResult(String asrResult, SttLanguage sttLanguage) {
-        myAsrResultString = asrResult;
-        transcription.setText(myAsrResultString);
-    }
-
-    private void transcriptMode() {
-        Log.i(TAG, "Entered transcriptMode");
-        setContentView(R.layout.activity_main);
-
-        transcription = findViewById(R.id.transcription);
-
-        Button listen = findViewById(R.id.confirmLocationButton);
-        listen.setOnClickListener(v -> temiWakeUp());
-    }*/
-
     private void toggleDarkMode() {
         Log.i(TAG, "Toggled Dark Mode");
 
-        Button themeButton = findViewById(R.id.themeButton);
-        themeButton.setOnClickListener(v -> enable_menu());
-
-        int currentNightMode = getResources().getConfiguration().uiMode
-                & android.content.res.Configuration.UI_MODE_NIGHT_MASK;
+        int currentNightMode = getResources().getConfiguration().uiMode & android.content.res.Configuration.UI_MODE_NIGHT_MASK;
         if (currentNightMode == android.content.res.Configuration.UI_MODE_NIGHT_NO) {
             // Night mode is not active, activate it
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
@@ -323,7 +258,8 @@ public class MainActivity extends AppCompatActivity /*implements Robot.AsrListen
             // Night mode is active, deactivate it
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         }
-        //recreate(); // Recreate activity to apply theme change
+
+        recreate(); // Recreate activity to apply theme change
     }
 
     private void transportMode() {
@@ -348,9 +284,6 @@ public class MainActivity extends AppCompatActivity /*implements Robot.AsrListen
         // Add click listener for arrived button
         Button yes_button = findViewById(R.id.confirmArrivedButton);
         yes_button.setOnClickListener(v -> arrived());
-
-        Button qr_code_button = findViewById(R.id.QRCodeButton);
-        qr_code_button.setOnClickListener(v -> QRCodeMode());
 
         Button menu_button = findViewById(R.id.MenuButton);
         menu_button.setOnClickListener(v -> enable_menu());
@@ -394,25 +327,6 @@ public class MainActivity extends AppCompatActivity /*implements Robot.AsrListen
         builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
         //builder.show();
 
-
-    }
-
-    private void QRCodeMode() {
-        Log.i(TAG, "Entered QRCodeMode");
-        this.isCheckingForQrCode = true;
-        viewBinding = CameraMainBinding.inflate(getLayoutInflater());
-        setContentView(viewBinding.getRoot());
-
-        // Request camera permissions
-        if (allPermissionsGranted()) {
-            startCamera();
-        } else {
-            requestPermissions();
-        }
-
-        viewBinding.imageCaptureButton.setOnClickListener(v -> transportMode());
-
-        cameraExecutor = Executors.newSingleThreadExecutor();
 
     }
 
@@ -506,7 +420,6 @@ public class MainActivity extends AppCompatActivity /*implements Robot.AsrListen
             this.waitingForFinish = true;
         } else {
             temi.goTo("aufzug");
-            myMQTT.publish("{\"destination\":\"" + destination + "\"}", MQTT.PUBLISH_TOPIC.TOPIC_TRANSPORT.getTopic());
 
             this.waitingForFloor = true;
             TextView textView = findViewById(R.id.elevatorTextView);
@@ -523,13 +436,6 @@ public class MainActivity extends AppCompatActivity /*implements Robot.AsrListen
         }
     }
 
-    // received the floor number to display on the message
-    @SuppressLint("SetTextI18n")
-    private void temiWakeUp() {
-        transcription.setText("Ready... Temi should listen now");
-        temi.wakeup(Collections.singletonList(SttLanguage.SYSTEM));
-    }
-
     // is used to bring the guest to his destination when he's coming from a different floor
     public void setNewDest(String x) {
         newDest = x;
@@ -540,7 +446,6 @@ public class MainActivity extends AppCompatActivity /*implements Robot.AsrListen
         if (!this.waitingForFinish) {
             temi.goTo(newDest);
             String msg = "{\"status\":\"arrived\",\"floor\":\"" + this.myfloorNumber + "\"}";
-            myMQTT.publish(msg, MQTT.PUBLISH_TOPIC.TOPIC_ARRIVED.getTopic());
             this.waitingForFinish = true;
 
             this.showArrivedMessage();
@@ -638,7 +543,6 @@ public class MainActivity extends AppCompatActivity /*implements Robot.AsrListen
             TextView elevatorTextView = findViewById(R.id.elevatorTextView);
             Button confirmYesButton = findViewById(R.id.confirmArrivedButton);
             Button confirmElevatorButton = findViewById(R.id.confirmFinishButton);
-            Button qrCodeButton = findViewById(R.id.QRCodeButton);
             Button confirm_button = findViewById(R.id.confirmLocationButton);
             Spinner spinner = findViewById(R.id.dropdownMenu);
             TextView textView = findViewById(R.id.topTextView);
@@ -647,7 +551,6 @@ public class MainActivity extends AppCompatActivity /*implements Robot.AsrListen
             confirmTextView.setVisibility(View.INVISIBLE);
             confirmYesButton.setVisibility(View.INVISIBLE);
             confirmElevatorButton.setVisibility(View.INVISIBLE);
-            qrCodeButton.setVisibility(View.VISIBLE);
             confirm_button.setVisibility(View.VISIBLE);
             spinner.setVisibility(View.VISIBLE);
             textView.setVisibility(View.VISIBLE);
@@ -658,179 +561,13 @@ public class MainActivity extends AppCompatActivity /*implements Robot.AsrListen
         this.destinationFloor = destinationFloor;
     }
 
-    private final ActivityResultLauncher<String[]> activityResultLauncher = registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), permissions -> {
-        // Handle Permission granted/rejected
-        boolean permissionGranted = true;
-        for (String permission : REQUIRED_PERMISSIONS) {
-            if (permissions.containsKey(permission) && Boolean.FALSE.equals(permissions.get(permission))) {
-                permissionGranted = false;
-                break;
-            }
-        }
-        if (!permissionGranted) {
-            Toast.makeText(getApplicationContext(), "Permission request denied", Toast.LENGTH_SHORT).show();
-        } else {
-            startCamera();
-        }
-    });
-
-    @OptIn(markerClass = ExperimentalGetImage.class)
-    private void hasQRCodeFromPreview(ImageProxy imageProxy) {
-        // Convert ImageProxy to byte array
-        Image image = imageProxy.getImage();
-        assert image != null;
-        ByteBuffer buffer = image.getPlanes()[0].getBuffer();
-        byte[] imageData = new byte[buffer.remaining()];
-        buffer.get(imageData);
-
-        // Check if QR code is present
-        if (checkForQRCode(imageData)) {
-            Log.d(TAG, "Destination from Qr Code:" + destination);
-            this.isCheckingForQrCode = false;
-            runOnUiThread(this::display_name);
-        }
-
-        // Close the imageProxy
-        imageProxy.close();
-    }
-
-    public boolean checkForQRCode(byte[] imageData) {
-        int width = 640; // only hardcoded because of Log spam by some Library
-        int height = 480;
-        int[] pixels = new int[width * height];
-
-        // Convert the byte image data to int[]
-        for (int i = 0; i < imageData.length; i++) {
-            int value = imageData[i] & 0xFF; // Convert byte value to unsigned int value
-            pixels[i] = 0xFF000000 | (value << 16) | (value << 8) | value; // Convert grayscale value to ARGB int value
-        }
-
-        RGBLuminanceSource source = new RGBLuminanceSource(width, height, pixels);
-
-
-        // Create a BinaryBitmap from the RGBLuminanceSource
-        BinaryBitmap bitmap = new BinaryBitmap(new HybridBinarizer(source));
-
-        // Create a QRCodeReader to decode the QR code
-        Reader reader = new QRCodeReader();
-
-        try {
-            if (this.isCheckingForQrCode) {
-                // Try to decode the QR code
-                Result result = reader.decode(bitmap);
-                JSONObject msg = new JSONObject(result.getText());
-                Log.i(TAG, "Detected QR Code: " + msg);
-                destination = msg.getString("destination");
-                displayName = msg.getString("name");
-                ttsWelcome = TtsWelcome.getLanguageByNumber(msg.getInt("language"));
-                Log.i(TAG, "Language set to: " + ttsWelcome);
-                ttsFollow = TtsFollow.getLanguageByNumber(msg.getInt("language"));
-                ttsLanguage = msg.getInt("language");
-
-                // If a QR code is found, return true
-                return true;
-            } else {
-                return false;
-            }
-
-        } catch (NotFoundException | ChecksumException | FormatException e) {
-            // QR code not found or decoding error occurred
-            return false;
-        } catch (JSONException e) {
-            Log.e(TAG, "QR Code is not valid!");
-            return false;
-        }
-    }
-
-    private void startCamera() {
-        ListenableFuture<ProcessCameraProvider> cameraProviderFuture = ProcessCameraProvider.getInstance(this);
-
-        cameraProviderFuture.addListener(() -> {
-            try {
-                // Used to bind the lifecycle of cameras to the lifecycle owner
-                ProcessCameraProvider cameraProvider = cameraProviderFuture.get();
-
-                // Preview
-                Preview preview = new Preview.Builder().build();
-                preview.setSurfaceProvider(viewBinding.viewFinder.getSurfaceProvider());
-
-
-                // Select back camera as a default
-                CameraSelector cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA;
-
-                imageAnalysis = new ImageAnalysis.Builder().setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST).setTargetResolution(new Size(640, 480)).build();
-                imageAnalysis.setAnalyzer(cameraExecutor, this::hasQRCodeFromPreview);
-
-                try {
-                    // Unbind use cases before rebinding
-                    cameraProvider.unbindAll();
-
-                    // Bind use cases to camera
-                    cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageAnalysis);
-                } catch (Exception exc) {
-                    Log.e(TAG, "Use case binding failed", exc);
-                }
-            } catch (ExecutionException | InterruptedException e) {
-                e.printStackTrace();
-            }
-        }, ContextCompat.getMainExecutor(this));
-    }
-
-    private void requestPermissions() {
-        String[] permissionsToRequest = getPermissionsToRequest();
-        if (permissionsToRequest.length > 0) {
-            activityResultLauncher.launch(permissionsToRequest);
-        }
-    }
-
-    private String[] getPermissionsToRequest() {
-        List<String> permissions = new ArrayList<>();
-        for (String permission : REQUIRED_PERMISSIONS) {
-            if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
-                permissions.add(permission);
-            }
-        }
-        return permissions.toArray(new String[0]);
-    }
-
-    private boolean allPermissionsGranted() {
-        for (String permission : REQUIRED_PERMISSIONS) {
-            if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
-                return false;
-            }
-        }
-        return true;
-    }
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        cameraExecutor.shutdown();
-    }
-
-    private void display_name() {
-        String msg = ttsWelcome + displayName + ttsFollow + destination;
-        temi.speak(TtsRequest.create(msg, true, getLanguageFromValue(ttsLanguage)));
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+        if (myExecutorService != null) {
+            myExecutorService.shutdown();
+        } else {
+            Log.w(TAG, "Attempted to shut down a null ExecutorService.");
         }
-        tts_ready();
-    }
-
-    private void tts_ready() {
-        transportMode();
-        confirm();
-    }
-
-    public TtsRequest.Language getLanguageFromValue(int value) {
-        for (TtsRequest.Language language : TtsRequest.Language.values()) {
-            if (language.getValue() == value) {
-                return language;
-            }
-        }
-        // Return a default language or handle the case when no matching language is found
-        return TtsRequest.Language.SYSTEM; // You can change this to another default if needed
     }
 }

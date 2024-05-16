@@ -2,7 +2,7 @@
     <string name="app_name">TemiVoice</string>
     <string name="confirm">Confirm</string>
     <string name="top_view_text">Bitte wählen Sie einen Raum und Temi wird sie dort hin bringen!</string>
-    <string name="ja">Ja</string>
+    <string name="ja">Zurück zur Basisstation</string>
     <string name="vielen_dank_temi">Vielen Dank Temi</string>
     <string-array name="spinner_items">
         <item>Default</item>
