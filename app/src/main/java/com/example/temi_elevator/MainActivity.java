@@ -21,6 +21,7 @@ import com.robotemi.sdk.Robot;
 import com.robotemi.sdk.constants.Page;
 import com.robotemi.sdk.navigation.model.SpeedLevel;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
@@ -40,7 +41,24 @@ import java.util.concurrent.Executors;
 
 import java.util.Collections;
 
-public class MainActivity extends AppCompatActivity /*implements Robot.AsrListener*/{
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
+
+import com.robotemi.sdk.Robot;
+import com.robotemi.sdk.listeners.OnConversationStatusChangedListener;
+import com.robotemi.sdk.listeners.OnRobotReadyListener;
+
+import org.jetbrains.annotations.NotNull;
+
+public class MainActivity extends AppCompatActivity implements
+        OnRobotReadyListener,
+        Robot.AsrListener,
+        OnConversationStatusChangedListener {
 
     // Member variables
     private final String TAG = "MainActivity";
@@ -59,6 +77,72 @@ public class MainActivity extends AppCompatActivity /*implements Robot.AsrListen
     private TextView transcription;
     private ExecutorService myExecutorService;
     private SpeechRecognizer speechRecognizer;
+
+    private String myAsrResultString = "";
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        // Add robot event listeners
+        temi.addOnRobotReadyListener(this);
+        temi.addAsrListener(this);
+        temi.addOnConversationStatusChangedListener(this);
+    }
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        // Remove robot event listeners
+        temi.removeOnRobotReadyListener(this);
+        temi.removeAsrListener(this);
+        temi.removeOnConversationStatusChangedListener(this);
+    }
+    @Override
+    public void onAsrResult(@NotNull String asrResult, @NonNull SttLanguage sttLanguage) {
+        //final TextView textView = findViewById(R.id.asrResult);
+
+        Log.i(TAG, "ASR Result: " + asrResult);
+        myAsrResultString = asrResult;
+        transcription.setText("myAsrResultString: " + myAsrResultString);
+
+        temi.finishConversation(); // stop ASR listener
+    }
+
+    @Override
+    public void onConversationStatusChanged(int status, @NotNull String text) {
+        myAsrResultString += text;
+        switch (status) {
+            case IDLE:
+                Log.i(TAG, "Status: IDLE | Text: " + text);
+                transcription.setText("Status: IDLE | Text: " + text);
+                break;
+            case LISTENING:
+                Log.i(TAG, "Status: LISTENING | Text: " + text);
+                transcription.setText("Status: LISTENING | Text: " + text);
+                break;
+            case THINKING:
+                Log.i(TAG, "Status: THINKING | Text: " + text);
+                transcription.setText("Status: THINKING | Text: " + text);
+                break;
+            case SPEAKING:
+                Log.i(TAG, "Status: SPEAKING | Text: " + text);
+                transcription.setText("Status: SPEAKING | Text: " + text);
+                break;
+            default:
+                Log.i(TAG, "Status: UNKNOWN | Text: " + text);
+                transcription.setText("Status: UNKNOWN | Text: " + text);
+                break;
+        }
+    }
+
+    @Override
+    public void onRobotReady(boolean b) {
+        if (temi.isReady()) {                                     // true instead of 'isReady'????
+            Log.i(TAG, "Robot is ready");
+            temi.hideTopBar(); // hide temi's top action bar when skill is active
+        }
+    }
 
     private enum TtsFollow {
         GERMAN(" bitte folgen Sie mir zu Raum: ", 11),
@@ -93,13 +177,12 @@ public class MainActivity extends AppCompatActivity /*implements Robot.AsrListen
         transportMode();
 
         myExecutorService = Executors.newSingleThreadExecutor();
-
         init();
     }
 
     private void init() {
         transcriptMode();
-        setupThemeButton();
+        //setupThemeButton();
     }
 
     private void setupThemeButton() {
@@ -119,6 +202,7 @@ public class MainActivity extends AppCompatActivity /*implements Robot.AsrListen
             Log.e(TAG, "Error setting up theme button: ", e);
         }
     }
+
 
     private void startRecording(Intent speechRecognizerIntent) {
         try {
@@ -165,7 +249,7 @@ public class MainActivity extends AppCompatActivity /*implements Robot.AsrListen
             public void onClick(View view) {
                 //transcription.setText("Ready... Temi should listen now");
                 temi.wakeup(Collections.singletonList(SttLanguage.SYSTEM));
-                startRecording(speechRecognizerIntent);
+                //startRecording(speechRecognizerIntent);
             }
         });
 
@@ -174,7 +258,7 @@ public class MainActivity extends AppCompatActivity /*implements Robot.AsrListen
             public void onClick(View view) {
                 transcription.setText("Transcription ended.");
                 temi.wakeup(Collections.singletonList(SttLanguage.SYSTEM));
-                stopRecording();
+                //stopRecording();
             }
         });
 
