@@ -58,6 +58,7 @@ import org.jetbrains.annotations.NotNull;
 public class MainActivity extends AppCompatActivity implements
         OnRobotReadyListener,
         Robot.AsrListener,
+        Robot.TtsListener,
         OnConversationStatusChangedListener {
 
     // Member variables
@@ -106,7 +107,37 @@ public class MainActivity extends AppCompatActivity implements
         myAsrResultString = asrResult;
         transcription.setText("myAsrResultString: " + myAsrResultString);
 
+
+        temi.speak(TtsRequest.create(myAsrResultString, false));
+
+        myAsrResultString = myAsrResultString.toLowerCase();
+        if(myAsrResultString.contains("gehe zur tür") || myAsrResultString.contains("geh zur tür"))
+        {
+            destination = "tür";
+            confirm();
+        }
+        else if(myAsrResultString.contains("gehe zur basisstation") || myAsrResultString.contains("geh  zur basisstation"))
+        {
+            destination = "home base";
+            confirm();
+        }
+        else if(myAsrResultString.contains("gehe zur wohnzimmer") || myAsrResultString.contains("geh  zur wohnzimmer"))
+        {
+            destination = "wohnzimmer";
+            confirm();
+        }
+        else if(myAsrResultString.contains("gehe zur küche") || myAsrResultString.contains("geh  zur küche"))
+        {
+            destination = "küche";
+            confirm();
+        }
+
+        //temi.goTo("door");
+
+
+
         temi.finishConversation(); // stop ASR listener
+
     }
 
     @Override
@@ -114,24 +145,24 @@ public class MainActivity extends AppCompatActivity implements
         myAsrResultString += text;
         switch (status) {
             case IDLE:
-                Log.i(TAG, "Status: IDLE | Text: " + text);
-                transcription.setText("Status: IDLE | Text: " + text);
+                Log.i(TAG, "Status: IDLE | Text: " + myAsrResultString);
+                transcription.setText("Status: IDLE | Text: " + myAsrResultString);
                 break;
             case LISTENING:
-                Log.i(TAG, "Status: LISTENING | Text: " + text);
-                transcription.setText("Status: LISTENING | Text: " + text);
+                Log.i(TAG, "Status: LISTENING | Text: " + myAsrResultString);
+                transcription.setText("Status: LISTENING | Text: " + myAsrResultString);
                 break;
             case THINKING:
-                Log.i(TAG, "Status: THINKING | Text: " + text);
-                transcription.setText("Status: THINKING | Text: " + text);
+                Log.i(TAG, "Status: THINKING | Text: " + myAsrResultString);
+                transcription.setText("Status: THINKING | Text: " + myAsrResultString);
                 break;
             case SPEAKING:
-                Log.i(TAG, "Status: SPEAKING | Text: " + text);
-                transcription.setText("Status: SPEAKING | Text: " + text);
+                Log.i(TAG, "Status: SPEAKING | Text: " + myAsrResultString);
+                transcription.setText("Status: SPEAKING | Text: " + myAsrResultString);
                 break;
             default:
-                Log.i(TAG, "Status: UNKNOWN | Text: " + text);
-                transcription.setText("Status: UNKNOWN | Text: " + text);
+                Log.i(TAG, "Status: UNKNOWN | Text: " + myAsrResultString);
+                transcription.setText("Status: UNKNOWN | Text: " + myAsrResultString);
                 break;
         }
     }
@@ -142,6 +173,11 @@ public class MainActivity extends AppCompatActivity implements
             Log.i(TAG, "Robot is ready");
             temi.hideTopBar(); // hide temi's top action bar when skill is active
         }
+    }
+
+    @Override
+    public void onTtsStatusChanged(@NonNull TtsRequest ttsRequest) {
+
     }
 
     private enum TtsFollow {
@@ -170,6 +206,8 @@ public class MainActivity extends AppCompatActivity implements
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        temi.setKioskModeOn(true);
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -182,7 +220,24 @@ public class MainActivity extends AppCompatActivity implements
 
     private void init() {
         transcriptMode();
-        //setupThemeButton();
+        setupThemeButton();
+
+        findViewById(R.id.MenuButton).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                temi.setKioskModeOn(false);
+                temi.setInteractionState(true);
+                enable_menu();
+
+            }
+        });
+
+        temi.addTtsListener(new Robot.TtsListener() {
+            @Override
+            public void onTtsStatusChanged(@NotNull TtsRequest ttsRequest) {
+                Log.i(TAG, "Status:" + ttsRequest.getStatus());
+            }
+        });
     }
 
     private void setupThemeButton() {
@@ -204,52 +259,14 @@ public class MainActivity extends AppCompatActivity implements
     }
 
 
-    private void startRecording(Intent speechRecognizerIntent) {
-        try {
-            speechRecognizer.startListening(speechRecognizerIntent);
-            transcription.setText("");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void stopRecording() {
-        speechRecognizer.stopListening();
-        speechRecognizer.cancel();
-    }
-
-        /*
-        findViewById(R.id.listen).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                transcription.setText("Ready... Temi should listen now");
-                temi.wakeup(Collections.singletonList(SttLanguage.SYSTEM));
-            }
-        });
-    }
-    private String myAsrResultString = "nixxx";     // here we want the transcribed string to be in
-    @Override
-    public void onAsrResult(String asrResult, SttLanguage sttLanguage) {
-        myAsrResultString = asrResult;
-        transcription.setText(myAsrResultString);
-    }*/
-
     private void transcriptMode() {
         transcription = findViewById(R.id.transcription);
         transcription.setText("Ready... Press the Listen Button to start the transcription");
 
-        speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
-        final Intent speechRecognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-        speechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-        speechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
-        speechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_MINIMUM_LENGTH_MILLIS, 100000);
-
         findViewById(R.id.listen).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //transcription.setText("Ready... Temi should listen now");
                 temi.wakeup(Collections.singletonList(SttLanguage.SYSTEM));
-                //startRecording(speechRecognizerIntent);
             }
         });
 
@@ -258,76 +275,16 @@ public class MainActivity extends AppCompatActivity implements
             public void onClick(View view) {
                 transcription.setText("Transcription ended.");
                 temi.wakeup(Collections.singletonList(SttLanguage.SYSTEM));
-                //stopRecording();
             }
         });
 
         findViewById(R.id.MenuButton).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                temi.setKioskModeOn(false);
                 enable_menu();
+
             }
-        });
-
-        speechRecognizer.setRecognitionListener(new RecognitionListener() {
-            @Override
-            public void onReadyForSpeech(Bundle bundle) {
-                transcription.setText("");
-            }
-
-            @Override
-            public void onBeginningOfSpeech() {
-                //state.setText("Listening...");
-            }
-
-            @Override
-            public void onRmsChanged(float v) {}
-
-            @Override
-            public void onBufferReceived(byte[] bytes) {}
-
-            @Override
-            public void onEndOfSpeech() {
-                //state.setText("Ready...");
-            }
-
-            @Override
-            public void onError(int i) {}
-
-            @Override
-            public void onResults(Bundle results) {
-                if (results != null) {
-                    List<String> data = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
-                    if (data != null && !data.isEmpty()) {
-                        String result = data.get(0); // Get the first recognized result
-                        result = result.trim();
-                        result = result.substring(0, 1).toUpperCase() + result.substring(1);
-                        if (!result.isEmpty()) {
-                            transcription.append(result);
-                            transcription.append("\n");
-                        }
-                    }
-                }
-            }
-
-            @Override
-            public void onPartialResults(Bundle bundle) {
-                if (bundle != null) {
-                    List<String> data = bundle.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
-                    if (data != null && !data.isEmpty()) {
-                        String result = data.get(0); // Get the first recognized result
-                        result = result.trim();
-                        result = result.substring(0, 1).toUpperCase() + result.substring(1);
-                        if (!result.isEmpty()) {
-                            transcription.append(result);
-                            transcription.append("\n");
-                        }
-                    }
-                }
-            }
-
-            @Override
-            public void onEvent(int i, Bundle bundle) {}
         });
     }
 
@@ -648,6 +605,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onDestroy() {
         super.onDestroy();
+
         if (myExecutorService != null) {
             myExecutorService.shutdown();
         } else {

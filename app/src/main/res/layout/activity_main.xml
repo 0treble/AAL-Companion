@@ -105,8 +105,9 @@
                 android:text="@string/ja"
                 android:textSize="20sp"
                 android:visibility="invisible"
-                tools:layout_editor_absoluteX="437dp"
-                tools:layout_editor_absoluteY="142dp" />
+                app:layout_constraintBottom_toBottomOf="@+id/confirmTextView"
+                app:layout_constraintTop_toTopOf="@+id/elevatorTextView"
+                tools:layout_editor_absoluteX="437dp" />
 
             <Button
                 android:id="@+id/confirmFinishButton"
