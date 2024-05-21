@@ -19,6 +19,7 @@ import android.widget.TextView;
 import com.robotemi.sdk.*;
 import com.robotemi.sdk.Robot;
 import com.robotemi.sdk.constants.Page;
+import com.robotemi.sdk.listeners.OnGoToLocationStatusChangedListener;
 import com.robotemi.sdk.navigation.model.SpeedLevel;
 
 import androidx.annotation.NonNull;
@@ -59,7 +60,8 @@ public class MainActivity extends AppCompatActivity implements
         OnRobotReadyListener,
         Robot.AsrListener,
         Robot.TtsListener,
-        OnConversationStatusChangedListener {
+        OnConversationStatusChangedListener,
+        OnGoToLocationStatusChangedListener {
 
     // Member variables
     private final String TAG = "MainActivity";
@@ -81,9 +83,13 @@ public class MainActivity extends AppCompatActivity implements
 
     private String myAsrResultString = "";
 
+
+
     enum sequence {GREETING,SMALL_TALK};
     sequence currentSequence = sequence.GREETING;
     int currentSequenceStep = 1;
+
+    boolean flagTemiOnTheMove = false;
 
     @Override
     protected void onStart() {
@@ -93,6 +99,8 @@ public class MainActivity extends AppCompatActivity implements
         temi.addOnRobotReadyListener(this);
         temi.addAsrListener(this);
         temi.addOnConversationStatusChangedListener(this);
+
+        temi.addOnGoToLocationStatusChangedListener(this);
     }
     @Override
     protected void onStop() {
@@ -116,7 +124,6 @@ public class MainActivity extends AppCompatActivity implements
 
         analyzeVoiceCommand();
 
-        //temi.goTo("door");
 
         temi.finishConversation(); // stop ASR listener
 
@@ -132,14 +139,14 @@ public class MainActivity extends AppCompatActivity implements
         {
             relocateTemi();
         }
-/*
+
         switch (currentSequence)
         {
             case GREETING:
                 handleSequenceGreeting();
                 break;
         }
-*/
+
 
 
 
@@ -179,14 +186,21 @@ public class MainActivity extends AppCompatActivity implements
         {
             case 1:
                 temi.goTo("tür");
-                while(!temi.isReady());
+                while(flagTemiOnTheMove == true)
+                {
+                    // wait for temi to arrive at destination
+                }
                 String greeting_string = getString(R.string.greeting_string);
                 transcription.setText(greeting_string);
                 temi.speak(TtsRequest.create(greeting_string, false));
-                /*
+
                 waitHandler.postDelayed(() -> {
                 }, 3000);
                 temi.goTo("wohnzimmer");
+                while(flagTemiOnTheMove == true)
+                {
+                    // wait for temi to arrive at destination
+                }
                 waitHandler.postDelayed(() -> {
                 }, 5000);
                 String livingroom_string = getString(R.string.livingroom_string);
@@ -200,7 +214,7 @@ public class MainActivity extends AppCompatActivity implements
                 waitHandler.postDelayed(() -> {
                 }, 3000);
 
-                currentSequenceStep++;*/
+                currentSequenceStep++;
                 break;
 
             default:    // reset current sequence - restarting sequence
@@ -210,6 +224,18 @@ public class MainActivity extends AppCompatActivity implements
                 }, 3000);
                 break;
 
+        }
+    }
+
+    @Override
+    public void onGoToLocationStatusChanged(@NonNull String location, @NonNull String status, int descriptionId, @NonNull String description) {
+        if(status.equals(COMPLETE))
+        {
+            flagTemiOnTheMove = false;
+        }
+        else
+        {
+            flagTemiOnTheMove = true;
         }
     }
 
