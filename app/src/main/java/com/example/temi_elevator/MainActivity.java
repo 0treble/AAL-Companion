@@ -114,9 +114,7 @@ public class MainActivity extends AppCompatActivity implements
 
         temi.speak(TtsRequest.create(myAsrResultString, false));
 
-        myAsrResultString = myAsrResultString.toLowerCase();
-
-
+        analyzeVoiceCommand();
 
         //temi.goTo("door");
 
@@ -134,14 +132,14 @@ public class MainActivity extends AppCompatActivity implements
         {
             relocateTemi();
         }
-
+/*
         switch (currentSequence)
         {
             case GREETING:
                 handleSequenceGreeting();
                 break;
         }
-
+*/
 
 
 
@@ -181,23 +179,28 @@ public class MainActivity extends AppCompatActivity implements
         {
             case 1:
                 temi.goTo("tür");
-                transcription.setText("@strings/greeting_string");
-                temi.speak(TtsRequest.create("@strings/greeting_string", false));
+                while(!temi.isReady());
+                String greeting_string = getString(R.string.greeting_string);
+                transcription.setText(greeting_string);
+                temi.speak(TtsRequest.create(greeting_string, false));
+                /*
                 waitHandler.postDelayed(() -> {
                 }, 3000);
                 temi.goTo("wohnzimmer");
                 waitHandler.postDelayed(() -> {
                 }, 5000);
-                transcription.setText("@strings/livingroom_string");
-                temi.speak(TtsRequest.create("@strings/livingroom_string", false));
+                String livingroom_string = getString(R.string.livingroom_string);
+                transcription.setText(livingroom_string);
+                temi.speak(TtsRequest.create(livingroom_string, false));
                 waitHandler.postDelayed(() -> {
                 }, 3000);
-                transcription.setText("@strings/introduction_string");
-                temi.speak(TtsRequest.create("@strings/introduction_string", false));
+                String introduction_string = getString(R.string.introduction_string);
+                transcription.setText(introduction_string);
+                temi.speak(TtsRequest.create(introduction_string, false));
                 waitHandler.postDelayed(() -> {
                 }, 3000);
 
-                currentSequenceStep++;
+                currentSequenceStep++;*/
                 break;
 
             default:    // reset current sequence - restarting sequence
@@ -291,6 +294,7 @@ public class MainActivity extends AppCompatActivity implements
     private void init() {
         transcriptMode();
         setupThemeButton();
+        findViewById(R.id.isRecordingBar).setVisibility(View.INVISIBLE);
 
         findViewById(R.id.MenuButton).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -344,6 +348,7 @@ public class MainActivity extends AppCompatActivity implements
             @Override
             public void onClick(View view) {
                 temi.wakeup(Collections.singletonList(SttLanguage.SYSTEM));
+                findViewById(R.id.isRecordingBar).setVisibility(View.VISIBLE);
             }
         });
 
@@ -352,6 +357,7 @@ public class MainActivity extends AppCompatActivity implements
             public void onClick(View view) {
                 transcription.setText("Transcription ended.");
                 temi.wakeup(Collections.singletonList(SttLanguage.SYSTEM));
+                findViewById(R.id.isRecordingBar).setVisibility(View.INVISIBLE);
             }
         });
 
@@ -664,6 +670,7 @@ public class MainActivity extends AppCompatActivity implements
             Button confirm_button = findViewById(R.id.confirmLocationButton);
             Spinner spinner = findViewById(R.id.dropdownMenu);
             TextView textView = findViewById(R.id.topTextView);
+            findViewById(R.id.isRecordingBar).setVisibility(View.INVISIBLE);
 
             elevatorTextView.setVisibility(View.INVISIBLE);
             confirmTextView.setVisibility(View.INVISIBLE);

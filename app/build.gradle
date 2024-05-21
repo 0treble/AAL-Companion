@@ -37,6 +37,10 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
     namespace 'com.example.temi_elevator'
+
+    tasks.withType(JavaCompile) {
+        options.compilerArgs << "-Xlint:deprecation"
+    }
 }
 
 

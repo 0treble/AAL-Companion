@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">TemiVoice</string>
-    <string name="confirm">Confirm</string>
+    <string name="confirm">Bestätigen</string>
     <string name="top_view_text">Bitte wählen Sie einen Raum und Temi wird sie dort hin bringen!</string>
     <string name="ja">Zurück zur Basisstation</string>
     <string name="vielen_dank_temi">Vielen Dank Temi</string>
@@ -32,14 +32,14 @@
 
     <string name="take_photo">Transport Modus</string>
     <string name="i_want_to_scan_a_qr_code">I want to scan a QR Code</string>
-    <string name="quit">Quit</string>
+    <string name="quit">Beenden</string>
     <string name="button">Button</string>
-    <string name="listen">Listen</string>
-    <string name="TranscriptionText">Transcription will appear here...</string>
+    <string name="listen">Hören</string>
+    <string name="TranscriptionText">Transkription wird hier angezeigt...</string>
     <string name="endTranscriptionButton">endTranscriptionButton</string>
-    <string name="end_transcription">End Transcription</string>
-    <string name="sequenceOne">Sequence One</string>
-    <string name="theme">Dark Mode</string>
+    <string name="end_transcription">Transkription beenden</string>
+    <string name="sequenceOne">Sequenz Eins</string>
+    <string name="theme">Dunkler Modus</string>
 
 
 </resources>
