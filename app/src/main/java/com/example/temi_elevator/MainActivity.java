@@ -81,6 +81,10 @@ public class MainActivity extends AppCompatActivity implements
 
     private String myAsrResultString = "";
 
+    enum sequence {GREETING,SMALL_TALK};
+    sequence currentSequence = sequence.GREETING;
+    int currentSequenceStep = 1;
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -131,6 +135,13 @@ public class MainActivity extends AppCompatActivity implements
             relocateTemi();
         }
 
+        switch (currentSequence)
+        {
+            case GREETING:
+                handleSequenceGreeting();
+                break;
+        }
+
 
 
 
@@ -164,6 +175,40 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
+    public void handleSequenceGreeting()
+    {
+        switch (currentSequenceStep)
+        {
+            case 1:
+                temi.goTo("tür");
+                transcription.setText("@strings/greeting_string");
+                temi.speak(TtsRequest.create("@strings/greeting_string", false));
+                waitHandler.postDelayed(() -> {
+                }, 3000);
+                temi.goTo("wohnzimmer");
+                waitHandler.postDelayed(() -> {
+                }, 5000);
+                transcription.setText("@strings/livingroom_string");
+                temi.speak(TtsRequest.create("@strings/livingroom_string", false));
+                waitHandler.postDelayed(() -> {
+                }, 3000);
+                transcription.setText("@strings/introduction_string");
+                temi.speak(TtsRequest.create("@strings/introduction_string", false));
+                waitHandler.postDelayed(() -> {
+                }, 3000);
+
+                currentSequenceStep++;
+                break;
+
+            default:    // reset current sequence - restarting sequence
+                currentSequenceStep = 1;
+                transcription.setText("Err. in Funktion 'handleSequenceGreeting'! Sequenz-Schritt zürückgesetzt!");
+                waitHandler.postDelayed(() -> {
+                }, 3000);
+                break;
+
+        }
+    }
 
     @Override
     public void onConversationStatusChanged(int status, @NotNull String text) {
@@ -254,6 +299,13 @@ public class MainActivity extends AppCompatActivity implements
                 temi.setInteractionState(true);
                 enable_menu();
 
+            }
+        });
+
+        findViewById(R.id.sequence1Button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                handleSequenceGreeting();
             }
         });
 
