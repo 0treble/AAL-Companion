@@ -19,7 +19,6 @@ import android.widget.TextView;
 import com.robotemi.sdk.*;
 import com.robotemi.sdk.Robot;
 import com.robotemi.sdk.constants.Page;
-import com.robotemi.sdk.listeners.OnGoToLocationStatusChangedListener;
 import com.robotemi.sdk.navigation.model.SpeedLevel;
 
 import androidx.annotation.NonNull;
@@ -60,7 +59,7 @@ public class MainActivity extends AppCompatActivity implements
         OnRobotReadyListener,
         Robot.AsrListener,
         Robot.TtsListener,
-        OnConversationStatusChangedListener, OnGoToLocationStatusChangedListener  {
+        OnConversationStatusChangedListener {
 
     // Member variables
     private final String TAG = "MainActivity";
@@ -82,13 +81,9 @@ public class MainActivity extends AppCompatActivity implements
 
     private String myAsrResultString = "";
 
-
-
     enum sequence {GREETING,SMALL_TALK};
     sequence currentSequence = sequence.GREETING;
     int currentSequenceStep = 1;
-
-    boolean flagTemiOnTheMove = false;   // to decide whether temi is still on his way to destination
 
     @Override
     protected void onStart() {
@@ -98,8 +93,6 @@ public class MainActivity extends AppCompatActivity implements
         temi.addOnRobotReadyListener(this);
         temi.addAsrListener(this);
         temi.addOnConversationStatusChangedListener(this);
-
-        temi.addOnGoToLocationStatusChangedListener(this);
     }
     @Override
     protected void onStop() {
@@ -123,7 +116,7 @@ public class MainActivity extends AppCompatActivity implements
 
         analyzeVoiceCommand();
 
-
+        //temi.goTo("door");
 
         temi.finishConversation(); // stop ASR listener
 
@@ -139,14 +132,14 @@ public class MainActivity extends AppCompatActivity implements
         {
             relocateTemi();
         }
-
+/*
         switch (currentSequence)
         {
             case GREETING:
                 handleSequenceGreeting();
                 break;
         }
-
+*/
 
 
 
@@ -186,31 +179,28 @@ public class MainActivity extends AppCompatActivity implements
         {
             case 1:
                 temi.goTo("tür");
-                while(flagTemiOnTheMove ==  true){
-                    // waiting for arrival at destination
-                }
-                transcription.setText("@strings/greeting_string");
-                temi.speak(TtsRequest.create("@strings/greeting_string", false));
-
-
+                while(!temi.isReady());
+                String greeting_string = getString(R.string.greeting_string);
+                transcription.setText(greeting_string);
+                temi.speak(TtsRequest.create(greeting_string, false));
+                /*
                 waitHandler.postDelayed(() -> {
                 }, 3000);
                 temi.goTo("wohnzimmer");
-                while(flagTemiOnTheMove ==  true){
-                    // waiting for arrival at destination
-                }
                 waitHandler.postDelayed(() -> {
                 }, 5000);
-                transcription.setText("@strings/livingroom_string");
-                temi.speak(TtsRequest.create("@strings/livingroom_string", false));
+                String livingroom_string = getString(R.string.livingroom_string);
+                transcription.setText(livingroom_string);
+                temi.speak(TtsRequest.create(livingroom_string, false));
                 waitHandler.postDelayed(() -> {
                 }, 3000);
-                transcription.setText("@strings/introduction_string");
-                temi.speak(TtsRequest.create("@strings/introduction_string", false));
+                String introduction_string = getString(R.string.introduction_string);
+                transcription.setText(introduction_string);
+                temi.speak(TtsRequest.create(introduction_string, false));
                 waitHandler.postDelayed(() -> {
                 }, 3000);
 
-                currentSequenceStep++;
+                currentSequenceStep++;*/
                 break;
 
             default:    // reset current sequence - restarting sequence
@@ -222,24 +212,6 @@ public class MainActivity extends AppCompatActivity implements
 
         }
     }
-
-    // ***************************************************************************************
-    // ***************************************************************************************
-    // ***************************************************************************************
-
-    @Override
-    public void onGoToLocationStatusChanged(@NonNull String location, @NonNull String status, int descriptionId, @NonNull String description) {
-        if(status.equals(COMPLETE))
-        {
-            flagTemiOnTheMove = false;
-        }
-        else
-        {
-            flagTemiOnTheMove = true;
-        }
-    }
-
-
 
     @Override
     public void onConversationStatusChanged(int status, @NotNull String text) {
@@ -322,6 +294,7 @@ public class MainActivity extends AppCompatActivity implements
     private void init() {
         transcriptMode();
         setupThemeButton();
+        findViewById(R.id.isRecordingBar).setVisibility(View.INVISIBLE);
 
         findViewById(R.id.MenuButton).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -375,6 +348,7 @@ public class MainActivity extends AppCompatActivity implements
             @Override
             public void onClick(View view) {
                 temi.wakeup(Collections.singletonList(SttLanguage.SYSTEM));
+                findViewById(R.id.isRecordingBar).setVisibility(View.VISIBLE);
             }
         });
 
@@ -383,6 +357,7 @@ public class MainActivity extends AppCompatActivity implements
             public void onClick(View view) {
                 transcription.setText("Transcription ended.");
                 temi.wakeup(Collections.singletonList(SttLanguage.SYSTEM));
+                findViewById(R.id.isRecordingBar).setVisibility(View.INVISIBLE);
             }
         });
 
@@ -695,6 +670,7 @@ public class MainActivity extends AppCompatActivity implements
             Button confirm_button = findViewById(R.id.confirmLocationButton);
             Spinner spinner = findViewById(R.id.dropdownMenu);
             TextView textView = findViewById(R.id.topTextView);
+            findViewById(R.id.isRecordingBar).setVisibility(View.INVISIBLE);
 
             elevatorTextView.setVisibility(View.INVISIBLE);
             confirmTextView.setVisibility(View.INVISIBLE);
