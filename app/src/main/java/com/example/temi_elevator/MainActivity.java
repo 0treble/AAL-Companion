@@ -223,6 +223,10 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
+    // ***************************************************************************************
+    // ***************************************************************************************
+    // ***************************************************************************************
+
     @Override
     public void onGoToLocationStatusChanged(@NonNull String location, @NonNull String status, int descriptionId, @NonNull String description) {
         if(status.equals(COMPLETE))
