@@ -16,6 +16,7 @@
     <string name="TranscriptionText">Transcription will appear here...</string>
     <string name="endTranscriptionButton">endTranscriptionButton</string>
     <string name="end_transcription">End Transcription</string>
+    <string name="sequenceOne">Sequence One</string>
     <string name="theme">Dark Mode</string>
 
 

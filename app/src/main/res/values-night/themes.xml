@@ -11,7 +11,7 @@
         <item name="colorSecondaryVariant">@color/light_red</item>
         <item name="colorOnSecondary">@color/white_text</item>
         <!-- Status bar color. -->
-        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
     </style>
 </resources>

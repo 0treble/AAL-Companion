@@ -116,8 +116,6 @@ public class MainActivity extends AppCompatActivity implements
 
         //temi.goTo("door");
 
-
-
         temi.finishConversation(); // stop ASR listener
 
     }
