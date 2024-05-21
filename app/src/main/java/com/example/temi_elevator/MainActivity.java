@@ -19,6 +19,7 @@ import android.widget.TextView;
 import com.robotemi.sdk.*;
 import com.robotemi.sdk.Robot;
 import com.robotemi.sdk.constants.Page;
+import com.robotemi.sdk.listeners.OnGoToLocationStatusChangedListener;
 import com.robotemi.sdk.navigation.model.SpeedLevel;
 
 import androidx.annotation.NonNull;
@@ -59,7 +60,7 @@ public class MainActivity extends AppCompatActivity implements
         OnRobotReadyListener,
         Robot.AsrListener,
         Robot.TtsListener,
-        OnConversationStatusChangedListener {
+        OnConversationStatusChangedListener, OnGoToLocationStatusChangedListener  {
 
     // Member variables
     private final String TAG = "MainActivity";
@@ -81,9 +82,13 @@ public class MainActivity extends AppCompatActivity implements
 
     private String myAsrResultString = "";
 
+
+
     enum sequence {GREETING,SMALL_TALK};
     sequence currentSequence = sequence.GREETING;
     int currentSequenceStep = 1;
+
+    boolean flagTemiOnTheMove = false;   // to decide whether temi is still on his way to destination
 
     @Override
     protected void onStart() {
@@ -93,6 +98,8 @@ public class MainActivity extends AppCompatActivity implements
         temi.addOnRobotReadyListener(this);
         temi.addAsrListener(this);
         temi.addOnConversationStatusChangedListener(this);
+
+        temi.addOnGoToLocationStatusChangedListener(this);
     }
     @Override
     protected void onStop() {
@@ -114,11 +121,9 @@ public class MainActivity extends AppCompatActivity implements
 
         temi.speak(TtsRequest.create(myAsrResultString, false));
 
-        myAsrResultString = myAsrResultString.toLowerCase();
+        analyzeVoiceCommand();
 
 
-
-        //temi.goTo("door");
 
         temi.finishConversation(); // stop ASR listener
 
@@ -181,11 +186,19 @@ public class MainActivity extends AppCompatActivity implements
         {
             case 1:
                 temi.goTo("tür");
+                while(flagTemiOnTheMove ==  true){
+                    // waiting for arrival at destination
+                }
                 transcription.setText("@strings/greeting_string");
                 temi.speak(TtsRequest.create("@strings/greeting_string", false));
+
+
                 waitHandler.postDelayed(() -> {
                 }, 3000);
                 temi.goTo("wohnzimmer");
+                while(flagTemiOnTheMove ==  true){
+                    // waiting for arrival at destination
+                }
                 waitHandler.postDelayed(() -> {
                 }, 5000);
                 transcription.setText("@strings/livingroom_string");
@@ -209,6 +222,20 @@ public class MainActivity extends AppCompatActivity implements
 
         }
     }
+
+    @Override
+    public void onGoToLocationStatusChanged(@NonNull String location, @NonNull String status, int descriptionId, @NonNull String description) {
+        if(status.equals(COMPLETE))
+        {
+            flagTemiOnTheMove = false;
+        }
+        else
+        {
+            flagTemiOnTheMove = true;
+        }
+    }
+
+
 
     @Override
     public void onConversationStatusChanged(int status, @NotNull String text) {
