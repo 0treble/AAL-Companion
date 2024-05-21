@@ -89,8 +89,9 @@ public class MainActivity extends AppCompatActivity implements
     sequence currentSequence = sequence.GREETING;
     int currentSequenceStep = 1;
 
-    boolean flagTemiOnTheMove = false;
+    boolean flagWaitingForTemiToArrive = false;
 
+    boolean flagWaitingForTemiToFinishSpeaking = false;
     @Override
     protected void onStart() {
         super.onStart();
@@ -138,13 +139,8 @@ public class MainActivity extends AppCompatActivity implements
                 ||    myAsrResultString.contains("fahr"))
         {
             relocateTemi();
-        }
-
-        switch (currentSequence)
-        {
-            case GREETING:
-                handleSequenceGreeting();
-                break;
+        } else {
+            chooseCurrentSequence();
         }
 
 
@@ -180,32 +176,53 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
+    public void chooseCurrentSequence()
+    {
+        switch(currentSequence)
+        {
+            case GREETING:
+                handleSequenceGreeting();
+                break;
+            default:
+                transcription.setText("Error default in switch(currentseqwuence)");
+                break;
+        }
+    }
+
     public void handleSequenceGreeting()
     {
         switch (currentSequenceStep)
         {
             case 1:
-                temi.goTo("tür");
-                while(flagTemiOnTheMove == true)
-                {
-                    // wait for temi to arrive at destination
-                }
+                flagWaitingForTemiToArrive = true;      /// SUPER IMPORTANT BEFORE EVERY GO-TO-COMMAND!!!!
+                temi.goTo("tür");               /// so that the next task is started AFTER arriving at destination
+                // step increment done by the onGoToStatusListener()
+                break;
+            case 2:
                 String greeting_string = getString(R.string.greeting_string);
                 transcription.setText(greeting_string);
+                flagWaitingForTemiToFinishSpeaking = true;  /// SUPER IMPORTANT BEFORE EVERY speaking-COMMAND!!!!
+                                                            /// so that the next task is started AFTER arriving at destination
                 temi.speak(TtsRequest.create(greeting_string, false));
-
+                // step increment done by the onTtsStatusChanged() when temi finished speaking previous string
+                break;
+            case 3:
                 waitHandler.postDelayed(() -> {
                 }, 3000);
+                flagWaitingForTemiToArrive = true;
                 temi.goTo("wohnzimmer");
-                while(flagTemiOnTheMove == true)
-                {
-                    // wait for temi to arrive at destination
-                }
-                waitHandler.postDelayed(() -> {
-                }, 5000);
+                break;
+            case 4:
+
                 String livingroom_string = getString(R.string.livingroom_string);
                 transcription.setText(livingroom_string);
+                waitHandler.postDelayed(() -> {
+                }, 5000);
+                flagWaitingForTemiToFinishSpeaking = true;
                 temi.speak(TtsRequest.create(livingroom_string, false));
+                // step increment done by the onTtsStatusChanged() when temi finished speaking previous string
+                break;
+            case 5:
                 waitHandler.postDelayed(() -> {
                 }, 3000);
                 String introduction_string = getString(R.string.introduction_string);
@@ -213,29 +230,31 @@ public class MainActivity extends AppCompatActivity implements
                 temi.speak(TtsRequest.create(introduction_string, false));
                 waitHandler.postDelayed(() -> {
                 }, 3000);
-
-                currentSequenceStep++;
+                // step increment done by the onTtsStatusChanged() when temi finished speaking previous string
                 break;
-
-            default:    // reset current sequence - restarting sequence
-                currentSequenceStep = 1;
-                transcription.setText("Err. in Funktion 'handleSequenceGreeting'! Sequenz-Schritt zürückgesetzt!");
-                waitHandler.postDelayed(() -> {
-                }, 3000);
+            case 6: // End of sequence GREETING
+                currentSequenceStep = 0;
                 break;
-
+            default:
+                transcription.setText("Error: Default in Sequenz GREETING!");
+                break;
         }
     }
 
+
+
+
     @Override
     public void onGoToLocationStatusChanged(@NonNull String location, @NonNull String status, int descriptionId, @NonNull String description) {
-        if(status.equals(COMPLETE))
+        if(status.equals(COMPLETE) && flagWaitingForTemiToArrive == true)
         {
-            flagTemiOnTheMove = false;
+            flagWaitingForTemiToArrive = false;
+            currentSequenceStep += 1;
+            chooseCurrentSequence();
         }
-        else
+        else if(flagWaitingForTemiToArrive == true)
         {
-            flagTemiOnTheMove = true;
+            //flagTemiOnTheMove = true;
         }
     }
 
@@ -342,7 +361,12 @@ public class MainActivity extends AppCompatActivity implements
         temi.addTtsListener(new Robot.TtsListener() {
             @Override
             public void onTtsStatusChanged(@NotNull TtsRequest ttsRequest) {
-                Log.i(TAG, "Status:" + ttsRequest.getStatus());
+                if(flagWaitingForTemiToFinishSpeaking == true && ttsRequest.getStatus() == TtsRequest.Status.COMPLETED)
+                {
+                    flagWaitingForTemiToFinishSpeaking = false;
+                    currentSequenceStep += 1;
+                    chooseCurrentSequence();
+                }
             }
         });
     }
