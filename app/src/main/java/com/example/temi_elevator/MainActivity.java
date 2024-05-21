@@ -111,26 +111,8 @@ public class MainActivity extends AppCompatActivity implements
         temi.speak(TtsRequest.create(myAsrResultString, false));
 
         myAsrResultString = myAsrResultString.toLowerCase();
-        if(myAsrResultString.contains("gehe zur tür") || myAsrResultString.contains("geh zur tür"))
-        {
-            destination = "tür";
-            confirm();
-        }
-        else if(myAsrResultString.contains("gehe zur basisstation") || myAsrResultString.contains("geh  zur basisstation"))
-        {
-            destination = "home base";
-            confirm();
-        }
-        else if(myAsrResultString.contains("gehe zur wohnzimmer") || myAsrResultString.contains("geh  zur wohnzimmer"))
-        {
-            destination = "wohnzimmer";
-            confirm();
-        }
-        else if(myAsrResultString.contains("gehe zur küche") || myAsrResultString.contains("geh  zur küche"))
-        {
-            destination = "küche";
-            confirm();
-        }
+
+
 
         //temi.goTo("door");
 
@@ -139,6 +121,51 @@ public class MainActivity extends AppCompatActivity implements
         temi.finishConversation(); // stop ASR listener
 
     }
+
+    public void analyzeVoiceCommand() {
+        myAsrResultString = myAsrResultString.toLowerCase();
+
+        if(     myAsrResultString.contains("gehe")
+                ||    myAsrResultString.contains("geh")
+                ||    myAsrResultString.contains("fahre")
+                ||    myAsrResultString.contains("fahr"))
+        {
+            relocateTemi();
+        }
+
+
+
+
+    }
+
+    public void relocateTemi()
+    {
+        if(myAsrResultString.contains("tür"))
+        {
+            destination = "tür";
+            confirm();
+        }
+        else if(myAsrResultString.contains("basisstation"))
+        {
+            destination = "home base";
+            confirm();
+        }
+        else if(myAsrResultString.contains("wohnzimmer"))
+        {
+            destination = "wohnzimmer";
+            confirm();
+        }
+        else if(myAsrResultString.contains("küche"))
+        {
+            destination = "küche";
+            confirm();
+        }
+        else
+        {   // default
+            temi.speak(TtsRequest.create("Entschuldige diesen Ort kenne ich leider nicht.", false));
+        }
+    }
+
 
     @Override
     public void onConversationStatusChanged(int status, @NotNull String text) {
