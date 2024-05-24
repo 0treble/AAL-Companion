@@ -9,7 +9,7 @@
     </string-array>
 
 
-    <string name="greeting_string">Herzlich Willkommen in der AAL Wohnung der htw saar! Mein Name ist Temi.
+    <string name="greeting_string">Herzlich Willkommen in der A A L Wohnung der htw saar! Mein Name ist Temi.
                                         Bitte folgen Sie mir ins Wohnzimmer.</string>
     <string name="livingroom_string">Sie können ihren Mantel oder ihre Jacke hier ablegen. Nehmen Sie
                                         doch bitte erst einmal Platz.</string>
@@ -21,13 +21,19 @@
                                         starten, indem du sagst   Hey Temi was kannst du noch?</string>
 
 
+    <string name="survey_greeting_string">Hallo, vielen Dank für Ihre Teilnahme am Forschungsprojekt VOICE (zur Erforschung
+                                        der Nutzbarkeit und Akzeptanz von KI basierten Robotik-Systemen im Alltag). Ich bin Temi und
+                                            freue mich schon darauf Sie kennenzulernen. Aber bevor wir anfangen folgen Sie mir bitte ins Wohnzimmer</string>
 
+    <string name="survey_livingroom_string">Bitte nehmen Sie doch Platz. Mein Team wird gleich mit Ihnen noch kurz die Einzelheiten des heutigen Tages durchgehen, danach geht’s mit einer kurzen Führung weiter</string>
 
+    <string name="survey_start_phrase">Hey Temi lass uns anfangen</string>
 
+    <string name="survey_to_kitchen"> Ok! Folgen Sie mir bitte. Es ist wichtig viel zu trinken. Daher haben wir Ihnen Getränke bereitgestellt. Hier wären wir .
+        Bitte bedienen Sie sich. Wenn ich Ihnen etwas zu den hier verbauten (Dingen) erzählen soll, sagen Sie bitte ‚Hey Temi, was kannst du mir zur Küche‘ sagen, andernfalls können wir auch mit
+        ‚Hey Temi, lass uns weitergehen‘ mit der Besichtigung fortfahren. </string>
 
-
-
-
+    <string name="survey_goodbye_string">Ich habe mich gefreut, Sie kennenzulernen und ich möchte mich bei Ihne bedanken, dass Sie an unserer Studie teilgenommen haben. Vielen Dank und alles Gute. </string>
 
 
     <string name="take_photo">Transport Modus</string>
@@ -38,7 +44,7 @@
     <string name="TranscriptionText">Transkription wird hier angezeigt...</string>
     <string name="endTranscriptionButton">endTranscriptionButton</string>
     <string name="end_transcription">Transkription beenden</string>
-    <string name="sequenceOne">Sequenz Eins</string>
+    <string name="sequenceOne">Sequenz</string>
     <string name="theme">Dunkler Modus</string>
 
 

@@ -2,7 +2,6 @@ package com.example.temi_elevator;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -26,31 +25,20 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
+import android.text.method.ScrollingMovementMethod;
 
-import android.speech.RecognitionListener;
-import android.speech.RecognizerIntent;
-import android.speech.SpeechRecognizer;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Collections;
 
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
-
-import com.robotemi.sdk.Robot;
 import com.robotemi.sdk.listeners.OnConversationStatusChangedListener;
 import com.robotemi.sdk.listeners.OnRobotReadyListener;
 
@@ -79,19 +67,16 @@ public class MainActivity extends AppCompatActivity implements
     private static String[] REQUIRED_PERMISSIONS = new String[]{android.Manifest.permission.RECORD_AUDIO};
     private TextView transcription;
     private ExecutorService myExecutorService;
-    private SpeechRecognizer speechRecognizer;
-
     private String myAsrResultString = "";
-
-
-
     enum sequence {GREETING,SMALL_TALK};
     sequence currentSequence = sequence.GREETING;
     int currentSequenceStep = 1;
-
     boolean flagWaitingForTemiToArrive = false;
-
     boolean flagWaitingForTemiToFinishSpeaking = false;
+    boolean conversationMode = false;
+
+
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -114,24 +99,52 @@ public class MainActivity extends AppCompatActivity implements
     }
     @Override
     public void onAsrResult(@NotNull String asrResult, @NonNull SttLanguage sttLanguage) {
-        //final TextView textView = findViewById(R.id.asrResult);
 
         Log.i(TAG, "ASR Result: " + asrResult);
         myAsrResultString = asrResult;
-        transcription.setText("myAsrResultString: " + myAsrResultString);
+        transcription.append("myAsrResultString: " + myAsrResultString + "\n");
 
 
         temi.speak(TtsRequest.create(myAsrResultString, false));
 
         analyzeVoiceCommand();
 
+        if(!conversationMode){
+            temi.finishConversation(); // stop ASR listener
+        }
+    }
 
-        temi.finishConversation(); // stop ASR listener
+    /* Voice Command Recognition */
+    @FunctionalInterface
+    interface CommandAction {
+        void execute(String command);
+    }
 
+    private final Map<String[], CommandAction> commandsMap = new HashMap<>();
+    private void initCommandsMap() {
+        commandsMap.put(new String[]{"gehe", "geh", "fahre", "fahr"}, command -> relocateTemi());
+        commandsMap.put(new String[]{"sequenz starten", "sequenz beginnen"}, command -> findViewById(R.id.sequence1Button).performClick());
+        commandsMap.put(new String[]{"transkription starten", "aufnahme beginnen", "aufnahme starten"}, command -> findViewById(R.id.listen).performClick());
+        commandsMap.put(new String[]{"transkription beenden", "aufnahme beenden"}, command -> findViewById(R.id.endTranscription).performClick());
+        commandsMap.put(new String[]{"applikation beenden", "app beenden"}, command -> findViewById(R.id.quitButton).performClick());
+        commandsMap.put(new String[]{"dunkler modus"}, command -> findViewById(R.id.themeButton).performClick());
+        commandsMap.put(new String[]{"gesprächsmodus", "dialogmodus", "gesprächs modus"}, command -> conversationMode = !conversationMode);
     }
 
     public void analyzeVoiceCommand() {
+
         myAsrResultString = myAsrResultString.toLowerCase();
+
+        for (Map.Entry<String[], CommandAction> entry : commandsMap.entrySet()) {
+            for (String command : entry.getKey()) {
+                if (myAsrResultString.contains(command)) {
+                    entry.getValue().execute(myAsrResultString);
+                    return;
+                }
+            }
+        }
+
+        /*myAsrResultString = myAsrResultString.toLowerCase();
 
         if(     myAsrResultString.contains("gehe")
                 ||    myAsrResultString.contains("geh")
@@ -139,12 +152,30 @@ public class MainActivity extends AppCompatActivity implements
                 ||    myAsrResultString.contains("fahr"))
         {
             relocateTemi();
-        } else {
+        }else if((myAsrResultString.contains("sequenz starten")
+                || myAsrResultString.contains("sequenz beginnen"))){
+            findViewById(R.id.sequence1Button).performClick();
+
+        }else if((myAsrResultString.contains("transkription starten")
+                || myAsrResultString.contains("aufnahme beginnen"))){
+            findViewById(R.id.listen).performClick();
+
+        }else if((myAsrResultString.contains("transkription beenden")
+                || myAsrResultString.contains("aufnahme beenden"))){
+            findViewById(R.id.endTranscription).performClick();
+
+        }else if((myAsrResultString.contains("applikation beenden")
+                || myAsrResultString.contains("app beenden"))){
+            findViewById(R.id.quitButton).performClick();
+
+        }else if(myAsrResultString.contains("dunkler modus")){
+            findViewById(R.id.themeButton).performClick();
+
+        }else if(myAsrResultString.contains("gesprächmodus")){
+            conversationMode = !conversationMode;
+        }else {
             chooseCurrentSequence();
-        }
-
-
-
+        }*/
 
     }
 
@@ -183,8 +214,11 @@ public class MainActivity extends AppCompatActivity implements
             case GREETING:
                 handleSequenceGreeting();
                 break;
+            case SMALL_TALK:
+
+                break;
             default:
-                transcription.setText("Error default in switch(currentseqwuence)");
+                transcription.append("Error default in switch(currentseqwuence)");
                 break;
         }
     }
@@ -236,23 +270,20 @@ public class MainActivity extends AppCompatActivity implements
                 currentSequenceStep = 0;
                 break;
             default:
-                transcription.setText("Error: Default in Sequenz GREETING!");
+                transcription.append("Error: Default in Sequenz GREETING!");
                 break;
         }
     }
 
-
-
-
     @Override
     public void onGoToLocationStatusChanged(@NonNull String location, @NonNull String status, int descriptionId, @NonNull String description) {
-        if(status.equals(COMPLETE) && flagWaitingForTemiToArrive == true)
+        if(status.equals(COMPLETE) && flagWaitingForTemiToArrive)
         {
             flagWaitingForTemiToArrive = false;
             currentSequenceStep += 1;
             chooseCurrentSequence();
         }
-        else if(flagWaitingForTemiToArrive == true)
+        else if(flagWaitingForTemiToArrive)
         {
             //flagTemiOnTheMove = true;
         }
@@ -264,23 +295,26 @@ public class MainActivity extends AppCompatActivity implements
         switch (status) {
             case IDLE:
                 Log.i(TAG, "Status: IDLE | Text: " + myAsrResultString);
-                transcription.setText("Status: IDLE | Text: " + myAsrResultString);
+                transcription.append("Status: IDLE | Text: " + myAsrResultString + "\n");
+                findViewById(R.id.isRecordingBar).setVisibility(View.INVISIBLE);
                 break;
             case LISTENING:
                 Log.i(TAG, "Status: LISTENING | Text: " + myAsrResultString);
-                transcription.setText("Status: LISTENING | Text: " + myAsrResultString);
+                transcription.append("Status: LISTENING | Text: " + myAsrResultString + "\n");
+                findViewById(R.id.isRecordingBar).setVisibility(View.VISIBLE);
                 break;
             case THINKING:
                 Log.i(TAG, "Status: THINKING | Text: " + myAsrResultString);
-                transcription.setText("Status: THINKING | Text: " + myAsrResultString);
+                transcription.append("Status: THINKING | Text: " + myAsrResultString + "\n");
                 break;
             case SPEAKING:
                 Log.i(TAG, "Status: SPEAKING | Text: " + myAsrResultString);
-                transcription.setText("Status: SPEAKING | Text: " + myAsrResultString);
+                transcription.append("Status: SPEAKING | Text: " + myAsrResultString + "\n");
                 break;
             default:
                 Log.i(TAG, "Status: UNKNOWN | Text: " + myAsrResultString);
-                transcription.setText("Status: UNKNOWN | Text: " + myAsrResultString);
+                transcription.append("Status: UNKNOWN | Text: " + myAsrResultString + "\n");
+                findViewById(R.id.isRecordingBar).setVisibility(View.INVISIBLE);
                 break;
         }
     }
@@ -296,19 +330,6 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onTtsStatusChanged(@NonNull TtsRequest ttsRequest) {
 
-    }
-
-    private enum TtsFollow {
-        GERMAN(" bitte folgen Sie mir zu Raum: ", 11),
-        ENGLISH(" please follow me to room: ", 1);
-
-        private final String language;
-        private final int number;
-
-        TtsFollow(String language, int number) {
-            this.language = language;
-            this.number = number;
-        }
     }
 
     static {
@@ -339,15 +360,42 @@ public class MainActivity extends AppCompatActivity implements
     private void init() {
         transcriptMode();
         setupThemeButton();
+        initCommandsMap();
+
         findViewById(R.id.isRecordingBar).setVisibility(View.INVISIBLE);
 
-        findViewById(R.id.MenuButton).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.quitButton).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 temi.setKioskModeOn(false);
                 temi.setInteractionState(true);
                 enable_menu();
 
+            }
+        });
+
+        findViewById(R.id.listen).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                temi.wakeup(Collections.singletonList(SttLanguage.SYSTEM));
+                findViewById(R.id.isRecordingBar).setVisibility(View.VISIBLE);
+            }
+        });
+
+        findViewById(R.id.endTranscription).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                transcription.append("Transcription ended." + "\n");
+                temi.wakeup(Collections.singletonList(SttLanguage.SYSTEM));
+                findViewById(R.id.isRecordingBar).setVisibility(View.INVISIBLE);
+            }
+        });
+
+        findViewById(R.id.quitButton).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                temi.setKioskModeOn(false);
+                enable_menu();
             }
         });
 
@@ -361,7 +409,7 @@ public class MainActivity extends AppCompatActivity implements
         temi.addTtsListener(new Robot.TtsListener() {
             @Override
             public void onTtsStatusChanged(@NotNull TtsRequest ttsRequest) {
-                if(flagWaitingForTemiToFinishSpeaking == true && ttsRequest.getStatus() == TtsRequest.Status.COMPLETED)
+                if(flagWaitingForTemiToFinishSpeaking && ttsRequest.getStatus() == TtsRequest.Status.COMPLETED)
                 {
                     flagWaitingForTemiToFinishSpeaking = false;
                     currentSequenceStep += 1;
@@ -392,33 +440,9 @@ public class MainActivity extends AppCompatActivity implements
 
     private void transcriptMode() {
         transcription = findViewById(R.id.transcription);
-        transcription.setText("Ready... Press the Listen Button to start the transcription");
+        transcription.setMovementMethod(new ScrollingMovementMethod());
+        transcription.append("Ready... Press the Listen Button to start the transcription" + "\n");
 
-        findViewById(R.id.listen).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                temi.wakeup(Collections.singletonList(SttLanguage.SYSTEM));
-                findViewById(R.id.isRecordingBar).setVisibility(View.VISIBLE);
-            }
-        });
-
-        findViewById(R.id.endTranscription).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                transcription.setText("Transcription ended.");
-                temi.wakeup(Collections.singletonList(SttLanguage.SYSTEM));
-                findViewById(R.id.isRecordingBar).setVisibility(View.INVISIBLE);
-            }
-        });
-
-        findViewById(R.id.MenuButton).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                temi.setKioskModeOn(false);
-                enable_menu();
-
-            }
-        });
     }
 
     private void toggleDarkMode() {
@@ -459,7 +483,7 @@ public class MainActivity extends AppCompatActivity implements
         Button yes_button = findViewById(R.id.confirmArrivedButton);
         yes_button.setOnClickListener(v -> arrived());
 
-        Button menu_button = findViewById(R.id.MenuButton);
+        Button menu_button = findViewById(R.id.quitButton);
         menu_button.setOnClickListener(v -> enable_menu());
 
         // Add listener for dropdown menu
@@ -486,22 +510,13 @@ public class MainActivity extends AppCompatActivity implements
         final EditText input = new EditText(this);
         builder.setView(input);
         builder.setPositiveButton("Go to Home", (dialog, which) -> {
-            String numberString = input.getText().toString();
             try {
-                int number = Integer.parseInt(numberString);
-                if (true) {
-                    temi.startPage(Page.HOME);
-                } else {
-                    Log.i(TAG, "Wrong password entered");
-                }
+                temi.startPage(Page.HOME);
             } catch (NumberFormatException e) {
                 Log.i(TAG, "not a valid number");
             }
         });
         builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
-        //builder.show();
-
-
     }
 
     private void fillDropdownMenu() {
@@ -539,8 +554,8 @@ public class MainActivity extends AppCompatActivity implements
             ActivityInfo activityInfo = getPackageManager()
                     .getActivityInfo(getComponentName(), PackageManager.GET_META_DATA);
             Robot.getInstance().onStart(activityInfo);
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
+        }catch (Exception e) {
+            Log.e(TAG, "Error refreshing temi UI: ", e);
         }
     }
 
@@ -619,7 +634,7 @@ public class MainActivity extends AppCompatActivity implements
     public void arrived() {
         if (!this.waitingForFinish) {
             temi.goTo(newDest);
-            String msg = "{\"status\":\"arrived\",\"floor\":\"" + this.myfloorNumber + "\"}";
+            //String msg = "{\"status\":\"arrived\",\"floor\":\"" + this.myfloorNumber + "\"}";
             this.waitingForFinish = true;
 
             this.showArrivedMessage();
@@ -716,6 +731,7 @@ public class MainActivity extends AppCompatActivity implements
             TextView confirmTextView = findViewById(R.id.confirmTextView);
             TextView elevatorTextView = findViewById(R.id.elevatorTextView);
             Button confirmYesButton = findViewById(R.id.confirmArrivedButton);
+
             Button confirmElevatorButton = findViewById(R.id.confirmFinishButton);
             Button confirm_button = findViewById(R.id.confirmLocationButton);
             Spinner spinner = findViewById(R.id.dropdownMenu);
@@ -739,6 +755,8 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onDestroy() {
         super.onDestroy();
+
+        instance = null;
 
         if (myExecutorService != null) {
             myExecutorService.shutdown();

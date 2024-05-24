@@ -157,7 +157,7 @@
                 app:layout_constraintVertical_bias="0.813" />
 
             <Button
-                android:id="@+id/MenuButton"
+                android:id="@+id/quitButton"
                 android:layout_width="242dp"
                 android:layout_height="74dp"
                 android:backgroundTint="?attr/colorPrimary"
@@ -177,7 +177,7 @@
                 android:textColor="?attr/colorOnPrimary"
                 android:textSize="20sp"
                 app:layout_constraintBottom_toBottomOf="@+id/QRCodeButton"
-                app:layout_constraintEnd_toStartOf="@+id/MenuButton"
+                app:layout_constraintEnd_toStartOf="@+id/quitButton"
                 app:layout_constraintStart_toEndOf="@+id/QRCodeButton" />
 
             <TextView
