@@ -41,7 +41,7 @@
     <string name="quit">Beenden</string>
     <string name="button">Button</string>
     <string name="listen">Hören</string>
-    <string name="TranscriptionText">Transkription wird hier angezeigt...</string>
+    <string name="TranscriptionText">Transkription wird hier angezeigt.</string>
     <string name="endTranscriptionButton">endTranscriptionButton</string>
     <string name="end_transcription">Transkription beenden</string>
     <string name="sequenceOne">Sequenz</string>

@@ -15,6 +15,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.ScrollView;
 import com.robotemi.sdk.*;
 import com.robotemi.sdk.Robot;
 import com.robotemi.sdk.constants.Page;
@@ -25,8 +26,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
-import android.text.method.ScrollingMovementMethod;
-
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -66,6 +65,7 @@ public class MainActivity extends AppCompatActivity implements
     private final Handler waitHandler = new Handler();
     private static String[] REQUIRED_PERMISSIONS = new String[]{android.Manifest.permission.RECORD_AUDIO};
     private TextView transcription;
+    private ScrollView scrollView;
     private ExecutorService myExecutorService;
     private String myAsrResultString = "";
     enum sequence {GREETING,SMALL_TALK};
@@ -74,9 +74,6 @@ public class MainActivity extends AppCompatActivity implements
     boolean flagWaitingForTemiToArrive = false;
     boolean flagWaitingForTemiToFinishSpeaking = false;
     boolean conversationMode = false;
-
-
-
     @Override
     protected void onStart() {
         super.onStart();
@@ -88,22 +85,127 @@ public class MainActivity extends AppCompatActivity implements
 
         temi.addOnGoToLocationStatusChangedListener(this);
     }
-    @Override
-    protected void onStop() {
-        super.onStop();
 
-        // Remove robot event listeners
-        temi.removeOnRobotReadyListener(this);
-        temi.removeAsrListener(this);
-        temi.removeOnConversationStatusChangedListener(this);
+    /**************************************************************************************
+     * ************************************************************************************
+     * ************************************************************************************
+     */
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        temi.setKioskModeOn(true);
+
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        instance = this;
+        transportMode();
+
+        myExecutorService = Executors.newSingleThreadExecutor();
+        init(savedInstanceState);
     }
+
+    private void init(Bundle savedInstanceState) {
+        transcriptMode();
+        setupThemeButton();
+        initCommandsMap();
+
+        scrollView = findViewById(R.id.scrollView);
+
+        findViewById(R.id.isRecordingBar).setVisibility(View.INVISIBLE);
+
+        if (savedInstanceState != null) {
+            String transcript = savedInstanceState.getString("transcript");
+            transcription.setText(transcript);
+        }
+
+        findViewById(R.id.quitButton).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                temi.setKioskModeOn(false);
+                temi.setInteractionState(true);
+                enable_menu();
+
+            }
+        });
+
+        findViewById(R.id.listen).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                temi.wakeup(Collections.singletonList(SttLanguage.SYSTEM));
+                findViewById(R.id.isRecordingBar).setVisibility(View.VISIBLE);
+            }
+        });
+
+        findViewById(R.id.endTranscription).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                transcription.append("Transkription beended." + "\n");
+                temi.wakeup(Collections.singletonList(SttLanguage.SYSTEM));
+                findViewById(R.id.isRecordingBar).setVisibility(View.INVISIBLE);
+                scrollToBottom();
+            }
+        });
+
+        findViewById(R.id.quitButton).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                temi.setKioskModeOn(false);
+                enable_menu();
+            }
+        });
+
+        findViewById(R.id.sequence1Button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                handleSequenceGreeting();
+            }
+        });
+
+        temi.addTtsListener(new Robot.TtsListener() {
+            @Override
+            public void onTtsStatusChanged(@NotNull TtsRequest ttsRequest) {
+                if(flagWaitingForTemiToFinishSpeaking && ttsRequest.getStatus() == TtsRequest.Status.COMPLETED)
+                {
+                    flagWaitingForTemiToFinishSpeaking = false;
+                    currentSequenceStep += 1;
+                    chooseCurrentSequence();
+                }
+            }
+        });
+    }
+
+    private void setupThemeButton() {
+        try {
+            Button themeButton = findViewById(R.id.themeButton);
+            if (themeButton != null) {
+                themeButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        toggleDarkMode();
+                    }
+                });
+            } else {
+                Log.e(TAG, "themeButton is null");
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error setting up theme button: ", e);
+        }
+    }
+
+
+    private void transcriptMode() {
+        transcription = findViewById(R.id.transcription);
+        transcription.append("\n" + "Bereit... Drücken Sie die Taste 'Hören', um die Transkription zu starten." + "\n");
+        //scrollToBottom();
+    }
+
     @Override
     public void onAsrResult(@NotNull String asrResult, @NonNull SttLanguage sttLanguage) {
 
         Log.i(TAG, "ASR Result: " + asrResult);
         myAsrResultString = asrResult;
         transcription.append("myAsrResultString: " + myAsrResultString + "\n");
-
+        scrollToBottom();
 
         temi.speak(TtsRequest.create(myAsrResultString, false));
 
@@ -114,7 +216,7 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-    /* Voice Command Recognition */
+    /* Voice Commands */
     @FunctionalInterface
     interface CommandAction {
         void execute(String command);
@@ -129,6 +231,7 @@ public class MainActivity extends AppCompatActivity implements
         commandsMap.put(new String[]{"applikation beenden", "app beenden"}, command -> findViewById(R.id.quitButton).performClick());
         commandsMap.put(new String[]{"dunkler modus"}, command -> findViewById(R.id.themeButton).performClick());
         commandsMap.put(new String[]{"gesprächsmodus", "dialogmodus", "gesprächs modus"}, command -> conversationMode = !conversationMode);
+        commandsMap.put(new String[]{"gehe zu alexa", "zu alexa gehen", "alexa sequenz ausführen", "alexa sequenz starten", "sag alexa die rolläden zu schließen"}, command -> sequenceAlexa());
     }
 
     public void analyzeVoiceCommand() {
@@ -218,9 +321,30 @@ public class MainActivity extends AppCompatActivity implements
 
                 break;
             default:
-                transcription.append("Error default in switch(currentseqwuence)");
+                transcription.append("Error default in switch(currentsequence)");
+                scrollToBottom();
                 break;
         }
+    }
+
+    public void sequenceAlexa(){
+        String alexa_command_init = "Okay. Ich gehe zu Alexa um ihr zu sagen, dass sie den Rolläden schließen soll.";
+        transcription.append(alexa_command_init + "\n");
+
+        flagWaitingForTemiToFinishSpeaking = true;
+        temi.speak(TtsRequest.create(alexa_command_init, false));
+
+        flagWaitingForTemiToArrive = true;
+        temi.goTo("alexa");
+
+        flagWaitingForTemiToFinishSpeaking = true;
+        temi.speak(TtsRequest.create("Alexa", false));
+
+        waitHandler.postDelayed(() -> {
+        }, 1000);
+
+        flagWaitingForTemiToFinishSpeaking = true;
+        temi.speak(TtsRequest.create("Bitte schließe die Rolläden", false));
     }
 
     public void handleSequenceGreeting()
@@ -236,7 +360,7 @@ public class MainActivity extends AppCompatActivity implements
                 String greeting_string = getString(R.string.greeting_string);
                 transcription.setText(greeting_string);
                 flagWaitingForTemiToFinishSpeaking = true;  /// SUPER IMPORTANT BEFORE EVERY speaking-COMMAND!!!!
-                                                            /// so that the next task is started AFTER arriving at destination
+                /// so that the next task is started AFTER arriving at destination
                 temi.speak(TtsRequest.create(greeting_string, false));
                 // step increment done by the onTtsStatusChanged() when temi finished speaking previous string
                 break;
@@ -271,6 +395,7 @@ public class MainActivity extends AppCompatActivity implements
                 break;
             default:
                 transcription.append("Error: Default in Sequenz GREETING!");
+                scrollToBottom();
                 break;
         }
     }
@@ -297,24 +422,29 @@ public class MainActivity extends AppCompatActivity implements
                 Log.i(TAG, "Status: IDLE | Text: " + myAsrResultString);
                 transcription.append("Status: IDLE | Text: " + myAsrResultString + "\n");
                 findViewById(R.id.isRecordingBar).setVisibility(View.INVISIBLE);
+                scrollToBottom();
                 break;
             case LISTENING:
                 Log.i(TAG, "Status: LISTENING | Text: " + myAsrResultString);
                 transcription.append("Status: LISTENING | Text: " + myAsrResultString + "\n");
                 findViewById(R.id.isRecordingBar).setVisibility(View.VISIBLE);
+                scrollToBottom();
                 break;
             case THINKING:
                 Log.i(TAG, "Status: THINKING | Text: " + myAsrResultString);
                 transcription.append("Status: THINKING | Text: " + myAsrResultString + "\n");
+                scrollToBottom();
                 break;
             case SPEAKING:
                 Log.i(TAG, "Status: SPEAKING | Text: " + myAsrResultString);
                 transcription.append("Status: SPEAKING | Text: " + myAsrResultString + "\n");
+                scrollToBottom();
                 break;
             default:
                 Log.i(TAG, "Status: UNKNOWN | Text: " + myAsrResultString);
                 transcription.append("Status: UNKNOWN | Text: " + myAsrResultString + "\n");
                 findViewById(R.id.isRecordingBar).setVisibility(View.INVISIBLE);
+                scrollToBottom();
                 break;
         }
     }
@@ -337,112 +467,6 @@ public class MainActivity extends AppCompatActivity implements
             REQUIRED_PERMISSIONS = Arrays.copyOf(REQUIRED_PERMISSIONS, REQUIRED_PERMISSIONS.length + 1);
             REQUIRED_PERMISSIONS[REQUIRED_PERMISSIONS.length - 1] = Manifest.permission.WRITE_EXTERNAL_STORAGE;
         }
-    }
-
-    /**************************************************************************************
-     * ************************************************************************************
-     * ************************************************************************************
-     */
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        temi.setKioskModeOn(true);
-
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-        instance = this;
-        transportMode();
-
-        myExecutorService = Executors.newSingleThreadExecutor();
-        init();
-    }
-
-    private void init() {
-        transcriptMode();
-        setupThemeButton();
-        initCommandsMap();
-
-        findViewById(R.id.isRecordingBar).setVisibility(View.INVISIBLE);
-
-        findViewById(R.id.quitButton).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                temi.setKioskModeOn(false);
-                temi.setInteractionState(true);
-                enable_menu();
-
-            }
-        });
-
-        findViewById(R.id.listen).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                temi.wakeup(Collections.singletonList(SttLanguage.SYSTEM));
-                findViewById(R.id.isRecordingBar).setVisibility(View.VISIBLE);
-            }
-        });
-
-        findViewById(R.id.endTranscription).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                transcription.append("Transcription ended." + "\n");
-                temi.wakeup(Collections.singletonList(SttLanguage.SYSTEM));
-                findViewById(R.id.isRecordingBar).setVisibility(View.INVISIBLE);
-            }
-        });
-
-        findViewById(R.id.quitButton).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                temi.setKioskModeOn(false);
-                enable_menu();
-            }
-        });
-
-        findViewById(R.id.sequence1Button).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                handleSequenceGreeting();
-            }
-        });
-
-        temi.addTtsListener(new Robot.TtsListener() {
-            @Override
-            public void onTtsStatusChanged(@NotNull TtsRequest ttsRequest) {
-                if(flagWaitingForTemiToFinishSpeaking && ttsRequest.getStatus() == TtsRequest.Status.COMPLETED)
-                {
-                    flagWaitingForTemiToFinishSpeaking = false;
-                    currentSequenceStep += 1;
-                    chooseCurrentSequence();
-                }
-            }
-        });
-    }
-
-    private void setupThemeButton() {
-        try {
-            Button themeButton = findViewById(R.id.themeButton);
-            if (themeButton != null) {
-                themeButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        toggleDarkMode();
-                    }
-                });
-            } else {
-                Log.e(TAG, "themeButton is null");
-            }
-        } catch (Exception e) {
-            Log.e(TAG, "Error setting up theme button: ", e);
-        }
-    }
-
-
-    private void transcriptMode() {
-        transcription = findViewById(R.id.transcription);
-        transcription.setMovementMethod(new ScrollingMovementMethod());
-        transcription.append("Ready... Press the Listen Button to start the transcription" + "\n");
-
     }
 
     private void toggleDarkMode() {
@@ -547,6 +571,11 @@ public class MainActivity extends AppCompatActivity implements
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.dropdown_menu_text_view, locations);
         adapter.setDropDownViewResource(R.layout.dropdown_menu_pick_text_view);
         dropdownMenu.setAdapter(adapter);
+    }
+
+    private void scrollToBottom() {
+        scrollView.post(() -> {scrollView.fullScroll(ScrollView.FOCUS_DOWN);
+        });
     }
 
     private void refreshTemiUi() {
@@ -750,6 +779,31 @@ public class MainActivity extends AppCompatActivity implements
 
     public void setDestinationFloor(int destinationFloor) {
         this.destinationFloor = destinationFloor;
+    }
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString("transcript", transcription.getText().toString());
+    }
+
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        if (savedInstanceState != null) {
+            String transcript = savedInstanceState.getString("transcript");
+            transcription.setText(transcript);
+        }
+    }
+
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        // Remove robot event listeners
+        temi.removeOnRobotReadyListener(this);
+        temi.removeAsrListener(this);
+        temi.removeOnConversationStatusChangedListener(this);
     }
 
     @Override
