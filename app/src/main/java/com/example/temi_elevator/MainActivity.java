@@ -27,6 +27,10 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.Nullable;
+
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -67,6 +71,7 @@ public class MainActivity extends AppCompatActivity implements
     private static String[] REQUIRED_PERMISSIONS = new String[]{android.Manifest.permission.RECORD_AUDIO};
     private TextView transcription;
     private ScrollView scrollView;
+    private ActivityResultLauncher<Intent> sequenceResultLauncher;
     private ExecutorService myExecutorService;
     private String myAsrResultString = "";
     enum sequence {GREETING,SMALL_TALK};
@@ -159,10 +164,24 @@ public class MainActivity extends AppCompatActivity implements
             }
         });
 
+        /* Sequence Window Launcher*/
+
+        sequenceResultLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                        int sequenceId = result.getData().getIntExtra("SEQUENCE_ID", -1);
+                        handleSequence(sequenceId);
+                    }
+                }
+        );
+
         findViewById(R.id.sequenceWindowButton).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(MainActivity.this, SequenceActivity.class));
+                //startActivity(new Intent(MainActivity.this, SequenceActivity.class));
+                Intent intent = new Intent(MainActivity.this, SequenceActivity.class);
+                sequenceResultLauncher.launch(intent);
             }
         });
 
@@ -177,6 +196,29 @@ public class MainActivity extends AppCompatActivity implements
                 }
             }
         });
+    }
+
+    private void handleSequence(int sequenceId) {
+        switch (sequenceId) {
+            case 1:
+                handleSequenceGreeting();
+                transcription.append("Begrüßungssequenz wurde getriggert" + "\n");
+                scrollToBottom();
+                break;
+            case 2:
+                sequenceAlexa();
+                transcription.append("Alexa-Sequenz wurde getriggert" + "\n");
+                scrollToBottom();
+                break;
+            case 3:
+                transcription.append("Sequenz 3 wurde getriggert" + "\n");
+                scrollToBottom();
+                break;
+            default:
+                transcription.append("Error default in handleSequence)" + "\n");
+                scrollToBottom();
+                break;
+        }
     }
 
     private void setupThemeButton() {
@@ -230,13 +272,13 @@ public class MainActivity extends AppCompatActivity implements
     private final Map<String[], CommandAction> commandsMap = new HashMap<>();
     private void initCommandsMap() {
         commandsMap.put(new String[]{"gehe", "geh", "fahre", "fahr"}, command -> relocateTemi());
-        commandsMap.put(new String[]{"sequenz starten", "sequenz beginnen"}, command -> findViewById(R.id.sequenceWindowButton).performClick());
+        commandsMap.put(new String[]{"begrüssungssequenz starten", "willkommenssequenz starten", "sequenz eins starten", "sequenz eins beginnen"}, command -> findViewById(R.id.sequenceWindowButton).performClick());
         commandsMap.put(new String[]{"transkription starten", "aufnahme beginnen", "aufnahme starten"}, command -> findViewById(R.id.listen).performClick());
         commandsMap.put(new String[]{"transkription beenden", "aufnahme beenden"}, command -> findViewById(R.id.endTranscription).performClick());
         commandsMap.put(new String[]{"applikation beenden", "app beenden"}, command -> findViewById(R.id.quitButton).performClick());
         commandsMap.put(new String[]{"dunkler modus"}, command -> findViewById(R.id.themeButton).performClick());
         commandsMap.put(new String[]{"gesprächsmodus", "dialogmodus", "gesprächs modus"}, command -> conversationMode = !conversationMode);
-        commandsMap.put(new String[]{"gehe zu alexa", "zu alexa gehen", "alexa sequenz ausführen", "alexa sequenz starten", "sag alexa die rolläden zu schließen"}, command -> sequenceAlexa());
+        commandsMap.put(new String[]{"gehe zu alexa", "zu alexa gehen", "sequenz zwei starten", "sequenz zwei beginnen", "alexa sequenz ausführen", "alexa sequenz starten", "sag alexa die rolläden zu schließen"}, command -> sequenceAlexa());
         commandsMap.put(new String[]{"erinnere mich", "erinnerung setzen", "setze eine erinnerung"}, command -> setReminder());
     }
 

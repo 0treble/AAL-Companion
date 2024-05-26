@@ -16,8 +16,7 @@ public class SequenceActivity extends AppCompatActivity {
         button1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Define behavior for button 1
-                // For example, you can perform an action or start another activity
+                setResultAndFinish(1);
             }
         });
 
@@ -25,8 +24,7 @@ public class SequenceActivity extends AppCompatActivity {
         button2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Define behavior for button 2
-                // For example, you can perform an action or start another activity
+                setResultAndFinish(2);
             }
         });
 
@@ -34,8 +32,7 @@ public class SequenceActivity extends AppCompatActivity {
         button3.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Define behavior for button 3
-                // For example, you can perform an action or start another activity
+                setResultAndFinish(3);
             }
         });
 
@@ -46,5 +43,11 @@ public class SequenceActivity extends AppCompatActivity {
                 finish();
             }
         });
+    }
+    private void setResultAndFinish(int sequenceId) {
+        Intent resultIntent = new Intent();
+        resultIntent.putExtra("SEQUENCE_ID", sequenceId);
+        setResult(RESULT_OK, resultIntent);
+        finish();
     }
 }
