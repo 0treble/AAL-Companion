@@ -2,6 +2,7 @@ package com.example.temi_elevator;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -74,6 +75,8 @@ public class MainActivity extends AppCompatActivity implements
     boolean flagWaitingForTemiToArrive = false;
     boolean flagWaitingForTemiToFinishSpeaking = false;
     boolean conversationMode = false;
+    private Reminder.ReminderManager reminderManager;
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -118,13 +121,15 @@ public class MainActivity extends AppCompatActivity implements
             transcription.setText(transcript);
         }
 
+        // Initialize the reminder manager
+        reminderManager = new Reminder.ReminderManager(this);
+
         findViewById(R.id.quitButton).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 temi.setKioskModeOn(false);
                 temi.setInteractionState(true);
                 enable_menu();
-
             }
         });
 
@@ -154,10 +159,10 @@ public class MainActivity extends AppCompatActivity implements
             }
         });
 
-        findViewById(R.id.sequence1Button).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.sequenceWindowButton).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                handleSequenceGreeting();
+                startActivity(new Intent(MainActivity.this, SequenceActivity.class));
             }
         });
 
@@ -225,13 +230,14 @@ public class MainActivity extends AppCompatActivity implements
     private final Map<String[], CommandAction> commandsMap = new HashMap<>();
     private void initCommandsMap() {
         commandsMap.put(new String[]{"gehe", "geh", "fahre", "fahr"}, command -> relocateTemi());
-        commandsMap.put(new String[]{"sequenz starten", "sequenz beginnen"}, command -> findViewById(R.id.sequence1Button).performClick());
+        commandsMap.put(new String[]{"sequenz starten", "sequenz beginnen"}, command -> findViewById(R.id.sequenceWindowButton).performClick());
         commandsMap.put(new String[]{"transkription starten", "aufnahme beginnen", "aufnahme starten"}, command -> findViewById(R.id.listen).performClick());
         commandsMap.put(new String[]{"transkription beenden", "aufnahme beenden"}, command -> findViewById(R.id.endTranscription).performClick());
         commandsMap.put(new String[]{"applikation beenden", "app beenden"}, command -> findViewById(R.id.quitButton).performClick());
         commandsMap.put(new String[]{"dunkler modus"}, command -> findViewById(R.id.themeButton).performClick());
         commandsMap.put(new String[]{"gesprächsmodus", "dialogmodus", "gesprächs modus"}, command -> conversationMode = !conversationMode);
         commandsMap.put(new String[]{"gehe zu alexa", "zu alexa gehen", "alexa sequenz ausführen", "alexa sequenz starten", "sag alexa die rolläden zu schließen"}, command -> sequenceAlexa());
+        commandsMap.put(new String[]{"erinnere mich", "erinnerung setzen", "setze eine erinnerung"}, command -> setReminder());
     }
 
     public void analyzeVoiceCommand() {
@@ -257,7 +263,7 @@ public class MainActivity extends AppCompatActivity implements
             relocateTemi();
         }else if((myAsrResultString.contains("sequenz starten")
                 || myAsrResultString.contains("sequenz beginnen"))){
-            findViewById(R.id.sequence1Button).performClick();
+            findViewById(R.id.sequenceWindowButton).performClick();
 
         }else if((myAsrResultString.contains("transkription starten")
                 || myAsrResultString.contains("aufnahme beginnen"))){
@@ -447,6 +453,18 @@ public class MainActivity extends AppCompatActivity implements
                 scrollToBottom();
                 break;
         }
+    }
+
+    /* Reminder */
+    public void setReminder() {
+        long timeInMillis = System.currentTimeMillis() + 15000; // Set reminder after 15 seconds for demonstration
+        Reminder reminder = new Reminder(myAsrResultString, timeInMillis);
+        reminderManager.setReminder(reminder);
+
+        String reminderString = "Erinnerung: " + myAsrResultString;
+        transcription.append(reminderString);
+        scrollToBottom();
+        temi.speak(TtsRequest.create(reminderString, false));
     }
 
     @Override

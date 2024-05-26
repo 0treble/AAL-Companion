@@ -44,7 +44,14 @@
     <string name="TranscriptionText">Transkription wird hier angezeigt.</string>
     <string name="endTranscriptionButton">endTranscriptionButton</string>
     <string name="end_transcription">Transkription beenden</string>
-    <string name="sequenceOne">Sequenz</string>
+    <string name="sequenceButtonText">Sequenz</string>
+    <string name="sequence1">Sequenz 1</string>
+    <string name="sequence2">Sequenz 2</string>
+    <string name="sequence3">Sequenz 3</string>
+    <string name="sequence4">Sequenz 4</string>
+    <string name="back">Zurück</string>
+
+
     <string name="theme">Dunkler Modus</string>
 
 

@@ -30,11 +30,11 @@
         app:layout_constraintVertical_bias="1.0">
 
         <Button
-            android:id="@+id/sequence1Button"
+            android:id="@+id/sequenceWindowButton"
             android:layout_width="242dp"
             android:layout_height="74dp"
             android:backgroundTint="?attr/colorPrimary"
-            android:text="@string/sequenceOne"
+            android:text="@string/sequenceButtonText"
             android:textColor="?attr/colorOnPrimary"
             android:textSize="20sp"
             app:layout_constraintBottom_toBottomOf="@+id/confirmLocationButton"
@@ -254,9 +254,9 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
             app:layout_constraintBottom_toBottomOf="@+id/endTranscription"
-            app:layout_constraintEnd_toEndOf="@+id/sequence1Button"
+            app:layout_constraintEnd_toEndOf="@+id/sequenceWindowButton"
             app:layout_constraintHorizontal_bias="1.0"
-            app:layout_constraintStart_toStartOf="@+id/sequence1Button"
+            app:layout_constraintStart_toStartOf="@+id/sequenceWindowButton"
             app:layout_constraintTop_toTopOf="@+id/endTranscription"
             app:layout_constraintVertical_bias="0.0" />
     </androidx.constraintlayout.widget.ConstraintLayout>
