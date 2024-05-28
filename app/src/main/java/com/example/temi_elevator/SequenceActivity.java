@@ -37,6 +37,14 @@ public class SequenceActivity extends AppCompatActivity {
             }
         });
 
+        Button button4 = findViewById(R.id.sequence4Button);
+        button4.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setResultAndFinish(MainActivity.Sequence.SEQUENCE_BRAIN_GAME);
+            }
+        });
+
         Button backButton = findViewById(R.id.backButton);
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
