@@ -47,6 +47,9 @@ import com.robotemi.sdk.TtsRequest;
 
 import org.jetbrains.annotations.NotNull;
 
+import android.text.format.DateFormat;
+import java.util.Date;
+
 public class MainActivity extends AppCompatActivity implements
         OnRobotReadyListener,
         Robot.AsrListener,
