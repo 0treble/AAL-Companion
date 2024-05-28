@@ -7,6 +7,7 @@ import android.widget.Button;
 import androidx.appcompat.app.AppCompatActivity;
 public class SequenceActivity extends AppCompatActivity {
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -16,7 +17,7 @@ public class SequenceActivity extends AppCompatActivity {
         button1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                setResultAndFinish(1);
+                setResultAndFinish(MainActivity.Sequence.GREETING);
             }
         });
 
@@ -24,7 +25,7 @@ public class SequenceActivity extends AppCompatActivity {
         button2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                setResultAndFinish(2);
+                setResultAndFinish(MainActivity.Sequence.SEQUENCE_ALEXA);
             }
         });
 
@@ -32,7 +33,7 @@ public class SequenceActivity extends AppCompatActivity {
         button3.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                setResultAndFinish(3);
+                setResultAndFinish(MainActivity.Sequence.AAL_SEQUENCE);
             }
         });
 
@@ -44,9 +45,9 @@ public class SequenceActivity extends AppCompatActivity {
             }
         });
     }
-    private void setResultAndFinish(int sequenceId) {
+    private void setResultAndFinish(MainActivity.Sequence sequenceType) {
         Intent resultIntent = new Intent();
-        resultIntent.putExtra("SEQUENCE_ID", sequenceId);
+        resultIntent.putExtra("SEQUENCE_TYPE", sequenceType.name());
         setResult(RESULT_OK, resultIntent);
         finish();
     }

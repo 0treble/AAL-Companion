@@ -9,31 +9,30 @@
     </string-array>
 
 
-    <string name="greeting_string">Herzlich Willkommen in der A A L Wohnung der htw saar! Mein Name ist Temi.
-                                        Bitte folgen Sie mir ins Wohnzimmer.</string>
-    <string name="livingroom_string">Sie können ihren Mantel oder ihre Jacke hier ablegen. Nehmen Sie
-                                        doch bitte erst einmal Platz.</string>
-    <string name="introduction_string">Hallo mein Name ist Temi. Ich bin ein Roboter. Ich wurde entwickelt,
-                                        um Menschen zu unterstützen.
-                                        Wenn du mir etwas sagen möchtest, sprich mich bitte mit Hey Temi an.
-                                        Im Verlauf dieser Untersuchung haben wir einigen Szenarien vorbereitet, in
-                                        denen du meine Fähigkeiten kennenlernen kannst. Du kannst die nächste Aktion
-                                        starten, indem du sagst   Hey Temi was kannst du noch?</string>
+    <string name="greeting_string">Herzlich Willkommen in der AAL Wohnung der htw saar! Mein Name ist Temi. Bitte folgen Sie mir ins Wohnzimmer.</string>
+    <string name="livingroom_string">Sie können ihren Mantel oder ihre Jacke hier ablegen. Nehmen Sie doch bitte erst einmal Platz.</string>
+    <string name="introduction_string">Hallo mein Name ist Temi. Ich bin ein Roboter. Ich wurde entwickelt, um Menschen zu unterstützen. Wenn du mir etwas sagen möchtest, sprich mich bitte mit Hey Temi an. Im Verlauf dieser Untersuchung haben wir einigen Szenarien vorbereitet, in denen du meine Fähigkeiten kennenlernen kannst. Du kannst die nächste Aktion starten, indem du sagst   Hey Temi was kannst du noch?</string>
 
 
-    <string name="survey_greeting_string">Hallo, vielen Dank für Ihre Teilnahme am Forschungsprojekt VOICE (zur Erforschung
-                                        der Nutzbarkeit und Akzeptanz von KI basierten Robotik-Systemen im Alltag). Ich bin Temi und
-                                            freue mich schon darauf Sie kennenzulernen. Aber bevor wir anfangen folgen Sie mir bitte ins Wohnzimmer</string>
-
+    <string name="survey_greeting_string">Hallo, vielen Dank für Ihre Teilnahme am Forschungsprojekt VOICE (zur Erforschung der Nutzbarkeit und Akzeptanz von KI basierten Robotik-Systemen im Alltag). Ich bin Temi und freue mich schon darauf Sie kennenzulernen. Aber bevor wir anfangen folgen Sie mir bitte ins Wohnzimmer</string>
     <string name="survey_livingroom_string">Bitte nehmen Sie doch Platz. Mein Team wird gleich mit Ihnen noch kurz die Einzelheiten des heutigen Tages durchgehen, danach geht’s mit einer kurzen Führung weiter</string>
-
     <string name="survey_start_phrase">Hey Temi lass uns anfangen</string>
-
-    <string name="survey_to_kitchen"> Ok! Folgen Sie mir bitte. Es ist wichtig viel zu trinken. Daher haben wir Ihnen Getränke bereitgestellt. Hier wären wir .
-        Bitte bedienen Sie sich. Wenn ich Ihnen etwas zu den hier verbauten (Dingen) erzählen soll, sagen Sie bitte ‚Hey Temi, was kannst du mir zur Küche‘ sagen, andernfalls können wir auch mit
-        ‚Hey Temi, lass uns weitergehen‘ mit der Besichtigung fortfahren. </string>
-
+    <string name="survey_to_kitchen"> Ok! Folgen Sie mir bitte. Es ist wichtig viel zu trinken. Daher haben wir Ihnen Getränke bereitgestellt. Hier wären wir. Bitte bedienen Sie sich. Wenn ich Ihnen etwas zu den hier verbauten (Dingen) erzählen soll, sagen Sie bitte‚ Hey Temi, was kannst du mir zur Küche‘ sagen, andernfalls können wir auch mit‚Hey Temi, lass uns weitergehen‘ mit der Besichtigung fortfahren. </string>
     <string name="survey_goodbye_string">Ich habe mich gefreut, Sie kennenzulernen und ich möchte mich bei Ihne bedanken, dass Sie an unserer Studie teilgenommen haben. Vielen Dank und alles Gute. </string>
+
+    <!-- AAL Sequence Strings -->
+    <string name="aal_welcome">Herzlich Willkommen in der AAL Musterwohnung.</string>
+    <string name="aal_intro">Ich bin temi, Ihr Begleiter für einen kleinen Rundgang durch die Wohnung. Bitte folgen Sie mir in die Küche, zu der ich Ihnen einige Erläuterungen geben werde.</string>
+    <string name="aal_kitchen_intro">Auf den ersten Blick sieht es aus, wie in einer gewöhnlichen Küche. Doch sind hier einige Erleichterungen für den Bewohner eingebaut, die auf den ersten Blick nicht auffallen.</string>
+    <string name="aal_kitchen_details1">Hier nur 3 der meiner Meinung nach wichtigsten Erleichterungen.</string>
+    <string name="aal_kitchen_details2">Zum einen sind Kühlschrank, Backofen und Geschirrspüler etwas erhöht angebracht. Dadurch muss man sich zur Nutzung nicht bücken. Dies ist insbesondere für ältere Menschen von Vorteil, da mit zunehmendem Alter die Rückenbeweglichkeit nachlässt. Auch für jüngere Menschen ist es von Vorteil, denn jeder Mensch hat es ja gerne bequem. Beispielsweise sieht mein menschlicher Programmierer sofort, ob noch kühles Bier vorhanden ist.</string>
+    <string name="aal_sink_details">Zum anderen lässt mit zunehmendem Alter auch die Schulterbeweglichkeit nach. Daher sind im Hängeschrank elektrisch höhenverstellbare Regalböden eingebaut. Sie sehen die Schalter dazu rechts an der Arbeitsplatte. Interessant ist, dass diese höhenverstellbaren Regalböden nachträglich in einen bestehenden Hängeschrank eingebaut werden können.</string>
+    <string name="aal_worktop_details">Links an der Arbeitsplatte sehen Sie weitere Schalter. Sie sind für die Arbeitsplatte selbst. Denn auch ihre Höhe kann man elektrisch verstellen und so individuell auf den Nutzer anpassen, z.B. für Rollstuhlfahrer.</string>
+    <string name="aal_kitchen_summary">Soweit in aller Kürze zu den wichtigsten und leicht erkennbaren Erleichterungen. Bitte folgen Sie mir nun in das Wohnzimmer.</string>
+    <string name="aal_livingroom_intro">Wir befinden uns nun in dem Teil der Musterwohnung, der nachträglich mit relativ geringem Aufwand aufgerüstet wurde. Beispielsweise sehen Sie rechts neben der Balkontür einen Aufwickler für den Rollladengurt. Auf diese Weise lässt sich sehr einfach und sehr schnell ein Rollladenheber nachrüsten, ohne einen teuren Motor aufwändig zu installieren. Dieser Rollladengurt-Aufwickler verfügt auch über eine Fernbedienung, so dass er auch für Menschen mit Bewegungseinschränkungen leicht zu bedienen ist.</string>
+    <string name="aal_livingroom_details1">Ebenfalls sind in diesem Raum 2 digitale Assistenzsysteme installiert. Zum einen die Uschi von Amazon. Alexa darf ich nicht sagen, sonst meldet sie sich immer sofort. Die will dann immer mitreden, wenn sich erwachsene Leute wie wir unterhalten.</string>
+    <string name="aal_livingroom_details2">Und zum anderen ist das System VIVAIcare mit der Sprachsteuerung VIVI installiert. Wie sie funktioniert wird Ihnen ein menschlicher Kollege von mir erläutern. Ich bin überzeugt, dass er es ebenso kompetent macht wie ich. Auch bei Fragen zu mir wird er Ihnen Auskunft geben.</string>
+    <string name="aal_farewell">Ich würde mich freuen, wenn der kleine Rundgang Ihnen gefallen hat und Sie unsere AAL Musterwohnung weiterempfehlen würden. Ich selbst werde nun schweigen, denn es ist Freitagnachmittag und meine Arbeitszeit ist zu Ende. Überstunden bekomme ich nämlich nicht bezahlt.</string>
 
 
     <string name="take_photo">Transport Modus</string>
@@ -47,11 +46,11 @@
     <string name="sequenceButtonText">Sequenz</string>
     <string name="sequence1">Begrüßungssequenz</string>
     <string name="sequence2">Alexa-Sequenz</string>
-    <string name="sequence3">Sequenz 3</string>
+    <string name="sequence3">AAL-Sequenz</string>
     <string name="sequence4">Sequenz 4</string>
     <string name="back">Zurück</string>
-
-
+    <string name="next">Weiter</string>
+    <string name="repeat">Wiederholen</string>
     <string name="theme">Dunkler Modus</string>
 
 

@@ -9,6 +9,7 @@ import android.os.Build;
 import android.os.Handler;
 import android.util.Log;
 import android.os.Bundle;
+import android.os.Environment;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -17,6 +18,12 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.ScrollView;
+
+import android.widget.Toast;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+
 import com.robotemi.sdk.*;
 import com.robotemi.sdk.Robot;
 import com.robotemi.sdk.constants.Page;
@@ -40,10 +47,14 @@ import java.util.concurrent.Executors;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Collections;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
+import java.util.Date;
 
 import com.robotemi.sdk.listeners.OnConversationStatusChangedListener;
 import com.robotemi.sdk.listeners.OnRobotReadyListener;
 import com.robotemi.sdk.TtsRequest;
+//import com.robotemi.sdk.voice.model.TtsVoice;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -73,9 +84,9 @@ public class MainActivity extends AppCompatActivity implements
     private ActivityResultLauncher<Intent> sequenceResultLauncher;
     private ExecutorService myExecutorService;
     private String myAsrResultString = "";
-    enum sequence {GREETING,SMALL_TALK}
-    sequence currentSequence = sequence.GREETING;
-    int currentSequenceStep = 1;
+    enum Sequence {GREETING,SMALL_TALK,SEQUENCE_ALEXA, AAL_SEQUENCE}
+    private Sequence currentSequence;
+    int currentSequenceStep = 0;
     private boolean flagWaitingForTemiToArrive = false;
     private boolean flagWaitingForTemiToFinishSpeaking = false;
     boolean conversationMode = false;
@@ -101,6 +112,8 @@ public class MainActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         temi.setKioskModeOn(true);
 
+        if(!temi.isKioskModeOn()){temi.setKioskModeOn(true);}
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -118,7 +131,7 @@ public class MainActivity extends AppCompatActivity implements
 
         scrollView = findViewById(R.id.scrollView);
 
-        findViewById(R.id.isRecordingBar).setVisibility(View.INVISIBLE);
+        findViewById(R.id.isRecordingImg).setVisibility(View.INVISIBLE);
 
         if (savedInstanceState != null) {
             String transcript = savedInstanceState.getString("transcript");
@@ -136,17 +149,18 @@ public class MainActivity extends AppCompatActivity implements
 
         findViewById(R.id.listen).setOnClickListener(view -> {
             temi.wakeup(Collections.singletonList(SttLanguage.SYSTEM));
-            findViewById(R.id.isRecordingBar).setVisibility(View.VISIBLE);
+            findViewById(R.id.isRecordingImg).setVisibility(View.VISIBLE);
         });
 
         findViewById(R.id.endTranscription).setOnClickListener(view -> {
             transcription.append("Transkription beended." + "\n");
             temi.wakeup(Collections.singletonList(SttLanguage.SYSTEM));
-            findViewById(R.id.isRecordingBar).setVisibility(View.INVISIBLE);
+            findViewById(R.id.isRecordingImg).setVisibility(View.INVISIBLE);
             scrollToBottom();
         });
 
         findViewById(R.id.quitButton).setOnClickListener(view -> {
+            saveTranscriptionToFile();
             temi.setKioskModeOn(false);
             temi.setHardButtonsDisabled(false);
             temi.setGoToSpeed(SpeedLevel.SLOW);
@@ -164,35 +178,17 @@ public class MainActivity extends AppCompatActivity implements
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
                     if (result.getResultCode() == RESULT_OK && result.getData() != null) {
-                        int sequenceId = result.getData().getIntExtra("SEQUENCE_ID", -1);
-                        handleSequence(sequenceId);
+                        String sequenceTypeName = result.getData().getStringExtra("SEQUENCE_TYPE");
+                        if (sequenceTypeName != null) {
+                            currentSequence = Sequence.valueOf(sequenceTypeName);
+                            currentSequenceStep = 0;
+                            chooseCurrentSequence();
+                        }
                     }
                 }
         );
     }
 
-    private void handleSequence(int sequenceId) {
-        switch (sequenceId) {
-            case 1:
-                handleSequenceGreeting();
-                transcription.append("Begrüßungssequenz wurde getriggert" + "\n");
-                scrollToBottom();
-                break;
-            case 2:
-                sequenceAlexa();
-                transcription.append("Alexa-Sequenz wurde getriggert" + "\n");
-                scrollToBottom();
-                break;
-            case 3:
-                transcription.append("Sequenz 3 wurde getriggert" + "\n");
-                scrollToBottom();
-                break;
-            default:
-                transcription.append("Error default in handleSequence)" + "\n");
-                scrollToBottom();
-                break;
-        }
-    }
 
     private void setupThemeButton() {
         try {
@@ -238,16 +234,29 @@ public class MainActivity extends AppCompatActivity implements
     private final Map<String[], CommandAction> commandsMap = new HashMap<>();
     private void initCommandsMap() {
         commandsMap.put(new String[]{"gehe", "geh", "fahre", "fahr"}, command -> relocateTemi());
-        commandsMap.put(new String[]{"begrüssungssequenz starten", "willkommenssequenz starten", "sequenz 1 starten",
-                                    "sequenz 1 beginnen"}, command -> findViewById(R.id.sequenceWindowButton).performClick());
         commandsMap.put(new String[]{"transkription starten", "aufnahme beginnen", "aufnahme starten"}, command -> findViewById(R.id.listen).performClick());
         commandsMap.put(new String[]{"transkription beenden", "aufnahme beenden"}, command -> findViewById(R.id.endTranscription).performClick());
         commandsMap.put(new String[]{"applikation beenden", "app beenden"}, command -> findViewById(R.id.quitButton).performClick());
         commandsMap.put(new String[]{"dunkler modus"}, command -> findViewById(R.id.themeButton).performClick());
         commandsMap.put(new String[]{"stopp","stop","abbrechen","abbruch" }, command -> stopCurrentSequence());
         commandsMap.put(new String[]{"gesprächsmodus", "dialogmodus", "gesprächs modus"}, command -> conversationMode = !conversationMode);
+        /* Sequences */
+        commandsMap.put(new String[]{"gäste begrüßen", "begrüßung starten", "willkommenssequenz starten", "sequenz 1 starten",
+                "sequenz 1 beginnen"}, command -> {
+            currentSequence = Sequence.GREETING;
+            currentSequenceStep = 0;
+            chooseCurrentSequence();
+        });
         commandsMap.put(new String[]{"sequenz 2 starten", "sequenz 2 beginnen", "alexa sequenz ausführen",
-                                     "alexa sequenz starten", "sag alexa die rolläden zu schließen"}, command -> sequenceAlexa());
+                                     "alexa sequenz starten", "sag alexa die rolläden zu schließen"}, command -> {
+            currentSequence = Sequence.SEQUENCE_ALEXA;
+            currentSequenceStep = 0;
+            chooseCurrentSequence();});
+        commandsMap.put(new String[]{"aal sequenz", "rundgang starten"}, command -> {
+            currentSequence = Sequence.AAL_SEQUENCE;
+            currentSequenceStep = 0;
+            chooseCurrentSequence();
+        });
         commandsMap.put(new String[]{"erinnere mich", "erinnerung setzen", "setze eine erinnerung"}, command -> setReminder());
     }
 
@@ -269,6 +278,264 @@ public class MainActivity extends AppCompatActivity implements
     {
         temi.stopMovement();
         temi.cancelAllTtsRequests();
+    }
+
+    //Handles result from voice commands and SequenceActivity.java click result
+    public void chooseCurrentSequence()
+    {
+        switch(currentSequence)
+        {
+            case GREETING:
+                scrollToBottom();
+                handleSequenceGreeting();
+                break;
+            case SMALL_TALK:
+
+                break;
+            case SEQUENCE_ALEXA:
+                scrollToBottom();
+                handleSequenceAlexa();
+                break;
+            case AAL_SEQUENCE:
+                scrollToBottom();
+                handleAALSequence();
+                break;
+            default:
+                transcription.append("Error default in switch(currentsequence)" + "\n");
+                scrollToBottom();
+                break;
+        }
+    }
+
+    @Override
+    public void onTtsStatusChanged(@NonNull TtsRequest ttsRequest) {
+        TtsRequest.Status status = ttsRequest.getStatus();
+        if (status == TtsRequest.Status.COMPLETED && flagWaitingForTemiToFinishSpeaking) {
+            flagWaitingForTemiToFinishSpeaking = false;
+            currentSequenceStep += 1;
+            chooseCurrentSequence();
+        }
+    }
+
+
+    @Override
+    public void onGoToLocationStatusChanged(@NonNull String location, @NonNull String status, int descriptionId, @NonNull String description) {
+        if (status.equals(COMPLETE) && flagWaitingForTemiToArrive) {
+            flagWaitingForTemiToArrive = false;
+            currentSequenceStep += 1;
+            chooseCurrentSequence();
+        }
+    }
+
+    public void handleSequenceGreeting()
+    {
+        switch (currentSequenceStep)
+        {
+            case 0:
+                flagWaitingForTemiToArrive = true;      /// SUPER IMPORTANT BEFORE EVERY GO-TO-COMMAND!!!!
+                temi.goTo("tür");               /// so that the next task is started AFTER arriving at destination
+                // step increment done by the onGoToStatusListener()
+                break;
+            case 1:
+                String greeting_string = getString(R.string.greeting_string);
+                transcription.setText(greeting_string);
+                flagWaitingForTemiToFinishSpeaking = true;  /// SUPER IMPORTANT BEFORE EVERY speaking-COMMAND!!!!
+                /// so that the next task is started AFTER arriving at destination
+                temi.speak(TtsRequest.create(greeting_string, false));
+                // step increment done by the onTtsStatusChanged() when temi finished speaking previous string
+                break;
+            case 2:
+                waitHandler.postDelayed(() -> {
+                }, 3000);
+                flagWaitingForTemiToArrive = true;
+                temi.goTo("wohnzimmer");
+                break;
+            case 3:
+
+                String livingroom_string = getString(R.string.livingroom_string);
+                transcription.setText(livingroom_string);
+                waitHandler.postDelayed(() -> {
+                }, 5000);
+                flagWaitingForTemiToFinishSpeaking = true;
+                temi.speak(TtsRequest.create(livingroom_string, false));
+                // step increment done by the onTtsStatusChanged() when temi finished speaking previous string
+                break;
+            case 4:
+                waitHandler.postDelayed(() -> {
+                }, 3000);
+                String introduction_string = getString(R.string.introduction_string);
+                transcription.setText(introduction_string);
+                temi.speak(TtsRequest.create(introduction_string, false));
+                waitHandler.postDelayed(() -> {
+                }, 3000);
+                // step increment done by the onTtsStatusChanged() when temi finished speaking previous string
+                break;
+            case 5: // End of sequence GREETING
+                currentSequenceStep = 0;
+                currentSequence = null;
+                break;
+            default:
+                transcription.append("Error: Default in Sequenz GREETING!");
+                scrollToBottom();
+                break;
+        }
+    }
+
+    private void handleSequenceAlexa() {
+        switch (currentSequenceStep) {
+            case 0:
+                // Initial command
+                String alexa_command_init = "Okay. Ich gehe zu Alexa um ihr zu sagen, dass sie den Rolläden schließen soll.";
+                flagWaitingForTemiToFinishSpeaking = true;
+                temi.speak(TtsRequest.create(alexa_command_init, false));
+                break;
+            case 1:
+                // Go to Alexa location
+                flagWaitingForTemiToArrive = true;
+                temi.goTo("alexa");
+                break;
+            case 2:
+                // Speak "Alexa"
+                flagWaitingForTemiToFinishSpeaking = true;
+                temi.speak(TtsRequest.create("Alexa", false));
+                break;
+            case 3:
+                // Final command after a delay
+                waitHandler.postDelayed(() -> {
+                    flagWaitingForTemiToFinishSpeaking = true;
+                    temi.speak(TtsRequest.create("Bitte schließe die Rolläden", false));
+                    // oder temi.speak(TtsRequest.create("Wohnzimmer an", false));
+                }, 1000);
+                break;
+            default:
+                // Sequence completed
+                currentSequenceStep = 0;
+                currentSequence = null;
+                break;
+        }
+    }
+
+    private void handleAALSequence() {
+        switch (currentSequenceStep) {
+            case 0:
+                // At the entrance
+                String entranceWelcome = getString(R.string.aal_welcome);
+                flagWaitingForTemiToFinishSpeaking = true;
+                temi.speak(TtsRequest.create(entranceWelcome, false));
+                break;
+            case 1:
+                String introduction = getString(R.string.aal_intro);
+                flagWaitingForTemiToFinishSpeaking = true;
+                temi.speak(TtsRequest.create(introduction, false));
+                break;
+            case 2:
+                // Move to the kitchen
+                flagWaitingForTemiToArrive = true;
+                temi.goTo("küche");
+                break;
+            case 3:
+                // In the kitchen
+                String kitchenIntro = getString(R.string.aal_kitchen_intro);
+                flagWaitingForTemiToFinishSpeaking = true;
+                temi.speak(TtsRequest.create(kitchenIntro, false));
+                break;
+            case 4:
+                String kitchenDetails1 = getString(R.string.aal_kitchen_details1);
+                flagWaitingForTemiToFinishSpeaking = true;
+                temi.speak(TtsRequest.create(kitchenDetails1, false));
+                break;
+            case 5:
+                String kitchenDetails2 = getString(R.string.aal_kitchen_details2);
+                flagWaitingForTemiToFinishSpeaking = true;
+                temi.speak(TtsRequest.create(kitchenDetails2, false));
+                break;
+            case 6:
+                // Move to the sink
+                flagWaitingForTemiToArrive = true;
+                temi.goTo("waschbecken");
+                break;
+            case 7:
+                String sinkDetails = getString(R.string.aal_sink_details);
+                flagWaitingForTemiToFinishSpeaking = true;
+                temi.speak(TtsRequest.create(sinkDetails, false));
+                break;
+            case 8:
+                String worktopDetails = getString(R.string.aal_worktop_details);
+                flagWaitingForTemiToFinishSpeaking = true;
+                temi.speak(TtsRequest.create(worktopDetails, false));
+                break;
+            case 9:
+                String kitchenSummary = getString(R.string.aal_kitchen_summary);
+                flagWaitingForTemiToFinishSpeaking = true;
+                temi.speak(TtsRequest.create(kitchenSummary, false));
+                break;
+            case 10:
+                // Move to the living room
+                flagWaitingForTemiToArrive = true;
+                temi.goTo("wohnzimmer");
+                break;
+            case 11:
+                // In the living room
+                String livingRoomIntro = getString(R.string.aal_livingroom_intro);
+                flagWaitingForTemiToFinishSpeaking = true;
+                temi.speak(TtsRequest.create(livingRoomIntro, false));
+                break;
+            case 12:
+                String livingRoomDetails1 = getString(R.string.aal_livingroom_details1);
+                flagWaitingForTemiToFinishSpeaking = true;
+                temi.speak(TtsRequest.create(livingRoomDetails1, false));
+                break;
+            case 13:
+                String livingRoomDetails2 = getString(R.string.aal_livingroom_details2);
+                flagWaitingForTemiToFinishSpeaking = true;
+                temi.speak(TtsRequest.create(livingRoomDetails2, false));
+                break;
+            case 14:
+                String farewell = getString(R.string.aal_farewell);
+                flagWaitingForTemiToFinishSpeaking = true;
+                temi.speak(TtsRequest.create(farewell, false));
+                break;
+            default:
+                // Sequence completed
+                currentSequenceStep = 0; // Reset the sequence step
+                currentSequence = null; // Or set to another sequence as needed
+                break;
+        }
+    }
+
+    @Override
+    public void onConversationStatusChanged(int status, @NotNull String text) {
+        myAsrResultString += text;
+        switch (status) {
+            case IDLE:
+                Log.i(TAG, "Status: IDLE | Text: " + myAsrResultString);
+                transcription.append("Status: IDLE | Text: " + myAsrResultString + "\n");
+                findViewById(R.id.isRecordingImg).setVisibility(View.INVISIBLE);
+                scrollToBottom();
+                break;
+            case LISTENING:
+                Log.i(TAG, "Status: LISTENING | Text: " + myAsrResultString);
+                transcription.append("Status: LISTENING | Text: " + myAsrResultString + "\n");
+                findViewById(R.id.isRecordingImg).setVisibility(View.VISIBLE);
+                scrollToBottom();
+                break;
+            case THINKING:
+                Log.i(TAG, "Status: THINKING | Text: " + myAsrResultString);
+                transcription.append("Status: THINKING | Text: " + myAsrResultString + "\n");
+                scrollToBottom();
+                break;
+            case SPEAKING:
+                Log.i(TAG, "Status: SPEAKING | Text: " + myAsrResultString);
+                transcription.append("Status: SPEAKING | Text: " + myAsrResultString + "\n");
+                scrollToBottom();
+                break;
+            default:
+                Log.i(TAG, "Status: UNKNOWN | Text: " + myAsrResultString);
+                transcription.append("Status: UNKNOWN | Text: " + myAsrResultString + "\n");
+                findViewById(R.id.isRecordingImg).setVisibility(View.INVISIBLE);
+                scrollToBottom();
+                break;
+        }
     }
 
     public void relocateTemi()
@@ -304,148 +571,6 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-    public void chooseCurrentSequence()
-    {
-        switch(currentSequence)
-        {
-            case GREETING:
-                handleSequenceGreeting();
-                break;
-            case SMALL_TALK:
-
-                break;
-            default:
-                transcription.append("Error default in switch(currentsequence)");
-                scrollToBottom();
-                break;
-        }
-    }
-
-    @Override
-    public void onTtsStatusChanged(@NonNull TtsRequest ttsRequest) {
-        TtsRequest.Status status = ttsRequest.getStatus();
-        if (status == TtsRequest.Status.COMPLETED && flagWaitingForTemiToFinishSpeaking) {
-            flagWaitingForTemiToFinishSpeaking = false;
-            currentSequenceStep += 1;
-            chooseCurrentSequence();
-        }
-    }
-
-
-    @Override
-    public void onGoToLocationStatusChanged(@NonNull String location, @NonNull String status, int descriptionId, @NonNull String description) {
-        if (status.equals(COMPLETE) && flagWaitingForTemiToArrive) {
-            flagWaitingForTemiToArrive = false;
-            currentSequenceStep += 1;
-            chooseCurrentSequence();
-        }
-    }
-
-    private void sequenceAlexa() {
-        String alexa_command_init = "Okay. Ich gehe zu Alexa um ihr zu sagen, dass sie den Rolläden schließen soll.";
-        flagWaitingForTemiToFinishSpeaking = true;
-        temi.speak(TtsRequest.create(alexa_command_init, false));
-
-        flagWaitingForTemiToArrive = true;
-        temi.goTo("alexa");
-
-        flagWaitingForTemiToFinishSpeaking = true;
-        temi.speak(TtsRequest.create("Alexa", false));
-
-        waitHandler.postDelayed(() -> {
-            flagWaitingForTemiToFinishSpeaking = true;
-            temi.speak(TtsRequest.create("Bitte schließe die Rolläden", false));
-        }, 1000);
-    }
-
-    public void handleSequenceGreeting()
-    {
-        switch (currentSequenceStep)
-        {
-            case 1:
-                flagWaitingForTemiToArrive = true;      /// SUPER IMPORTANT BEFORE EVERY GO-TO-COMMAND!!!!
-                temi.goTo("tür");               /// so that the next task is started AFTER arriving at destination
-                // step increment done by the onGoToStatusListener()
-                break;
-            case 2:
-                String greeting_string = getString(R.string.greeting_string);
-                transcription.setText(greeting_string);
-                flagWaitingForTemiToFinishSpeaking = true;  /// SUPER IMPORTANT BEFORE EVERY speaking-COMMAND!!!!
-                /// so that the next task is started AFTER arriving at destination
-                temi.speak(TtsRequest.create(greeting_string, false));
-                // step increment done by the onTtsStatusChanged() when temi finished speaking previous string
-                break;
-            case 3:
-                waitHandler.postDelayed(() -> {
-                }, 3000);
-                flagWaitingForTemiToArrive = true;
-                temi.goTo("wohnzimmer");
-                break;
-            case 4:
-
-                String livingroom_string = getString(R.string.livingroom_string);
-                transcription.setText(livingroom_string);
-                waitHandler.postDelayed(() -> {
-                }, 5000);
-                flagWaitingForTemiToFinishSpeaking = true;
-                temi.speak(TtsRequest.create(livingroom_string, false));
-                // step increment done by the onTtsStatusChanged() when temi finished speaking previous string
-                break;
-            case 5:
-                waitHandler.postDelayed(() -> {
-                }, 3000);
-                String introduction_string = getString(R.string.introduction_string);
-                transcription.setText(introduction_string);
-                temi.speak(TtsRequest.create(introduction_string, false));
-                waitHandler.postDelayed(() -> {
-                }, 3000);
-                // step increment done by the onTtsStatusChanged() when temi finished speaking previous string
-                break;
-            case 6: // End of sequence GREETING
-                currentSequenceStep = 0;
-                break;
-            default:
-                transcription.append("Error: Default in Sequenz GREETING!");
-                scrollToBottom();
-                break;
-        }
-    }
-
-    @Override
-    public void onConversationStatusChanged(int status, @NotNull String text) {
-        myAsrResultString += text;
-        switch (status) {
-            case IDLE:
-                Log.i(TAG, "Status: IDLE | Text: " + myAsrResultString);
-                transcription.append("Status: IDLE | Text: " + myAsrResultString + "\n");
-                findViewById(R.id.isRecordingBar).setVisibility(View.INVISIBLE);
-                scrollToBottom();
-                break;
-            case LISTENING:
-                Log.i(TAG, "Status: LISTENING | Text: " + myAsrResultString);
-                transcription.append("Status: LISTENING | Text: " + myAsrResultString + "\n");
-                findViewById(R.id.isRecordingBar).setVisibility(View.VISIBLE);
-                scrollToBottom();
-                break;
-            case THINKING:
-                Log.i(TAG, "Status: THINKING | Text: " + myAsrResultString);
-                transcription.append("Status: THINKING | Text: " + myAsrResultString + "\n");
-                scrollToBottom();
-                break;
-            case SPEAKING:
-                Log.i(TAG, "Status: SPEAKING | Text: " + myAsrResultString);
-                transcription.append("Status: SPEAKING | Text: " + myAsrResultString + "\n");
-                scrollToBottom();
-                break;
-            default:
-                Log.i(TAG, "Status: UNKNOWN | Text: " + myAsrResultString);
-                transcription.append("Status: UNKNOWN | Text: " + myAsrResultString + "\n");
-                findViewById(R.id.isRecordingBar).setVisibility(View.INVISIBLE);
-                scrollToBottom();
-                break;
-        }
-    }
-
     /* Reminder */
     public void setReminder() {
         long timeInMillis = System.currentTimeMillis() + 15000; // Set reminder after 15 seconds for demonstration
@@ -456,6 +581,36 @@ public class MainActivity extends AppCompatActivity implements
         transcription.append(reminderString);
         scrollToBottom();
         temi.speak(TtsRequest.create(reminderString, false));
+    }
+
+    /* Text Field to TXT File*/
+    private void saveTranscriptionToFile() {
+        String transcript = transcription.getText().toString();
+        String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
+        String filename = "transcription_" + timestamp + ".txt";
+
+        transcription.append("Transkription gespeichert unter: " + filename + "\n");
+        scrollToBottom();
+
+        if (!transcript.isEmpty()) {
+            try {
+                File root = new File(Environment.getExternalStorageDirectory(), "TemiVoice Transcriptions");
+                if (!root.exists()) {
+                    root.mkdirs(); // Create folder if it doesn't exist
+                }
+                File file = new File(root, filename);
+                FileWriter writer = new FileWriter(file);
+                writer.append(transcript);
+                writer.flush();
+                writer.close();
+                Toast.makeText(getApplicationContext(), "Transcription saved to file", Toast.LENGTH_SHORT).show();
+            } catch (IOException e) {
+                e.printStackTrace();
+                Toast.makeText(getApplicationContext(), "Error saving transcription", Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            Toast.makeText(getApplicationContext(), "Transcription is empty", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
@@ -770,8 +925,8 @@ public class MainActivity extends AppCompatActivity implements
             Button confirm_button = findViewById(R.id.confirmLocationButton);
             Spinner spinner = findViewById(R.id.dropdownMenu);
             TextView textView = findViewById(R.id.topTextView);
-            findViewById(R.id.isRecordingBar).setVisibility(View.INVISIBLE);
-
+            findViewById(R.id.isRecordingImg).setVisibility(View.INVISIBLE);
+            //findViewById(R.id.isRecordingBar).setVisibility(View.INVISIBLE);
             elevatorTextView.setVisibility(View.INVISIBLE);
             confirmTextView.setVisibility(View.INVISIBLE);
             confirmYesButton.setVisibility(View.INVISIBLE);
