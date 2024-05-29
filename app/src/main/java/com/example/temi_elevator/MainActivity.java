@@ -225,7 +225,7 @@ public class MainActivity extends AppCompatActivity implements
         Log.i(TAG, "ASR Result: " + asrResult);
         myAsrResultString = asrResult;
         transcription.append("myAsrResultString: " + myAsrResultString + "\n");
-        appendTranscription("myAsrResultString: " + myAsrResultString);
+        logToFile("myAsrResultString: " + myAsrResultString);
         scrollToBottom();
 
         temi.speak(TtsRequest.create(myAsrResultString, false));
@@ -237,10 +237,18 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-    private void appendTranscription(String text) {
+    private void logToFile(String text) {
         String currentTime = DateFormat.format("HH:mm:ss", new Date()).toString();
-        transcription.append(currentTime + " - " + text + "\n");
-        scrollToBottom();
+        String logText = currentTime + " - " + text;
+
+        File logFile = new File(getExternalFilesDir(null), "transcription_log.txt");
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(logFile, true))) {
+            writer.write(logText);
+            writer.newLine();
+        } catch (IOException e) {
+            Log.e(TAG, "Error writing to log file", e);
+        }
     }
 
     /* Voice Commands */
