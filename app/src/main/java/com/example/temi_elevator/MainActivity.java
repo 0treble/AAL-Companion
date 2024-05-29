@@ -221,6 +221,7 @@ public class MainActivity extends AppCompatActivity implements
         Log.i(TAG, "ASR Result: " + asrResult);
         myAsrResultString = asrResult;
         transcription.append("myAsrResultString: " + myAsrResultString + "\n");
+        appendTranscription("myAsrResultString: " + myAsrResultString);
         scrollToBottom();
 
         temi.speak(TtsRequest.create(myAsrResultString, false));
@@ -230,6 +231,12 @@ public class MainActivity extends AppCompatActivity implements
         if(!conversationMode){
             temi.finishConversation(); // stop ASR listener
         }
+    }
+
+    private void appendTranscription(String text) {
+        String currentTime = DateFormat.format("HH:mm:ss", new Date()).toString();
+        transcription.append(currentTime + " - " + text + "\n");
+        scrollToBottom();
     }
 
     /* Voice Commands */
