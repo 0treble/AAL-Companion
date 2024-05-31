@@ -55,7 +55,6 @@ import com.robotemi.sdk.listeners.OnConversationStatusChangedListener;
 import com.robotemi.sdk.listeners.OnRobotReadyListener;
 import com.robotemi.sdk.TtsRequest;
 
-
 import org.jetbrains.annotations.NotNull;
 
 public class MainActivity extends AppCompatActivity implements
@@ -110,8 +109,6 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         temi.setKioskModeOn(true);
-
-        if(!temi.isKioskModeOn()){temi.setKioskModeOn(true);}
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -260,6 +257,7 @@ public class MainActivity extends AppCompatActivity implements
     private final Map<String[], CommandAction> commandsMap = new HashMap<>();
     private void initCommandsMap() {
         commandsMap.put(new String[]{"gehe", "geh", "fahre", "fahr"}, command -> relocateTemi());
+        commandsMap.put(new String[]{"folge mir"}, command -> followMe());
         commandsMap.put(new String[]{"transkription starten", "aufnahme beginnen", "aufnahme starten"}, command -> findViewById(R.id.listen).performClick());
         commandsMap.put(new String[]{"transkription beenden", "aufnahme beenden"}, command -> findViewById(R.id.endTranscription).performClick());
         commandsMap.put(new String[]{"applikation beenden", "app beenden"}, command -> findViewById(R.id.quitButton).performClick());
@@ -277,8 +275,9 @@ public class MainActivity extends AppCompatActivity implements
                                      "alexa sequenz starten", "sag alexa die rolläden zu schließen"}, command -> {
             currentSequence = Sequence.SEQUENCE_ALEXA;
             currentSequenceStep = 0;
-            chooseCurrentSequence();});
-        commandsMap.put(new String[]{"aal sequenz", "rundgang starten"}, command -> {
+            chooseCurrentSequence();
+        });
+        commandsMap.put(new String[]{"aal sequenz", "sequenz 2 starten", "rundgang starten"}, command -> {
             currentSequence = Sequence.AAL_SEQUENCE;
             currentSequenceStep = 0;
             chooseCurrentSequence();
@@ -314,6 +313,8 @@ public class MainActivity extends AppCompatActivity implements
     {
         temi.stopMovement();
         temi.cancelAllTtsRequests();
+        currentSequenceStep = 0;
+        currentSequence = null;
     }
 
     //Handles result from voice commands and SequenceActivity.java click result
@@ -524,79 +525,83 @@ public class MainActivity extends AppCompatActivity implements
     private void handleAALSequence() {
         switch (currentSequenceStep) {
             case 0:
+                flagWaitingForTemiToArrive = true;
+                temi.goTo("tür");
+                break;
+            case 1:
                 // At the entrance
                 String entranceWelcome = getString(R.string.aal_welcome);
                 flagWaitingForTemiToFinishSpeaking = true;
                 temi.speak(TtsRequest.create(entranceWelcome, false));
                 break;
-            case 1:
+            case 2:
                 String introduction = getString(R.string.aal_intro);
                 flagWaitingForTemiToFinishSpeaking = true;
                 temi.speak(TtsRequest.create(introduction, false));
                 break;
-            case 2:
+            case 3:
                 // Move to the kitchen
                 flagWaitingForTemiToArrive = true;
                 temi.goTo("küche");
                 break;
-            case 3:
+            case 4:
                 // In the kitchen
                 String kitchenIntro = getString(R.string.aal_kitchen_intro);
                 flagWaitingForTemiToFinishSpeaking = true;
                 temi.speak(TtsRequest.create(kitchenIntro, false));
                 break;
-            case 4:
+            case 5:
                 String kitchenDetails1 = getString(R.string.aal_kitchen_details1);
                 flagWaitingForTemiToFinishSpeaking = true;
                 temi.speak(TtsRequest.create(kitchenDetails1, false));
                 break;
-            case 5:
+            case 6:
                 String kitchenDetails2 = getString(R.string.aal_kitchen_details2);
                 flagWaitingForTemiToFinishSpeaking = true;
                 temi.speak(TtsRequest.create(kitchenDetails2, false));
                 break;
-            case 6:
+            case 7:
                 // Move to the sink
                 flagWaitingForTemiToArrive = true;
                 temi.goTo("waschbecken");
                 break;
-            case 7:
+            case 8:
                 String sinkDetails = getString(R.string.aal_sink_details);
                 flagWaitingForTemiToFinishSpeaking = true;
                 temi.speak(TtsRequest.create(sinkDetails, false));
                 break;
-            case 8:
+            case 9:
                 String worktopDetails = getString(R.string.aal_worktop_details);
                 flagWaitingForTemiToFinishSpeaking = true;
                 temi.speak(TtsRequest.create(worktopDetails, false));
                 break;
-            case 9:
+            case 10:
                 String kitchenSummary = getString(R.string.aal_kitchen_summary);
                 flagWaitingForTemiToFinishSpeaking = true;
                 temi.speak(TtsRequest.create(kitchenSummary, false));
                 break;
-            case 10:
+            case 11:
                 // Move to the living room
                 flagWaitingForTemiToArrive = true;
                 temi.goTo("wohnzimmer");
                 break;
-            case 11:
+            case 12:
                 // In the living room
                 String livingRoomIntro = getString(R.string.aal_livingroom_intro);
                 flagWaitingForTemiToFinishSpeaking = true;
                 temi.speak(TtsRequest.create(livingRoomIntro, false));
                 break;
-            case 12:
+            case 13:
                 String livingRoomDetails1 = getString(R.string.aal_livingroom_details1);
                 flagWaitingForTemiToFinishSpeaking = true;
                 temi.speak(TtsRequest.create(livingRoomDetails1, false));
                 break;
-            case 13:
+            case 14:
                 String livingRoomDetails2 = getString(R.string.aal_livingroom_details2);
                 flagWaitingForTemiToFinishSpeaking = true;
                 temi.speak(TtsRequest.create(livingRoomDetails2, false));
                 break;
-            case 14:
+            case 15:
                 String farewell = getString(R.string.aal_farewell);
                 flagWaitingForTemiToFinishSpeaking = true;
                 temi.speak(TtsRequest.create(farewell, false));
@@ -799,6 +804,21 @@ public class MainActivity extends AppCompatActivity implements
             destination = "küche";
             confirm();
         }
+        else if(myAsrResultString.contains("büro"))
+        {
+            destination = "büro";
+            confirm();
+        }
+        else if(myAsrResultString.contains("esszimmer"))
+        {
+            destination = "esszimmer";
+            confirm();
+        }
+        else if(myAsrResultString.contains("waschbecken"))
+        {
+            destination = "waschbecken";
+            confirm();
+        }
         else if(myAsrResultString.contains("alexa"))
         {
             destination = "alexa";
@@ -850,6 +870,11 @@ public class MainActivity extends AppCompatActivity implements
         } else {
             Toast.makeText(getApplicationContext(), "Transcription is empty", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private void followMe() {
+        Log.i(TAG, "Follow the user");
+        //code to follow the user and check the listeners
     }
 
     @Override
