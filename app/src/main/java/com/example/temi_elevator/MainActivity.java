@@ -615,107 +615,201 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void handleSequenceBrainGame() {
-        isSequenceActive = true; // Sequence is active
+        //isSequenceActive = true; // Sequence is active
+
+        transcription.append("\nDEGBUG: in handleBrainGame: Schritt = " + currentSequenceStep + "\n");
 
         switch (currentSequenceStep) {
             case 0:
-                transcription.append("\nDEBUG: In Sequence: handleSequenceBrainGame\n\n\n\n\n\n\n");
+                transcription.append("\nDEGBUG: In Sequence: handleSequenceBrainGame\n\n\n\n\n\n\n");
+
                 String introducingBrainGame = getString(R.string.bg_introduction_short);
                 flagWaitingForTemiToFinishSpeaking = true;
                 temi.speak(TtsRequest.create(introducingBrainGame, false));
-                // step increment done by the onTtsStatusChanged()
+                // step/case incremeted by the statusChange of tts
                 break;
             case 1:
-                // Assuming some ASR processing happens here
+                /*
+                currentSequenceStep++;
+                temi.wakeup(Collections.singletonList(SttLanguage.SYSTEM));
+                findViewById(R.id.isRecordingImg).setVisibility(View.VISIBLE);
+
+                // when answer is transcripted - onAsrResult calls handle-func again to continue with step/case 2
+
+                //break;
+                */
                 currentSequenceStep++;
                 break;
+
             case 2:
-                if (myAsrResultString.contains("ja")) {
+                if(myAsrResultString.contains("ja"))
+                {
                     String letsgo = "Schritt 3: Alles klar. Los geht's!";
                     String sentence1 = letsgo + getString(R.string.bg_sentence1);
                     flagWaitingForTemiToFinishSpeaking = true;
                     temi.speak(TtsRequest.create(sentence1, false));
-                } else {
-                    //String aaaaaa = getString(R.string.bg_introduction);
+                    // step/case incremeted by the statusChange of tts
+
+                }
+                else
+                {
+                    String aaaaaa = getString(R.string.bg_introduction);
                     flagWaitingForTemiToFinishSpeaking = true;
                     temi.speak(TtsRequest.create("Schritt 3: Ich habe kein ja gehört. Reset zu Schritt 0", false));
                     currentSequenceStep = 0;
                     String introducingBrainGame2 = getString(R.string.bg_introduction_short);
                     flagWaitingForTemiToFinishSpeaking = true;
                     temi.speak(TtsRequest.create(introducingBrainGame2, false));
+                    // step/case incremeted by the statusChange of tts
                 }
+
                 break;
-            case 3:
-            case 5:
-            case 7:
-            case 9:
-            case 11:
-            case 14:
-                // Ensure ASR result is processed only once
-                if (!flagWaitingForAsrResult) {
-                    flagWaitingForAsrResult = true;
-                    temi.wakeup(Collections.singletonList(SttLanguage.SYSTEM));
-                    findViewById(R.id.isRecordingImg).setVisibility(View.VISIBLE);
-                }
+
+            case 3:         /// PROBLEM: onAsrResult is called multiple times during transcripting > error because our step/case gets increased every time......
+                ///         > Solution: User has to add "Hey Temi" before each answer, e.g. "hey Temi Taube auf dem Dach."
+                /*
+                currentSequenceStep++;
+                temi.wakeup(Collections.singletonList(SttLanguage.SYSTEM));
+                findViewById(R.id.isRecordingImg).setVisibility(View.VISIBLE);
+
+                // when answer is transcripted - onAsrResult calls handle-func again to continue with step/case 4
                 break;
+                */
+
+                currentSequenceStep++;
+                break;
+
             case 4:
-                transcription.append("\nDEBUG: myAsrResultString = \"" + myAsrResultString + "\"\n");
-                if ((myAsrResultString.contains("taube") || myAsrResultString.contains("spatz")) && myAsrResultString.contains("dach")) {
+                transcription.append("\nDEGBUG: myAsrResultString = \"" + myAsrResultString + "\"\n");
+                if( (myAsrResultString.contains("taube") || myAsrResultString.contains("spatz")) && myAsrResultString.contains("dach"))
+                {
                     String nextSentence = getString(R.string.bg_answer_correct) + getString(R.string.bg_sentence2);
                     flagWaitingForTemiToFinishSpeaking = true;
                     temi.speak(TtsRequest.create(nextSentence, false));
-                } else {
+                    // step/case incremeted by the statusChange of tts
+                }
+                else
+                {
                     String nextSentence = getString(R.string.bg_sentence1_correct) + getString(R.string.bg_sentence2);
                     flagWaitingForTemiToFinishSpeaking = true;
                     temi.speak(TtsRequest.create(nextSentence, false));
+                    // step/case incremeted by the statusChange of tts
                 }
                 break;
+
+            case 5:
+                /*
+                currentSequenceStep++;
+                temi.wakeup(Collections.singletonList(SttLanguage.SYSTEM));
+                findViewById(R.id.isRecordingImg).setVisibility(View.VISIBLE);
+                // when answer is transcripted - onAsrResult calls handle-func again to continue with step/case 4
+                break;
+                */
+                currentSequenceStep++;
+                break;
+
             case 6:
-                transcription.append("\nDEBUG: myAsrResultString = \"" + myAsrResultString + "\"\n");
-                if (myAsrResultString.contains("macht") && myAsrResultString.contains("sommer")) {
+                transcription.append("\nDEGBUG: myAsrResultString = \"" + myAsrResultString + "\"\n");
+                if(myAsrResultString.contains("macht") && myAsrResultString.contains("sommer"))
+                {
                     String nextSentence = getString(R.string.bg_answer_correct) + getString(R.string.bg_sentence3);
                     flagWaitingForTemiToFinishSpeaking = true;
                     temi.speak(TtsRequest.create(nextSentence, false));
-                } else {
+                    // step/case incremeted by the statusChange of tts
+                }
+                else
+                {
                     String nextSentence = getString(R.string.bg_sentence2_correct) + getString(R.string.bg_sentence3);
                     flagWaitingForTemiToFinishSpeaking = true;
                     temi.speak(TtsRequest.create(nextSentence, false));
+                    // step/case incremeted by the statusChange of tts
                 }
                 break;
+            case 7:
+                /*
+                currentSequenceStep++;
+                temi.wakeup(Collections.singletonList(SttLanguage.SYSTEM));
+                findViewById(R.id.isRecordingImg).setVisibility(View.VISIBLE);
+                // when answer is transcripted - onAsrResult calls handle-func again to continue with step/case 4
+                break;
+                */
+                currentSequenceStep++;
+                break;
+
             case 8:
-                transcription.append("\nDEBUG: myAsrResultString = \"" + myAsrResultString + "\"\n");
-                if (myAsrResultString.contains("torheit") && myAsrResultString.contains("nicht")) {
+                transcription.append("\nDEGBUG: myAsrResultString = \"" + myAsrResultString + "\"\n");
+                if(myAsrResultString.contains("torheit") && myAsrResultString.contains("nicht"))
+                {
                     String nextSentence = getString(R.string.bg_answer_correct) + getString(R.string.bg_sentence4);
                     flagWaitingForTemiToFinishSpeaking = true;
                     temi.speak(TtsRequest.create(nextSentence, false));
-                } else {
+                    // step/case incremeted by the statusChange of tts
+                }
+                else
+                {
                     String nextSentence = getString(R.string.bg_sentence3_correct) + getString(R.string.bg_sentence4);
                     flagWaitingForTemiToFinishSpeaking = true;
                     temi.speak(TtsRequest.create(nextSentence, false));
+                    // step/case incremeted by the statusChange of tts
                 }
                 break;
+
+            case 9:
+                /*
+                currentSequenceStep++;
+                temi.wakeup(Collections.singletonList(SttLanguage.SYSTEM));
+                findViewById(R.id.isRecordingImg).setVisibility(View.VISIBLE);
+                // when answer is transcripted - onAsrResult calls handle-func again to continue with step/case 4
+                break;
+                */
+                currentSequenceStep++;
+                break;
+
             case 10:
-                transcription.append("\nDEBUG: myAsrResultString = \"" + myAsrResultString + "\"\n");
-                if (myAsrResultString.contains("wird") && myAsrResultString.contains("kalt")) {
+                transcription.append("\nDEGBUG: myAsrResultString = \"" + myAsrResultString + "\"\n");
+                if(myAsrResultString.contains("wird") && myAsrResultString.contains("kalt"))
+                {
                     String nextSentence = getString(R.string.bg_answer_correct) + getString(R.string.bg_sentence5);
                     flagWaitingForTemiToFinishSpeaking = true;
                     temi.speak(TtsRequest.create(nextSentence, false));
-                } else {
+                    // step/case incremeted by the statusChange of tts
+                }
+                else
+                {
                     String nextSentence = getString(R.string.bg_sentence4_correct) + getString(R.string.bg_sentence5);
                     flagWaitingForTemiToFinishSpeaking = true;
                     temi.speak(TtsRequest.create(nextSentence, false));
+                    // step/case incremeted by the statusChange of tts
                 }
                 break;
+
+            case 11:
+                /*
+                currentSequenceStep++;
+                temi.wakeup(Collections.singletonList(SttLanguage.SYSTEM));
+                findViewById(R.id.isRecordingImg).setVisibility(View.VISIBLE);
+                // when answer is transcripted - onAsrResult calls handle-func again to continue with step/case 4
+                break;
+                */
+                currentSequenceStep++;
+                break;
+
+
             case 12:
-                transcription.append("\nDEBUG: myAsrResultString = \"" + myAsrResultString + "\"\n");
-                if (myAsrResultString.contains("schnaps") && myAsrResultString.contains("schnaps")) {
+                transcription.append("\nDEGBUG: myAsrResultString = \"" + myAsrResultString + "\"\n");
+                if(myAsrResultString.contains("schnaps") && myAsrResultString.contains("schnaps"))
+                {
                     String nextSentence = getString(R.string.bg_answer_correct);
                     flagWaitingForTemiToFinishSpeaking = true;
                     temi.speak(TtsRequest.create(nextSentence, false));
-                } else {
+                    // step/case incremeted by the statusChange of tts
+                }
+                else
+                {
                     String nextSentence = getString(R.string.bg_sentence5_correct);
                     flagWaitingForTemiToFinishSpeaking = true;
                     temi.speak(TtsRequest.create(nextSentence, false));
+                    // step/case incremeted by the statusChange of tts
                 }
                 break;
             case 13:
@@ -723,26 +817,42 @@ public class MainActivity extends AppCompatActivity implements
                 flagWaitingForTemiToFinishSpeaking = true;
                 temi.speak(TtsRequest.create(finish, false));
                 break;
+
+            case 14:
+                /*
+                currentSequenceStep++;
+                temi.wakeup(Collections.singletonList(SttLanguage.SYSTEM));
+                findViewById(R.id.isRecordingImg).setVisibility(View.VISIBLE);
+                // when answer is transcripted - onAsrResult calls handle-func again to continue with step/case 4
+                break;
+                */
+                currentSequenceStep++;
+                break;
             case 15:
-                transcription.append("\nDEBUG: myAsrResultString = \"" + myAsrResultString + "\"\n");
-                if (myAsrResultString.contains("ja")) {
+                transcription.append("\nDEGBUG: myAsrResultString = \"" + myAsrResultString + "\"\n");
+                if(myAsrResultString.contains("ja"))
+                {
                     String nextSentence = getString(R.string.bg_finish_answer_positive);
                     flagWaitingForTemiToFinishSpeaking = true;
                     temi.speak(TtsRequest.create(nextSentence, false));
-                } else {
+                    // step/case incremeted by the statusChange of tts
+                }
+                else
+                {
                     String nextSentence = getString(R.string.bg_finish_answer_negative);
                     flagWaitingForTemiToFinishSpeaking = true;
                     temi.speak(TtsRequest.create(nextSentence, false));
+                    // step/case incremeted by the statusChange of tts
                 }
                 break;
             case 16:
                 // Sequence-End
                 currentSequenceStep = 0;
-                currentSequence = null;
-                isSequenceActive = false; // Sequence is no longer active
-                break;
+
             default:
-                transcription.append("\nDEBUG: default in handleSequenceBrainGame!\n");
+
+                transcription.append("\nDEGBUG: default in handleSequenceBrainGame ! \n");
+
                 break;
         }
     }
