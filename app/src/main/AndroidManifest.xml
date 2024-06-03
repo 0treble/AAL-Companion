@@ -1,18 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <manifest
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="com.robotemi.sdk.permission.RUN_SDK_SERVICE" />
     <uses-feature android:name="android.hardware.camera.any" />
+    <uses-permission android:name="android.hardware.microphone.any" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-        android:maxSdkVersion="28" />
+        android:maxSdkVersion="33" />
 
 
     <application
@@ -36,13 +40,13 @@
             <meta-data
                 android:name="com.robotemi.sdk.metadata.UI_MODE"
                 android:value="4" />
-
-
         </activity>
+
+        <activity android:name=".SequenceActivity" />
 
         <meta-data
             android:name="com.robotemi.sdk.metadata.SKILL"
-            android:value="temi_elevator"/>
+            android:value="@string/app_name"/>
 
         <meta-data
             android:name="com.robotemi.sdk.metadata.PERMISSIONS"
@@ -50,8 +54,17 @@
                            com.robotemi.permission.sequence,
                            com.robotemi.permission.map" />
 
-        <service
-            android:name="org.eclipse.paho.android.service.MqttService"/>
+        <meta-data
+            android:name="com.robotemi.sdk.metadata.KIOSK"
+            android:value="true" />
+
+        <meta-data
+            android:name="com.robotemi.sdk.metadata.OVERRIDE_NLU"
+            android:value="true"/>
+
+        <meta-data
+            android:name="@string/metadata_override_conversation_layer"
+            android:value="TRUE" />
 
     </application>
 

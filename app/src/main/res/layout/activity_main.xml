@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF">
+    android:background="?attr/colorSurface">
 
     <TextView
         android:id="@+id/topTextView"
@@ -12,8 +12,8 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
         android:text="@string/top_view_text"
-        android:textColor="#000000"
-        android:textSize="38sp"
+        android:textColor="?attr/colorOnSurface"
+        android:textSize="30sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -24,34 +24,59 @@
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/topTextView">
+        app:layout_constraintTop_toBottomOf="@+id/topTextView"
+        app:layout_constraintVertical_bias="1.0">
+
+        <Button
+            android:id="@+id/sequenceWindowButton"
+            android:layout_width="242dp"
+            android:layout_height="74dp"
+            android:backgroundTint="?attr/colorPrimary"
+            android:text="@string/sequenceButtonText"
+            android:textColor="?attr/colorOnPrimary"
+            android:textSize="20sp"
+            app:layout_constraintBottom_toBottomOf="@+id/confirmLocationButton"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.984"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/confirmLocationButton"
+            app:layout_constraintVertical_bias="0.0" />
 
         <Spinner
             android:id="@+id/dropdownMenu"
-            android:layout_width="1100dp"
-            android:layout_height="50dp"
-            android:layout_marginTop="30dp"
-            android:backgroundTint="#FFFFFF"
+            android:layout_width="816dp"
+            android:layout_height="37dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="28dp"
+            android:backgroundTint="?attr/colorOnTertiary"
             android:entries="@array/spinner_items"
             android:scrollbarSize="30dp"
+            app:layout_constraintBottom_toTopOf="@+id/endTranscription"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:ignore="VisualLintBounds" />
 
         <Button
             android:id="@+id/confirmLocationButton"
-            android:layout_width="0dp"
-            android:layout_height="50dp"
+            android:layout_width="176dp"
+            android:layout_height="74dp"
+            android:layout_marginEnd="16dp"
+            android:backgroundTint="?attr/colorPrimary"
             android:elegantTextHeight="true"
             android:text="@string/confirm"
+            android:textColor="?attr/colorOnPrimary"
             android:textSize="20sp"
+            app:layout_constraintBottom_toBottomOf="@+id/dropdownMenu"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toEndOf="@+id/dropdownMenu"
             app:layout_constraintTop_toTopOf="@+id/dropdownMenu"
             tools:ignore="VisualLintButtonSize" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraintLayout"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_marginTop="100dp"
@@ -60,7 +85,7 @@
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/dropdownMenu"
-            app:layout_constraintVertical_bias="1.0">
+            app:layout_constraintVertical_bias="0.0">
 
             <TextView
                 android:id="@+id/elevatorTextView"
@@ -68,7 +93,7 @@
                 android:layout_height="wrap_content"
                 android:text=""
                 android:textAlignment="center"
-                android:textColor="#000000"
+                android:textColor="?attr/colorOnSurface"
                 android:textSize="60sp"
                 android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -81,7 +106,7 @@
                 android:layout_height="wrap_content"
                 android:text=""
                 android:textAlignment="center"
-                android:textColor="#000000"
+                android:textColor="?attr/colorOnSurface"
                 android:textSize="60sp"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -91,22 +116,27 @@
 
             <Button
                 android:id="@+id/confirmArrivedButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
+                android:layout_width="406dp"
+                android:layout_height="80dp"
+                android:backgroundTint="?attr/colorPrimary"
                 android:clickable="false"
                 android:text="@string/ja"
+                android:textColor="?attr/colorOnPrimary"
+                android:textSize="20sp"
                 android:visibility="invisible"
-                app:layout_constraintEnd_toEndOf="@+id/confirmTextView"
-                app:layout_constraintStart_toStartOf="@+id/confirmTextView"
-                app:layout_constraintTop_toBottomOf="@+id/confirmTextView" />
+                app:layout_constraintBottom_toBottomOf="@+id/confirmTextView"
+                app:layout_constraintEnd_toEndOf="@+id/scrollView"
+                app:layout_constraintStart_toStartOf="@+id/scrollView"
+                app:layout_constraintTop_toTopOf="@+id/elevatorTextView" />
 
             <Button
                 android:id="@+id/confirmFinishButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="14dp"
+                android:backgroundTint="?attr/colorPrimary"
                 android:text="@string/vielen_dank_temi"
+                android:textColor="?attr/colorOnPrimary"
                 android:visibility="invisible"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -116,34 +146,163 @@
                 android:id="@+id/QRCodeButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:backgroundTint="?attr/colorPrimary"
                 android:text="@string/i_want_to_scan_a_qr_code"
+                android:textColor="?attr/colorOnPrimary"
+                android:visibility="invisible"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/confirmArrivedButton" />
+                app:layout_constraintTop_toBottomOf="@+id/confirmArrivedButton"
+                app:layout_constraintVertical_bias="0.813" />
 
             <Button
-                android:id="@+id/MenuButton"
+                android:id="@+id/quitButton"
+                android:layout_width="242dp"
+                android:layout_height="74dp"
+                android:backgroundTint="?attr/colorPrimary"
+                android:elegantTextHeight="true"
                 android:text="@string/quit"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_constraintEnd_toEndOf="parent"
-                tools:layout_editor_absoluteY="398dp"
-                app:layout_constraintBottom_toBottomOf="@+id/QRCodeButton" />
+                android:textColor="?attr/colorOnPrimary"
+                android:textSize="20sp"
+                app:layout_constraintBottom_toBottomOf="@+id/QRCodeButton"
+                app:layout_constraintEnd_toEndOf="@+id/scrollView" />
 
             <Button
-                android:id="@+id/Listen"
+                android:id="@+id/listen"
+                android:layout_width="210dp"
+                android:layout_height="75dp"
+                android:backgroundTint="?attr/colorPrimary"
+                android:text="@string/listen"
+                android:textColor="?attr/colorOnPrimary"
+                android:textSize="20sp"
+                app:layout_constraintBottom_toBottomOf="@+id/QRCodeButton"
+                app:layout_constraintEnd_toStartOf="@+id/quitButton"
+                app:layout_constraintStart_toEndOf="@+id/QRCodeButton" />
+
+            <ScrollView
+                android:id="@+id/scrollView"
+                android:layout_width="1244dp"
+                android:layout_height="353dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:background="?attr/colorOnTertiary"
+                app:layout_constraintBottom_toTopOf="@+id/listen"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.0">
+
+                <TextView
+                    android:id="@+id/transcription"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:autofillHints=""
+                    android:background="?attr/colorOnTertiary"
+                    android:ems="10"
+                    android:scrollbars="vertical"
+                    android:text="@string/TranscriptionText"
+                    android:textColor="?attr/colorOnSurface"
+                    android:textSize="30sp"
+                    app:layout_constraintBottom_toTopOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.75"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0.0"
+                    tools:ignore="LabelFor,VisualLintTextFieldSize,VisualLintBounds" />
+
+            </ScrollView>
+
+            <Button
+                android:id="@+id/themeButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/listen"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/MenuButton"
-                app:layout_constraintHorizontal_bias="0.511"
-                app:layout_constraintStart_toEndOf="@+id/QRCodeButton"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.916" />
+                android:layout_marginEnd="16dp"
+                android:backgroundTint="?attr/colorPrimary"
+                android:elegantTextHeight="true"
+                android:text="@string/dark_theme"
+                android:textColor="?attr/colorOnPrimary"
+                app:layout_constraintBottom_toBottomOf="@+id/QRCodeButton"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.016"
+                app:layout_constraintStart_toStartOf="@+id/scrollView" />
+
+            <Button
+                android:id="@+id/imgOverlayButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:backgroundTint="?attr/colorPrimary"
+                android:elegantTextHeight="true"
+                android:text="@string/img_overlay"
+                android:textColor="?attr/colorOnPrimary"
+                app:layout_constraintBottom_toBottomOf="@+id/QRCodeButton"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.016"
+                app:layout_constraintStart_toEndOf="@+id/themeButton" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <Button
+            android:id="@+id/endTranscription"
+            android:layout_width="242dp"
+            android:layout_height="74dp"
+            android:backgroundTint="?attr/colorPrimary"
+            android:text="@string/end_transcription"
+            android:textColor="?attr/colorOnPrimary"
+            android:textSize="20sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.175" />
+
+        <ImageView
+            android:id="@+id/isRecordingImg"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginTop="16dp"
+            app:layout_constraintEnd_toEndOf="@+id/sequenceWindowButton"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="@+id/sequenceWindowButton"
+            app:layout_constraintTop_toBottomOf="@+id/sequenceWindowButton"
+            app:srcCompat="@android:drawable/presence_audio_busy" />
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <FrameLayout
+        android:id="@+id/image_overlay_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/overlay_image"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/wall_e_image"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:contentDescription="@string/img_description" />
+
+        <Button
+            android:id="@+id/img_close_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:visibility="gone"
+            android:backgroundTint="?attr/colorPrimary"
+            android:textColor="?attr/colorOnPrimary"
+            android:textSize="11sp"
+            android:text="@string/back"
+            app:layout_constraintEnd_toEndOf="@+id/overlay_image"
+            app:layout_constraintTop_toTopOf="@+id/overlay_image" />
+    </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

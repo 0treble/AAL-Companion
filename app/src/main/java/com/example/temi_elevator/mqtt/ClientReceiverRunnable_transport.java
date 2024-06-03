@@ -35,7 +35,7 @@ class ClientReceiverRunnable_transport implements Runnable {
 
                 if (temi.getLocations().contains(destination)) {
                     MainActivity.getInstance().hideModeElements();
-                    temi.goTo("aufzug");
+                    temi.goTo(destination);
 
                     MainActivity.getInstance().showContent(destination);
                     MainActivity.getInstance().setNewDest(destination);

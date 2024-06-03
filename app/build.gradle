@@ -23,6 +23,11 @@ android {
         }
     }
 
+    packagingOptions {
+        exclude 'META-INF/INDEX.LIST'
+        exclude 'META-INF/DEPENDENCIES'
+    }
+
     buildFeatures {
         viewBinding true
     }
@@ -32,6 +37,10 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
     namespace 'com.example.temi_elevator'
+
+    tasks.withType(JavaCompile) {
+        options.compilerArgs << "-Xlint:deprecation"
+    }
 }
 
 
@@ -53,14 +62,20 @@ dependencies {
     implementation 'com.journeyapps:zxing-android-embedded:3.6.0'
 
     implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'com.google.android.material:material:1.9.0'
+    implementation 'com.google.android.material:material:1.9.0' //needs to be 1.9.0 or app doesn't build
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     testImplementation 'junit:junit:4.13.2'
     implementation 'com.robotemi:sdk:1.132.1'
     implementation 'com.google.code.gson:gson:2.9.0'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+    implementation 'com.google.cloud:google-cloud-speech:1.29.1'
+    def lifecycle_version = "2.5.1"
+    implementation "androidx.lifecycle:lifecycle-viewmodel:$lifecycle_version"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
+    implementation 'com.google.auth:google-auth-library-oauth2-http:0.26.0'
     implementation 'org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.5'
     implementation 'org.eclipse.paho:org.eclipse.paho.android.service:1.1.1'
     implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.1.0'
+    implementation group: 'com.alphacephei', name: 'vosk-android', version: '0.3.47'
 }
