@@ -226,21 +226,19 @@ public class MainActivity extends AppCompatActivity implements
 
         transcription.append("\nDEGBUG: In der onAsrResult\n");
 
-
         Log.i(TAG, "ASR Result: " + asrResult);
         myAsrResultString = asrResult;
         transcription.append("myAsrResultString: " + myAsrResultString + "\n");
         scrollToBottom();
 
+        logToFile("ASR Result: " + asrResult);
 
         analyzeVoiceCommand();
-
 
         if(!conversationMode){
             temi.finishConversation(); // stop ASR listener
         }
     }
-
 
     /* Voice Commands */
     @FunctionalInterface
