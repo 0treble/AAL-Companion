@@ -897,21 +897,14 @@ public class MainActivity extends AppCompatActivity implements
         String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
         String filename = "transcription_" + timestamp + ".txt";
 
-        transcription.append("Transkription gespeichert unter: " + filename + "\n");
-        scrollToBottom();
-
         if (!transcript.isEmpty()) {
             try {
-                File root = new File(Environment.getExternalStorageDirectory(), "TemiVoice Transcriptions");
-                if (!root.exists()) {
-                    root.mkdirs(); // Create folder if it doesn't exist
-                }
-                File file = new File(root, filename);
+                File file = new File(getFilesDir(), filename); // Use internal storage
                 FileWriter writer = new FileWriter(file);
                 writer.append(transcript);
                 writer.flush();
                 writer.close();
-                Toast.makeText(getApplicationContext(), "Transcription saved to file", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Transcription saved to file: " + file.getAbsolutePath(), Toast.LENGTH_SHORT).show();
             } catch (IOException e) {
                 e.printStackTrace();
                 Toast.makeText(getApplicationContext(), "Error saving transcription", Toast.LENGTH_SHORT).show();
@@ -920,6 +913,7 @@ public class MainActivity extends AppCompatActivity implements
             Toast.makeText(getApplicationContext(), "Transcription is empty", Toast.LENGTH_SHORT).show();
         }
     }
+
 
     private void followMe() {
         Log.i(TAG, "Follow the user");
