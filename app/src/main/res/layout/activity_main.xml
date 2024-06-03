@@ -13,7 +13,7 @@
         android:layout_marginTop="30dp"
         android:text="@string/top_view_text"
         android:textColor="?attr/colorOnSurface"
-        android:textSize="38sp"
+        android:textSize="30sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -189,7 +189,7 @@
                 android:background="?attr/colorOnTertiary"
                 app:layout_constraintBottom_toTopOf="@+id/listen"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.75"
+                app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintVertical_bias="0.0">
@@ -224,12 +224,26 @@
                 android:layout_marginEnd="16dp"
                 android:backgroundTint="?attr/colorPrimary"
                 android:elegantTextHeight="true"
-                android:text="@string/theme"
+                android:text="@string/dark_theme"
                 android:textColor="?attr/colorOnPrimary"
                 app:layout_constraintBottom_toBottomOf="@+id/QRCodeButton"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.016"
                 app:layout_constraintStart_toStartOf="@+id/scrollView" />
+
+            <Button
+                android:id="@+id/imgOverlayButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:backgroundTint="?attr/colorPrimary"
+                android:elegantTextHeight="true"
+                android:text="@string/img_overlay"
+                android:textColor="?attr/colorOnPrimary"
+                app:layout_constraintBottom_toBottomOf="@+id/QRCodeButton"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.016"
+                app:layout_constraintStart_toEndOf="@+id/themeButton" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -247,18 +261,48 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.175" />
 
-        <ProgressBar
-            android:id="@+id/isRecordingBar"
-            style="?android:attr/progressBarStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            app:layout_constraintBottom_toBottomOf="@+id/endTranscription"
+        <ImageView
+            android:id="@+id/isRecordingImg"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginTop="16dp"
             app:layout_constraintEnd_toEndOf="@+id/sequenceWindowButton"
             app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="@+id/sequenceWindowButton"
-            app:layout_constraintTop_toTopOf="@+id/endTranscription"
-            app:layout_constraintVertical_bias="0.0" />
+            app:layout_constraintTop_toBottomOf="@+id/sequenceWindowButton"
+            app:srcCompat="@android:drawable/presence_audio_busy" />
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <FrameLayout
+        android:id="@+id/image_overlay_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/overlay_image"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/wall_e_image"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:contentDescription="@string/img_description" />
+
+        <Button
+            android:id="@+id/img_close_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:visibility="gone"
+            android:backgroundTint="?attr/colorPrimary"
+            android:textColor="?attr/colorOnPrimary"
+            android:textSize="11sp"
+            android:text="@string/back"
+            app:layout_constraintEnd_toEndOf="@+id/overlay_image"
+            app:layout_constraintTop_toTopOf="@+id/overlay_image" />
+    </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
