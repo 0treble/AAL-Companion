@@ -182,29 +182,29 @@ public class MainActivity extends AppCompatActivity implements
                     }
                 }
         );
-/*
-        // Set up the close button click listener
-        findViewById(R.id.close_button).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                findViewById(R.id.overlay_image).setVisibility(View.INVISIBLE);
-                findViewById(R.id.overlay_image).setVisibility(View.INVISIBLE);
-            }
+
+        /* Sequence Window Launcher*/
+        findViewById(R.id.imgOverlayButton).setOnClickListener(view ->  {
+            findViewById(R.id.overlay_image).setVisibility(View.VISIBLE);
+            findViewById(R.id.img_close_button).setVisibility(View.VISIBLE);
         });
 
-        findViewById(R.id.imgOverlayButton).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                findViewById(R.id.overlay_image).setVisibility(View.VISIBLE);
-                findViewById(R.id.close_button).setVisibility(View.VISIBLE);  }
-        });*/
+        findViewById(R.id.img_close_button).setOnClickListener(view ->  {
+            findViewById(R.id.overlay_image).setVisibility(View.GONE);
+            findViewById(R.id.img_close_button).setVisibility(View.GONE);
+        });
     }
 
     private void setupThemeButton() {
+
+        updateThemeButtonText();
+
         try {
             Button themeButton = findViewById(R.id.themeButton);
             if (themeButton != null) {
-                themeButton.setOnClickListener(view -> toggleDarkMode());
+                themeButton.setOnClickListener(view -> {
+                    toggleDarkMode();
+                });
             } else {
                 Log.e(TAG, "themeButton is null");
             }
@@ -942,6 +942,7 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
+    /* Dark Mode */
     private void toggleDarkMode() {
         Log.i(TAG, "Toggled Dark Mode");
 
@@ -953,8 +954,16 @@ public class MainActivity extends AppCompatActivity implements
             // Night mode is active, deactivate it
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         }
-
         recreate(); // Recreate activity to apply theme change
+    }
+    private void updateThemeButtonText() {
+        int currentNightMode = getResources().getConfiguration().uiMode & android.content.res.Configuration.UI_MODE_NIGHT_MASK;
+        Button theme_button = findViewById(R.id.themeButton);
+        if (currentNightMode == android.content.res.Configuration.UI_MODE_NIGHT_NO) {
+            theme_button.setText(R.string.dark_theme); // Show "Dark Mode"
+        } else {
+            theme_button.setText(R.string.light_theme); // Show "Light Mode"
+        }
     }
 
     private void transportMode() {

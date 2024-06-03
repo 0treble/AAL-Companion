@@ -85,6 +85,8 @@
     <string name="back">Zurück</string>
     <string name="next">Weiter</string>
     <string name="repeat">Wiederholen</string>
-    <string name="theme">Dunkler Modus</string>
+    <string name="dark_theme">Dunkler Modus</string>
+    <string name="light_theme">Heller Modus</string>
     <string name="img_overlay">Bild-Overlay</string>
+    <string name="img_description">WALL-E Bild</string>
 </resources>
