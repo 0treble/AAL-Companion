@@ -83,7 +83,7 @@ public class MainActivity extends AppCompatActivity implements
     private ActivityResultLauncher<Intent> sequenceResultLauncher;
     private ExecutorService myExecutorService;
     private String myAsrResultString = "";
-    enum Sequence {GREETING,SMALL_TALK,SEQUENCE_ALEXA, AAL_SEQUENCE, SEQUENCE_BRAIN_GAME}
+    enum Sequence {GREETING, SMALL_TALK, SEQUENCE_ALEXA, AAL_SEQUENCE, SEQUENCE_BRAIN_GAME}
     private Sequence currentSequence;
     int currentSequenceStep = 0;
     private boolean flagWaitingForTemiToArrive = false;
@@ -92,6 +92,9 @@ public class MainActivity extends AppCompatActivity implements
     private boolean flagWaitingForAsrResult = false;
     boolean conversationMode = false;
     private Reminder.ReminderManager reminderManager;
+
+    // Log file
+    private File logFile;
 
     @Override
     protected void onStart() {
@@ -105,7 +108,6 @@ public class MainActivity extends AppCompatActivity implements
         temi.addOnGoToLocationStatusChangedListener(this);
     }
 
-    /*****************************************************************************************************************************************************************/
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         temi.setKioskModeOn(true);
@@ -118,6 +120,8 @@ public class MainActivity extends AppCompatActivity implements
 
         myExecutorService = Executors.newSingleThreadExecutor();
         init(savedInstanceState);
+
+        createLogFile();
     }
 
     private void init(Bundle savedInstanceState) {
@@ -155,7 +159,6 @@ public class MainActivity extends AppCompatActivity implements
         });
 
         findViewById(R.id.quitButton).setOnClickListener(view -> {
-            saveTranscriptionToFile();
             temi.setKioskModeOn(false);
             temi.setHardButtonsDisabled(false);
             temi.setGoToSpeed(SpeedLevel.SLOW);
@@ -892,28 +895,37 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     /* Text Field to TXT File*/
-    private void saveTranscriptionToFile() {
-        String transcript = transcription.getText().toString();
+    private void createLogFile() {
         String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
-        String filename = "transcription_" + timestamp + ".txt";
+        String filename = "log_" + timestamp + ".txt";
 
-        if (!transcript.isEmpty()) {
-            try {
-                File file = new File(getFilesDir(), filename); // Use internal storage
-                FileWriter writer = new FileWriter(file);
-                writer.append(transcript);
-                writer.flush();
-                writer.close();
-                Toast.makeText(getApplicationContext(), "Transcription saved to file: " + file.getAbsolutePath(), Toast.LENGTH_SHORT).show();
-            } catch (IOException e) {
-                e.printStackTrace();
-                Toast.makeText(getApplicationContext(), "Error saving transcription", Toast.LENGTH_SHORT).show();
+        try {
+            logFile = new File(getFilesDir(), filename); // Use internal storage
+            if (logFile.createNewFile()) {
+                Toast.makeText(getApplicationContext(), "Log file created: " + logFile.getAbsolutePath(), Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(getApplicationContext(), "Log file already exists", Toast.LENGTH_SHORT).show();
             }
-        } else {
-            Toast.makeText(getApplicationContext(), "Transcription is empty", Toast.LENGTH_SHORT).show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            Toast.makeText(getApplicationContext(), "Error creating log file", Toast.LENGTH_SHORT).show();
         }
     }
 
+    public void logToFile(String logMessage) {
+        if (logFile != null) {
+            String timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
+            String logEntry = timestamp + " - " + logMessage;
+            try (FileWriter writer = new FileWriter(logFile, true)) {
+                writer.append(logEntry).append("\n");
+            } catch (IOException e) {
+                e.printStackTrace();
+                Toast.makeText(getApplicationContext(), "Error logging message", Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            Toast.makeText(getApplicationContext(), "Log file is not created", Toast.LENGTH_SHORT).show();
+        }
+    }
 
     private void followMe() {
         Log.i(TAG, "Follow the user");
