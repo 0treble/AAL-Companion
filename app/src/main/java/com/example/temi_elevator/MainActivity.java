@@ -323,6 +323,7 @@ public class MainActivity extends AppCompatActivity implements
         showTranscription("\nDEGBUG: In der analyzeVoiceCommand...\n");
         chooseCurrentSequence();
     }
+    // testkommentar
 
     public void stopCurrentSequence()
     {

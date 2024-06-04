@@ -66,7 +66,7 @@
     <string name="bg_sentence4_correct">Entschuldige, das habe ich wohl nicht korrekt verstanden. Die richtige Anwort lautet: Wenn ein Freund weggeht, muss man die Türe schließen, sonst wird es kalt.</string>
     <string name="bg_sentence5_correct">Entschuldige, das habe ich wohl nicht korrekt verstanden. Die richtige Anwort lautet: Dienst ist Dienst und Schnaps ist Schnaps.</string>
     <string name="bg_finish_question"   >Vielen Dank. Mir hat es viel Spaß gemacht mit Ihnen zu spielen. Hat es dir auch gefallen?</string>
-    <string name="bg_finish_answer_positive">Das freut mich.</string>
+    <string name="bg_finish_answer_positive">Das freut mich sehr.</string>
     <string name="bg_finish_answer_negative">Dann müssen meine Entwickler wohl noch etwas nachbessern!</string>
     <string name="bg_answer_correct">Das war richtig! Super!</string>
 
