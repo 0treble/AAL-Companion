@@ -50,8 +50,10 @@
 
     <!-- BrainGame Sequence Strings -->
     <string name="bg_introduction">Gerne würde ich mit Ihnen ein bischen spielen, damit wir feststellen können, ob oder wie gut wir uns verstehen oder uns unterhalten können. Das Spiel heißt alte Sprichwörter erkennen und vervollständigen.
-                                    Ich gebe den ersten Teil eines Spruches vor und Sie vollenden ihn. Wenn Sie bereit sind sagen Sie ja, wenn ich das Spiel nochmal erklären soll, sagen sie nein. Sind Sie bereit?</string>
+                                    Ich gebe den ersten Teil eines Spruches vor und Sie vollenden ihn. Wenn Sie einen Satz nicht verstanden haben, bitten Sie mich einfach, ihn zu widerholen. Wenn Sie bereit sind sagen Sie ja, wenn ich das Spiel nochmal erklären soll, sagen sie nein. Sind Sie bereit?</string>
     <string name="bg_introduction_short">Kurzfassung: Wenn Sie bereit sind sagen Sie ja Sind Sie bereit?</string>
+    <string name="bg_iRepeat">Kein Problem. Ich erkläre das Spiel nocheinmal.</string>
+    <string name="bg_letsgo">Alles klar. Los gehts!</string>
     <string name="bg_sentence1">Der erste Satz lautet: Besser den Spatz in der Hand, als …</string>
     <string name="bg_sentence2">Der nächste Satz lautet: Eine Schwalbe …</string>
     <string name="bg_sentence3">Der nächste Satz lautet: Alter schützt …</string>
@@ -88,5 +90,6 @@
     <string name="dark_theme">Dunkler Modus</string>
     <string name="light_theme">Heller Modus</string>
     <string name="img_overlay">Bild-Overlay</string>
+    <string name="repeatLastSequenceStep">Schritt wiederholen</string>
     <string name="img_description">WALL-E Bild</string>
 </resources>

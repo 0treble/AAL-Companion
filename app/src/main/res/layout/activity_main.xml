@@ -245,6 +245,21 @@
                 app:layout_constraintHorizontal_bias="0.016"
                 app:layout_constraintStart_toEndOf="@+id/themeButton" />
 
+            <Button
+                android:id="@+id/repeatSequenceStep"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:backgroundTint="?attr/colorPrimary"
+                android:elegantTextHeight="true"
+                android:text="@string/repeatLastSequenceStep"
+                android:textColor="?attr/colorOnPrimary"
+                app:layout_constraintBottom_toBottomOf="@+id/QRCodeButton"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.186"
+                app:layout_constraintStart_toEndOf="@+id/themeButton" />
+
+
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <Button

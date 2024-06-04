@@ -88,6 +88,11 @@ public class MainActivity extends AppCompatActivity implements
     int currentSequenceStep = 0;
     private boolean flagWaitingForTemiToArrive = false;
     private boolean flagWaitingForTemiToFinishSpeaking = false;
+
+
+    private boolean flagWaitingForUserResponse = false; // = true when we are expecting an answer from the user
+
+    private boolean flagRepeatSentenceRequest = false; // = true when user wants sentenced repeated (handleSequenceBrainGame)
     boolean conversationMode = false;
     private Reminder.ReminderManager reminderManager;
     private File logFile;
@@ -194,6 +199,14 @@ public class MainActivity extends AppCompatActivity implements
             findViewById(R.id.overlay_image).setVisibility(View.GONE);
             findViewById(R.id.img_close_button).setVisibility(View.GONE);
         });
+
+        findViewById(R.id.repeatSequenceStep).setOnClickListener(view ->  {
+            currentSequenceStep--;
+            chooseCurrentSequence();
+        });
+
+
+
     }
 
     private void setupThemeButton() {
@@ -239,7 +252,7 @@ public class MainActivity extends AppCompatActivity implements
         showTranscription("myAsrResultString: " + myAsrResultString);
 
         analyzeVoiceCommand();
-
+        flagWaitingForUserResponse = false; // relevant for the BrainGame when user doesnt say anything
         temi.finishConversation(); // stop ASR listener
     }
 
@@ -256,7 +269,7 @@ public class MainActivity extends AppCompatActivity implements
         commandsMap.put(new String[]{"transkription starten", "aufnahme beginnen", "aufnahme starten"}, command -> findViewById(R.id.listen).performClick());
         commandsMap.put(new String[]{"transkription beenden", "aufnahme beenden"}, command -> findViewById(R.id.endTranscription).performClick());
         commandsMap.put(new String[]{"applikation beenden", "app beenden"}, command -> findViewById(R.id.quitButton).performClick());
-        commandsMap.put(new String[]{"dunkler modus"}, command -> findViewById(R.id.themeButton).performClick());
+        commandsMap.put(new String[]{"dunkler modus", "heller modus", "keller modus"}, command -> findViewById(R.id.themeButton).performClick());
         commandsMap.put(new String[]{"stopp","stop","abbrechen","abbruch" }, command -> stopCurrentSequence());
         commandsMap.put(new String[]{"gesprächsmodus", "dialogmodus", "gesprächs modus"}, command -> conversationMode = !conversationMode);
         commandsMap.put(new String[]{"erinnere mich", "erinnerung setzen", "setze eine erinnerung"}, command -> setReminder());
@@ -297,6 +310,13 @@ public class MainActivity extends AppCompatActivity implements
                     entry.getValue().execute(myAsrResultString);
                     return;
                 }
+                /*
+                else {
+                    showTranscription("Das habe ich nicht verstanden.");
+                    temi.speak(TtsRequest.create("Das habe ich nicht verstanden.", false));
+                }
+                */
+
             }
         }
 
@@ -372,11 +392,13 @@ public class MainActivity extends AppCompatActivity implements
                 temi.goTo("tür");               /// so that the next task is started AFTER arriving at destination
                 // step increment done by the onGoToStatusListener()
 
-                waitHandler.postDelayed(() -> {
-                }, 10000);
+
 
                 break;
             case 1:
+                waitHandler.postDelayed(() -> {
+                    temi.tiltAngle(20);
+                }, 5000);
                 String greeting_string = getString(R.string.greeting_string);
                 //showTranscription(greeting_string);
                 flagWaitingForTemiToFinishSpeaking = true;  /// SUPER IMPORTANT BEFORE EVERY speaking-COMMAND!!!!
@@ -628,8 +650,8 @@ public class MainActivity extends AppCompatActivity implements
         switch (currentSequenceStep) {
             case 0:
                 showTranscription("\nDEGBUG: In Sequence: handleSequenceBrainGame\n");
-
-                String introducingBrainGame = getString(R.string.bg_introduction_short);
+                flagRepeatSentenceRequest = false;
+                String introducingBrainGame = getString(R.string.bg_introduction);
                 flagWaitingForTemiToFinishSpeaking = true;
                 temi.speak(TtsRequest.create(introducingBrainGame, false));
                 // step/case incremeted by the statusChange of tts
@@ -642,6 +664,12 @@ public class MainActivity extends AppCompatActivity implements
             case 9:
             case 11:
             case 14:
+                /*
+                waitHandler.postDelayed(() -> {
+                    temi.tiltAngle(20);
+                }, 5000);
+                */
+                flagWaitingForUserResponse = true;
                 temi.wakeup(Collections.singletonList(SttLanguage.SYSTEM));
                 findViewById(R.id.isRecordingImg).setVisibility(View.VISIBLE);
 
@@ -651,10 +679,11 @@ public class MainActivity extends AppCompatActivity implements
                 break;
 
             case 2:
-                if(myAsrResultString.contains("ja"))
+
+                if(((myAsrResultString.contains("ja") | myAsrResultString.contains("bereit")) & !myAsrResultString.contains("nicht")) | flagRepeatSentenceRequest)
                 {
-                    String letsgo = "Schritt 2: Alles klar. Los geht's!";
-                    String sentence1 = letsgo + getString(R.string.bg_sentence1);
+                    flagRepeatSentenceRequest = false;
+                    String sentence1 = getString(R.string.bg_letsgo) + getString(R.string.bg_sentence1);
                     flagWaitingForTemiToFinishSpeaking = true;
                     temi.speak(TtsRequest.create(sentence1, false));
                     // step/case incremeted by the statusChange of tts
@@ -662,23 +691,27 @@ public class MainActivity extends AppCompatActivity implements
                 }
                 else
                 {
-                    String aaaaaa = getString(R.string.bg_introduction);
-                    flagWaitingForTemiToFinishSpeaking = true;
-                    temi.speak(TtsRequest.create("Schritt 3: Ich habe kein ja gehört. Reset zu Schritt 0", false));
+                    String repeatIntdroduction = getString(R.string.bg_iRepeat) + getString(R.string.bg_introduction);
                     currentSequenceStep = 0;
-                    String introducingBrainGame2 = getString(R.string.bg_introduction_short);
                     flagWaitingForTemiToFinishSpeaking = true;
-                    temi.speak(TtsRequest.create(introducingBrainGame2, false));
-                    // step/case incremeted by the statusChange of tts
+                    temi.speak(TtsRequest.create(repeatIntdroduction, false));
+                    // step/case incremeted by the statusChange of tts > therefore continues at case 1
                 }
-
+                flagRepeatSentenceRequest = false;  // just to be save
                 break;
 
             // when answer is transcripted - onAsrResult calls handle-func again to continue with step/case 4
 
             case 4:
                 showTranscription("DEGBUG: myAsrResultString = " + myAsrResultString);
-                if( (myAsrResultString.contains("taube") || myAsrResultString.contains("spatz")) && myAsrResultString.contains("dach"))
+                if(!flagRepeatSentenceRequest & checkRepeatRequest()) {
+                    currentSequenceStep -= 2;
+                    flagRepeatSentenceRequest = true;
+                    chooseCurrentSequence();
+                    break;
+                }
+
+                if(((myAsrResultString.contains("taube") || myAsrResultString.contains("spatz")) && myAsrResultString.contains("dach")) | flagRepeatSentenceRequest)
                 {
                     String nextSentence = getString(R.string.bg_answer_correct) + getString(R.string.bg_sentence2);
                     flagWaitingForTemiToFinishSpeaking = true;
@@ -692,12 +725,20 @@ public class MainActivity extends AppCompatActivity implements
                     temi.speak(TtsRequest.create(nextSentence, false));
                     // step/case incremeted by the statusChange of tts
                 }
+                flagRepeatSentenceRequest = false;
                 break;
             // when answer is transcripted - onAsrResult calls handle-func again to continue with step/case 4
 
             case 6:
                 showTranscription("DEGBUG: InHandle myAsrResultString = " + myAsrResultString);
-                if(myAsrResultString.contains("macht") && myAsrResultString.contains("sommer"))
+                if(!flagRepeatSentenceRequest & checkRepeatRequest()) {
+                    currentSequenceStep -= 2;
+                    flagRepeatSentenceRequest = true;
+                    chooseCurrentSequence();
+                    break;
+                }
+
+                if((myAsrResultString.contains("macht") && myAsrResultString.contains("sommer")) | flagRepeatSentenceRequest)
                 {
                     String nextSentence = getString(R.string.bg_answer_correct) + getString(R.string.bg_sentence3);
                     flagWaitingForTemiToFinishSpeaking = true;
@@ -711,12 +752,20 @@ public class MainActivity extends AppCompatActivity implements
                     temi.speak(TtsRequest.create(nextSentence, false));
                     // step/case incremeted by the statusChange of tts
                 }
+                flagRepeatSentenceRequest = false;
                 break;
             // when answer is transcripted - onAsrResult calls handle-func again to continue with step/case 4
 
             case 8:
                 showTranscription("DEGBUG: myAsrResultString = " + myAsrResultString);
-                if(myAsrResultString.contains("torheit") && myAsrResultString.contains("nicht"))
+                if(!flagRepeatSentenceRequest & checkRepeatRequest()) {
+                    currentSequenceStep -= 2;
+                    flagRepeatSentenceRequest = true;
+                    chooseCurrentSequence();
+                    break;
+                }
+
+                if((myAsrResultString.contains("torheit") && myAsrResultString.contains("nicht")) | flagRepeatSentenceRequest)
                 {
                     String nextSentence = getString(R.string.bg_answer_correct) + getString(R.string.bg_sentence4);
                     flagWaitingForTemiToFinishSpeaking = true;
@@ -730,12 +779,20 @@ public class MainActivity extends AppCompatActivity implements
                     temi.speak(TtsRequest.create(nextSentence, false));
                     // step/case incremeted by the statusChange of tts
                 }
+                flagRepeatSentenceRequest = false;
                 break;
             // when answer is transcripted - onAsrResult calls handle-func again to continue with step/case 4
 
             case 10:
                 showTranscription("DEGBUG: myAsrResultString = " + myAsrResultString);
-                if(myAsrResultString.contains("wird") && myAsrResultString.contains("kalt"))
+                if(!flagRepeatSentenceRequest & checkRepeatRequest()) {
+                    currentSequenceStep -= 2;
+                    flagRepeatSentenceRequest = true;
+                    chooseCurrentSequence();
+                    break;
+                }
+
+                if((myAsrResultString.contains("wird") && myAsrResultString.contains("kalt")) | flagRepeatSentenceRequest)
                 {
                     String nextSentence = getString(R.string.bg_answer_correct) + getString(R.string.bg_sentence5);
                     flagWaitingForTemiToFinishSpeaking = true;
@@ -749,12 +806,20 @@ public class MainActivity extends AppCompatActivity implements
                     temi.speak(TtsRequest.create(nextSentence, false));
                     // step/case incremeted by the statusChange of tts
                 }
+                flagRepeatSentenceRequest = false;
                 break;
             // when answer is transcripted - onAsrResult calls handle-func again to continue with step/case 4
 
             case 12:
                 showTranscription("DEGBUG: myAsrResultString = " + myAsrResultString);
-                if(myAsrResultString.contains("schnaps") && myAsrResultString.contains("schnaps"))
+                if(!flagRepeatSentenceRequest & checkRepeatRequest()) {
+                    currentSequenceStep -= 2;
+                    flagRepeatSentenceRequest = true;
+                    chooseCurrentSequence();
+                    break;
+                }
+
+                if((myAsrResultString.contains("schnaps") && myAsrResultString.contains("schnaps")) | flagRepeatSentenceRequest)
                 {
                     String nextSentence = getString(R.string.bg_answer_correct);
                     flagWaitingForTemiToFinishSpeaking = true;
@@ -768,6 +833,7 @@ public class MainActivity extends AppCompatActivity implements
                     temi.speak(TtsRequest.create(nextSentence, false));
                     // step/case incremeted by the statusChange of tts
                 }
+                flagRepeatSentenceRequest = false;
                 break;
 
             case 13:
@@ -797,18 +863,34 @@ public class MainActivity extends AppCompatActivity implements
 
             case 16:
                 // Sequence-End
+                flagRepeatSentenceRequest = false;
                 currentSequenceStep = 0;
 
             default:
                 showTranscription("DEGBUG: default in handleSequenceBrainGame !");
+                flagRepeatSentenceRequest = false;
                 break;
+        }
+    }
+
+    // for handleSequenceBrainGame: func to check if the user didnt understand the question/sentence and wants it to be repeated
+    private boolean checkRepeatRequest()
+    {
+        if(myAsrResultString.contains("wiederhole") | myAsrResultString.contains("noch mal") | myAsrResultString.contains("nicht verstanden"))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
         }
     }
 
     @Override
     public void onConversationStatusChanged(int status, @NotNull String text) {
         myAsrResultString += text;
-        switch (status) {
+        switch (status)
+        {
             case IDLE:
                 Log.i(TAG, "Status: IDLE | Text: " + myAsrResultString);
                 showTranscription("Status: IDLE | Text: " + myAsrResultString);
@@ -832,6 +914,13 @@ public class MainActivity extends AppCompatActivity implements
                 showTranscription("Status: UNKNOWN | Text: " + myAsrResultString);
                 findViewById(R.id.isRecordingImg).setVisibility(View.INVISIBLE);
                 break;
+        }
+
+        if(flagWaitingForUserResponse == true & status == IDLE)
+        {
+            flagWaitingForUserResponse = false;
+
+            chooseCurrentSequence();
         }
     }
 
