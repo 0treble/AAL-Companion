@@ -280,7 +280,8 @@
 
         <ImageView
             android:id="@+id/overlay_image"
-            android:layout_width="match_parent"
+            android:scaleType="fitXY"
+            android:layout_width="fill_parent"
             android:layout_height="match_parent"
             android:src="@drawable/wall_e_image"
             android:visibility="gone"
@@ -296,11 +297,11 @@
             android:layout_margin="16dp"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
-            android:visibility="gone"
             android:backgroundTint="?attr/colorPrimary"
+            android:text="@string/back"
             android:textColor="?attr/colorOnPrimary"
             android:textSize="11sp"
-            android:text="@string/back"
+            android:visibility="gone"
             app:layout_constraintEnd_toEndOf="@+id/overlay_image"
             app:layout_constraintTop_toTopOf="@+id/overlay_image" />
     </FrameLayout>

@@ -34,11 +34,11 @@ class ClientReceiverRunnable_transport implements Runnable {
                 Robot temi = MainActivity.getInstance().getTemi();
 
                 if (temi.getLocations().contains(destination)) {
-                    MainActivity.getInstance().hideModeElements();
+                    //MainActivity.getInstance().hideModeElements();
                     temi.goTo(destination);
 
-                    MainActivity.getInstance().showContent(destination);
-                    MainActivity.getInstance().setNewDest(destination);
+                    //MainActivity.getInstance().showContent(destination);
+                    //MainActivity.getInstance().setNewDest(destination);
                     myMQTT.publish("{\"destination\":\"" + destination + "\",\"floor\":\"" + MainActivity.getInstance().getMyfloorNumber() + "\",\"task\":\"found\"}", MQTT.PUBLISH_TOPIC.TOPIC_FLOOR.getTopic());
                 }
 
