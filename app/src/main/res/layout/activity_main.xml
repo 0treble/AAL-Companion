@@ -235,14 +235,12 @@
                 android:id="@+id/imgOverlayButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="16dp"
                 android:backgroundTint="?attr/colorPrimary"
                 android:elegantTextHeight="true"
                 android:text="@string/img_overlay"
                 android:textColor="?attr/colorOnPrimary"
                 app:layout_constraintBottom_toBottomOf="@+id/QRCodeButton"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.016"
+                app:layout_constraintEnd_toStartOf="@+id/repeatSequenceStep"
                 app:layout_constraintStart_toEndOf="@+id/themeButton" />
 
             <Button
@@ -256,7 +254,7 @@
                 android:textColor="?attr/colorOnPrimary"
                 app:layout_constraintBottom_toBottomOf="@+id/QRCodeButton"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.186"
+                app:layout_constraintHorizontal_bias="0.191"
                 app:layout_constraintStart_toEndOf="@+id/themeButton" />
 
 

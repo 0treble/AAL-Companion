@@ -1,11 +1,9 @@
 package com.example.temi_elevator;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Handler;
 import android.util.Log;
 import android.os.Bundle;
@@ -14,7 +12,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.ScrollView;
@@ -77,7 +74,6 @@ public class MainActivity extends AppCompatActivity implements
     private boolean waitingForReset = false;
     private boolean waitingForFinish = false;
     private final Handler waitHandler = new Handler();
-    //private static String[] REQUIRED_PERMISSIONS = new String[]{android.Manifest.permission.RECORD_AUDIO};
     private TextView transcription;
     private ScrollView scrollView;
     private ActivityResultLauncher<Intent> sequenceResultLauncher;
@@ -88,10 +84,7 @@ public class MainActivity extends AppCompatActivity implements
     int currentSequenceStep = 0;
     private boolean flagWaitingForTemiToArrive = false;
     private boolean flagWaitingForTemiToFinishSpeaking = false;
-
-
     private boolean flagWaitingForUserResponse = false; // = true when we are expecting an answer from the user
-
     private boolean flagRepeatSentenceRequest = false; // = true when user wants sentenced repeated (handleSequenceBrainGame)
     boolean conversationMode = false;
     private Reminder.ReminderManager reminderManager;
@@ -146,12 +139,6 @@ public class MainActivity extends AppCompatActivity implements
         // Initialize the reminder manager
         reminderManager = new Reminder.ReminderManager(this);
 
-        findViewById(R.id.quitButton).setOnClickListener(view -> {
-            temi.setKioskModeOn(false);
-            temi.setInteractionState(true);
-            enable_menu();
-        });
-
         findViewById(R.id.listen).setOnClickListener(view -> {
             temi.wakeup(Collections.singletonList(SttLanguage.SYSTEM));
             findViewById(R.id.isRecordingImg).setVisibility(View.VISIBLE);
@@ -163,6 +150,7 @@ public class MainActivity extends AppCompatActivity implements
         });
 
         findViewById(R.id.quitButton).setOnClickListener(view -> {
+            logToFile(transcription.getText().toString());
             temi.setKioskModeOn(false);
             temi.setHardButtonsDisabled(false);
             temi.setGoToSpeed(SpeedLevel.SLOW);
@@ -201,12 +189,21 @@ public class MainActivity extends AppCompatActivity implements
         });
 
         findViewById(R.id.repeatSequenceStep).setOnClickListener(view ->  {
-            currentSequenceStep--;
+            if(currentSequence == Sequence.SEQUENCE_BRAIN_GAME){
+                currentSequenceStep -= 2;
+            }else if((currentSequence == null)){
+                showTranscription("Keine Sequenz ausgewählt");
+            }else{
+                currentSequenceStep--;
+            }
+
+            //for error avoidance
+            if(currentSequenceStep < 0){
+                currentSequenceStep = 0;
+            }
+
             chooseCurrentSequence();
         });
-
-
-
     }
 
     private void setupThemeButton() {
@@ -216,9 +213,7 @@ public class MainActivity extends AppCompatActivity implements
         try {
             Button themeButton = findViewById(R.id.themeButton);
             if (themeButton != null) {
-                themeButton.setOnClickListener(view -> {
-                    toggleDarkMode();
-                });
+                themeButton.setOnClickListener(view -> toggleDarkMode());
             } else {
                 Log.e(TAG, "themeButton is null");
             }
@@ -236,17 +231,16 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     public void showTranscription(@NotNull String text){
-        transcription.append(text + "\n");
+        String timestamp = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
+        transcription.append(timestamp + text + "\n");
         scrollToBottom();
 
-        logToFile(text + "\n");
+        //logToFile(text + "\n");
     }
 
+    /* Voice Commands */
     @Override
     public void onAsrResult(@NotNull String asrResult, @NonNull SttLanguage sttLanguage) {
-
-        //showTranscription("DEGBUG: In der onAsrResult");
-
         Log.i(TAG, "ASR Result: " + asrResult);
         myAsrResultString = asrResult;
         showTranscription("myAsrResultString: " + myAsrResultString);
@@ -256,7 +250,44 @@ public class MainActivity extends AppCompatActivity implements
         temi.finishConversation(); // stop ASR listener
     }
 
-    /* Voice Commands */
+    @Override
+    public void onConversationStatusChanged(int status, @NotNull String text) {
+        myAsrResultString += text;
+        switch (status)
+        {
+            case IDLE:
+                Log.i(TAG, "Status: IDLE | Text: " + myAsrResultString);
+                showTranscription("Status: IDLE | Text: " + myAsrResultString);
+                findViewById(R.id.isRecordingImg).setVisibility(View.INVISIBLE);
+                break;
+            case LISTENING:
+                Log.i(TAG, "Status: LISTENING | Text: " + myAsrResultString);
+                showTranscription("Status: LISTENING | Text: " + myAsrResultString);
+                findViewById(R.id.isRecordingImg).setVisibility(View.VISIBLE);
+                break;
+            case THINKING:
+                Log.i(TAG, "Status: THINKING | Text: " + myAsrResultString);
+                transcription.append("Status: THINKING | Text: " + myAsrResultString);
+                scrollToBottom();
+                break;
+            case SPEAKING:
+                Log.i(TAG, "Status: SPEAKING | Text: " + myAsrResultString);
+                showTranscription("Status: SPEAKING | Text: " + myAsrResultString);
+                break;
+            default:
+                Log.i(TAG, "Status: UNKNOWN | Text: " + myAsrResultString);
+                showTranscription("Status: UNKNOWN | Text: " + myAsrResultString);
+                findViewById(R.id.isRecordingImg).setVisibility(View.INVISIBLE);
+                break;
+        }
+
+        if(flagWaitingForUserResponse & status == IDLE)
+        {
+            flagWaitingForUserResponse = false;
+            chooseCurrentSequence();
+        }
+    }
+
     @FunctionalInterface
     interface CommandAction {
         void execute(String command);
@@ -273,11 +304,12 @@ public class MainActivity extends AppCompatActivity implements
         commandsMap.put(new String[]{"stopp","stop","abbrechen","abbruch" }, command -> stopCurrentSequence());
         commandsMap.put(new String[]{"gesprächsmodus", "dialogmodus", "gesprächs modus"}, command -> conversationMode = !conversationMode);
         commandsMap.put(new String[]{"erinnere mich", "erinnerung setzen", "setze eine erinnerung"}, command -> setReminder());
+        commandsMap.put(new String[]{"wiederholen", "erneut", "wiederhole", "noch mal", "nicht verstanden"}, command -> findViewById(R.id.repeatSequenceStep).performClick());
         /* Sequences */
         commandsMap.put(new String[]{"gäste begrüßen", "begrüßung starten", "willkommenssequenz starten", "sequenz 1 starten",
                 "sequenz 1 beginnen"}, command -> {
             currentSequence = Sequence.GREETING;
-            currentSequenceStep = 0;
+            currentSequenceStep = 5;
             chooseCurrentSequence();
         });
         commandsMap.put(new String[]{"sequenz 2 starten", "sequenz 2 beginnen", "alexa sequenz ausführen",
@@ -310,17 +342,10 @@ public class MainActivity extends AppCompatActivity implements
                     entry.getValue().execute(myAsrResultString);
                     return;
                 }
-                /*
-                else {
-                    showTranscription("Das habe ich nicht verstanden.");
-                    temi.speak(TtsRequest.create("Das habe ich nicht verstanden.", false));
-                }
-                */
-
             }
         }
 
-        showTranscription("\nDEGBUG: In der analyzeVoiceCommand...\n");
+        //showTranscription("DEGBUG: In der analyzeVoiceCommand...");
         chooseCurrentSequence();
     }
     // testkommentar
@@ -336,16 +361,11 @@ public class MainActivity extends AppCompatActivity implements
     //Handles result from voice commands and SequenceActivity.java click result
     public void chooseCurrentSequence()
     {
-
         switch(currentSequence)
         {
             case GREETING:
                 scrollToBottom();
                 handleSequenceGreeting();
-                break;
-            case SMALL_TALK:
-                // noch to-do
-
                 break;
             case SEQUENCE_ALEXA:
                 scrollToBottom();
@@ -358,6 +378,9 @@ public class MainActivity extends AppCompatActivity implements
             case SEQUENCE_BRAIN_GAME:
                 //scrollToBottom();
                 handleSequenceBrainGame();
+                break;
+            case SMALL_TALK:
+                // noch to-do
                 break;
             default:
                 showTranscription("Error default in switch(currentsequence)");
@@ -392,9 +415,6 @@ public class MainActivity extends AppCompatActivity implements
                 flagWaitingForTemiToArrive = true;      /// SUPER IMPORTANT BEFORE EVERY GO-TO-COMMAND!!!!
                 temi.goTo("tür");               /// so that the next task is started AFTER arriving at destination
                 // step increment done by the onGoToStatusListener()
-
-
-
                 break;
             case 1:
                 waitHandler.postDelayed(() -> {
@@ -443,48 +463,63 @@ public class MainActivity extends AppCompatActivity implements
                 askSurveyQuestion(R.string.survey_question_1);
                 break;
             case 7:
-                askSurveyQuestion(R.string.survey_question_2);
+            case 9:
+            case 11:
+            case 13:
+            case 15:
+            case 17:
+            case 19:
+            case 21:
+            case 23:
+            case 25:
+            case 27:
+            case 29:
+                flagWaitingForUserResponse = true;
+                temi.wakeup(Collections.singletonList(SttLanguage.SYSTEM));
+                findViewById(R.id.isRecordingImg).setVisibility(View.VISIBLE);
+
+                currentSequenceStep++;
                 break;
             case 8:
                 askSurveyQuestion(R.string.survey_question_3);
                 break;
-            case 9:
+            case 10:
                 askSurveyQuestion(R.string.survey_question_4);
                 break;
-            case 10:
+            case 12:
                 askSurveyQuestion(R.string.survey_question_5);
                 break;
-            case 11:
+            case 14:
                 askSurveyQuestion(R.string.survey_question_6);
                 break;
-            case 12:
+            case 16:
                 askSurveyQuestion(R.string.survey_question_7);
                 break;
-            case 13:
+            case 18:
                 askSurveyQuestion(R.string.survey_question_8);
                 break;
-            case 14:
+            case 20:
                 askSurveyQuestion(R.string.survey_question_9);
                 break;
-            case 15:
+            case 22:
                 askSurveyQuestion(R.string.survey_question_10);
                 break;
-            case 16:
+            case 24:
                 askSurveyQuestion(R.string.survey_question_11);
                 break;
-            case 17:
+            case 26:
                 askSurveyQuestion(R.string.survey_question_12);
                 break;
-            case 18:
+            case 28:
                 askSurveyQuestion(R.string.survey_question_13);
                 break;
-            case 19:
+            case 30:
                 String suggestions = getString(R.string.survey_suggestions);
                 showTranscription(suggestions);
                 flagWaitingForTemiToFinishSpeaking = true;
                 temi.speak(TtsRequest.create(suggestions, false));
                 break;
-            case 20: // End of sequence GREETING
+            case 31: // End of sequence GREETING
                 String goodbye_string = getString(R.string.survey_goodbye_string);
                 showTranscription(goodbye_string);
                 flagWaitingForTemiToFinishSpeaking = true;
@@ -532,11 +567,11 @@ public class MainActivity extends AppCompatActivity implements
                     temi.speak(TtsRequest.create("Bitte schließe die Rolläden", false));
                     // oder temi.speak(TtsRequest.create("Wohnzimmer an", false));
                 }, 1000);
-                break;
-            default:
-                // Sequence completed
                 currentSequenceStep = 0;
                 currentSequence = null;
+                break;
+            default:
+                showTranscription("Error: Default in Sequenz Alexa!");
                 break;
         }
     }
@@ -636,21 +671,22 @@ public class MainActivity extends AppCompatActivity implements
                 //showTranscription(farewell);
                 flagWaitingForTemiToFinishSpeaking = true;
                 temi.speak(TtsRequest.create(farewell, false));
+                // Sequence completed
+                currentSequenceStep = 0;
+                currentSequence = null;
                 break;
             default:
-                // Sequence completed
-                currentSequenceStep = 0; // Reset the sequence step
-                currentSequence = null; // Or set to another sequence as needed
+                showTranscription("Error: Default in Sequenz AAL!");
                 break;
         }
     }
 
     private void handleSequenceBrainGame() {
-        showTranscription("\nDEGBUG: in handleBrainGame: Schritt = " + currentSequenceStep);
+        showTranscription("DEGBUG: in handleBrainGame: Schritt = " + currentSequenceStep);
 
         switch (currentSequenceStep) {
             case 0:
-                showTranscription("\nDEGBUG: In Sequence: handleSequenceBrainGame\n");
+                showTranscription("DEGBUG: In Sequence: handleSequenceBrainGame");
                 flagRepeatSentenceRequest = false;
                 String introducingBrainGame = getString(R.string.bg_introduction);
                 flagWaitingForTemiToFinishSpeaking = true;
@@ -820,7 +856,7 @@ public class MainActivity extends AppCompatActivity implements
                     break;
                 }
 
-                if((myAsrResultString.contains("schnaps") && myAsrResultString.contains("schnaps")) | flagRepeatSentenceRequest)
+                if((myAsrResultString.contains("schnaps") | flagRepeatSentenceRequest))
                 {
                     String nextSentence = getString(R.string.bg_answer_correct);
                     flagWaitingForTemiToFinishSpeaking = true;
@@ -877,52 +913,7 @@ public class MainActivity extends AppCompatActivity implements
     // for handleSequenceBrainGame: func to check if the user didnt understand the question/sentence and wants it to be repeated
     private boolean checkRepeatRequest()
     {
-        if(myAsrResultString.contains("wiederhole") | myAsrResultString.contains("noch mal") | myAsrResultString.contains("nicht verstanden"))
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
-
-    @Override
-    public void onConversationStatusChanged(int status, @NotNull String text) {
-        myAsrResultString += text;
-        switch (status)
-        {
-            case IDLE:
-                Log.i(TAG, "Status: IDLE | Text: " + myAsrResultString);
-                showTranscription("Status: IDLE | Text: " + myAsrResultString);
-                findViewById(R.id.isRecordingImg).setVisibility(View.INVISIBLE);
-                break;
-            case LISTENING:
-                Log.i(TAG, "Status: LISTENING | Text: " + myAsrResultString);
-                showTranscription("Status: LISTENING | Text: " + myAsrResultString);
-                findViewById(R.id.isRecordingImg).setVisibility(View.VISIBLE);
-                break;
-            case THINKING:
-                Log.i(TAG, "Status: THINKING | Text: " + myAsrResultString);
-                showTranscription("Status: THINKING | Text: " + myAsrResultString);
-                break;
-            case SPEAKING:
-                Log.i(TAG, "Status: SPEAKING | Text: " + myAsrResultString);
-                showTranscription("Status: SPEAKING | Text: " + myAsrResultString);
-                break;
-            default:
-                Log.i(TAG, "Status: UNKNOWN | Text: " + myAsrResultString);
-                showTranscription("Status: UNKNOWN | Text: " + myAsrResultString);
-                findViewById(R.id.isRecordingImg).setVisibility(View.INVISIBLE);
-                break;
-        }
-
-        if(flagWaitingForUserResponse == true & status == IDLE)
-        {
-            flagWaitingForUserResponse = false;
-
-            chooseCurrentSequence();
-        }
+        return myAsrResultString.contains("wiederhole") | myAsrResultString.contains("noch mal") | myAsrResultString.contains("nicht verstanden");
     }
 
     public void relocateTemi()
@@ -999,19 +990,17 @@ public class MainActivity extends AppCompatActivity implements
                 Toast.makeText(getApplicationContext(), "Log file already exists", Toast.LENGTH_SHORT).show();
             }
         } catch (IOException e) {
-            e.printStackTrace();
             Toast.makeText(getApplicationContext(), "Error creating log file", Toast.LENGTH_SHORT).show();
         }
     }
 
     public void logToFile(String logMessage) {
         if (logFile != null) {
-            String timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
-            String logEntry = timestamp + " - " + logMessage;
+            // timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
+            //String logEntry = timestamp + " - " + logMessage;
             try (FileWriter writer = new FileWriter(logFile, true)) {
-                writer.append(logEntry).append("\n");
+                writer.append(logMessage).append("\n");
             } catch (IOException e) {
-                e.printStackTrace();
                 Toast.makeText(getApplicationContext(), "Error logging message", Toast.LENGTH_SHORT).show();
             }
         } else {
@@ -1031,14 +1020,6 @@ public class MainActivity extends AppCompatActivity implements
             temi.hideTopBar(); // hide temi's top action bar when skill is active
         }
     }
-
-/*
-    static {
-        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
-            REQUIRED_PERMISSIONS = Arrays.copyOf(REQUIRED_PERMISSIONS, REQUIRED_PERMISSIONS.length + 1);
-            REQUIRED_PERMISSIONS[REQUIRED_PERMISSIONS.length - 1] = Manifest.permission.WRITE_EXTERNAL_STORAGE;
-        }
-    }*/
 
     /* Dark Mode */
     private void toggleDarkMode() {
@@ -1154,8 +1135,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void scrollToBottom() {
-        scrollView.post(() -> {scrollView.fullScroll(ScrollView.FOCUS_DOWN);
-        });
+        scrollView.post(() -> scrollView.fullScroll(ScrollView.FOCUS_DOWN));
     }
 
     private void refreshTemiUi() {
@@ -1166,20 +1146,6 @@ public class MainActivity extends AppCompatActivity implements
         }catch (Exception e) {
             Log.e(TAG, "Error refreshing temi UI: ", e);
         }
-    }
-
-    public void hideModeElements() {
-        runOnUiThread(() -> {
-            Button qr_code_button = findViewById(R.id.QRCodeButton);
-            Button confirm_button = findViewById(R.id.confirmLocationButton);
-            Spinner spinner = findViewById(R.id.dropdownMenu);
-            TextView confirmtextView = findViewById(R.id.topTextView);
-
-            confirm_button.setVisibility(View.INVISIBLE);
-            spinner.setVisibility(View.INVISIBLE);
-            confirmtextView.setVisibility(View.INVISIBLE);
-            qr_code_button.setVisibility(View.INVISIBLE);
-        });
     }
 
     @SuppressLint("SetTextI18n")
@@ -1234,11 +1200,6 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-    // is used to bring the guest to his destination when he's coming from a different floor
-    public void setNewDest(String x) {
-        newDest = x;
-    }
-
     // tells the initial temi to reset and resets itself when the user arrives at the destination
     public void arrived() {
         if (!this.waitingForFinish) {
@@ -1267,20 +1228,6 @@ public class MainActivity extends AppCompatActivity implements
             confirmTextView.setVisibility(View.VISIBLE);
             String arrivedMSG = "Sind sie am richtigen Raum angekommen?";
             confirmTextView.setText(arrivedMSG);
-            confirmYesButton.setVisibility(View.VISIBLE);
-        });
-    }
-
-    // makes the confirm message and confirm button visible
-    @SuppressLint("SetTextI18n")
-    public void showContent(String room) {
-        waitingForReset = true;
-        runOnUiThread(() -> {
-            TextView confirmTextView = findViewById(R.id.confirmTextView);
-            Button confirmYesButton = findViewById(R.id.confirmArrivedButton);
-
-            confirmTextView.setVisibility(View.VISIBLE);
-            confirmTextView.setText("Bitte bestätigen, wenn Sie zu " + room + " wollen");
             confirmYesButton.setVisibility(View.VISIBLE);
         });
     }
@@ -1346,7 +1293,6 @@ public class MainActivity extends AppCompatActivity implements
             Spinner spinner = findViewById(R.id.dropdownMenu);
             TextView textView = findViewById(R.id.topTextView);
             findViewById(R.id.isRecordingImg).setVisibility(View.INVISIBLE);
-            //findViewById(R.id.isRecordingBar).setVisibility(View.INVISIBLE);
             elevatorTextView.setVisibility(View.INVISIBLE);
             confirmTextView.setVisibility(View.INVISIBLE);
             confirmYesButton.setVisibility(View.INVISIBLE);
@@ -1372,7 +1318,6 @@ public class MainActivity extends AppCompatActivity implements
         String transcript = savedInstanceState.getString("transcript");
         transcription.setText(transcript);
     }
-
 
     @Override
     protected void onStop() {
