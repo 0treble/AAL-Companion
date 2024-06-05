@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity implements
     private String newDest = ""; // is used to save a destination from MQTT
     private static MainActivity instance;
     private final Robot temi = Robot.getInstance();
-    private List<String> otherLocations = new ArrayList<>();
+    private List<String> validLocations = new ArrayList<>();
     private int myfloorNumber = 0;
     private boolean waitingForFloor = false;
     private boolean waitingForReset = false;
@@ -79,7 +79,7 @@ public class MainActivity extends AppCompatActivity implements
     private ActivityResultLauncher<Intent> sequenceResultLauncher;
     private ExecutorService myExecutorService;
     private String myAsrResultString = "";
-    enum Sequence {GREETING, SMALL_TALK, SEQUENCE_ALEXA, AAL_SEQUENCE, SEQUENCE_BRAIN_GAME}
+    enum Sequence {GREETING, SEQUENCE_ALEXA, AAL_SEQUENCE, SEQUENCE_BRAIN_GAME, QUESTIONNAIRE}
     private Sequence currentSequence;
     int currentSequenceStep = 0;
     private boolean flagWaitingForTemiToArrive = false;
@@ -231,11 +231,13 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     public void showTranscription(@NotNull String text){
-        String timestamp = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
-        transcription.append(timestamp + text + "\n");
-        scrollToBottom();
-
-        //logToFile(text + "\n");
+        try{
+            String timestamp = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
+            transcription.append(timestamp + ": " + text + "\n");
+            scrollToBottom();
+        }catch (Exception e){
+            Log.e(TAG, "Error in showTranscription: " + e.getMessage());
+        }
     }
 
     /* Voice Commands */
@@ -267,8 +269,7 @@ public class MainActivity extends AppCompatActivity implements
                 break;
             case THINKING:
                 Log.i(TAG, "Status: THINKING | Text: " + myAsrResultString);
-                transcription.append("Status: THINKING | Text: " + myAsrResultString);
-                scrollToBottom();
+                showTranscription("Status: THINKING | Text: " + myAsrResultString);
                 break;
             case SPEAKING:
                 Log.i(TAG, "Status: SPEAKING | Text: " + myAsrResultString);
@@ -309,7 +310,7 @@ public class MainActivity extends AppCompatActivity implements
         commandsMap.put(new String[]{"gäste begrüßen", "begrüßung starten", "willkommenssequenz starten", "sequenz 1 starten",
                 "sequenz 1 beginnen"}, command -> {
             currentSequence = Sequence.GREETING;
-            currentSequenceStep = 5;
+            currentSequenceStep = 0;
             chooseCurrentSequence();
         });
         commandsMap.put(new String[]{"sequenz 2 starten", "sequenz 2 beginnen", "alexa sequenz ausführen",
@@ -329,7 +330,11 @@ public class MainActivity extends AppCompatActivity implements
             currentSequenceStep = 0;
             chooseCurrentSequence();
         });
-
+        commandsMap.put(new String[]{"fragebogen starten", "fragebogensequenz starten", "fragebogen beginnen" }, command -> {
+            currentSequence = Sequence.QUESTIONNAIRE;
+            currentSequenceStep = 0;
+            chooseCurrentSequence();
+        });
     }
 
     public void analyzeVoiceCommand() {
@@ -348,7 +353,6 @@ public class MainActivity extends AppCompatActivity implements
         //showTranscription("DEGBUG: In der analyzeVoiceCommand...");
         chooseCurrentSequence();
     }
-    // testkommentar
 
     public void stopCurrentSequence()
     {
@@ -379,8 +383,9 @@ public class MainActivity extends AppCompatActivity implements
                 //scrollToBottom();
                 handleSequenceBrainGame();
                 break;
-            case SMALL_TALK:
-                // noch to-do
+            case QUESTIONNAIRE:
+                scrollToBottom();
+                handleSequenceQuestionnaire();
                 break;
             default:
                 showTranscription("Error default in switch(currentsequence)");
@@ -452,74 +457,76 @@ public class MainActivity extends AppCompatActivity implements
                 waitHandler.postDelayed(() -> {
                 }, 3000);
                 // step increment done by the onTtsStatusChanged() when temi finished speaking previous string
+                currentSequenceStep = 0;
+                currentSequence = null;
                 break;
-            case 5:
+            default:
+                showTranscription("Error: Default in Sequenz GREETING!");
+                break;
+        }
+    }
+
+    public void handleSequenceQuestionnaire()
+    {
+        switch (currentSequenceStep)
+        {
+            case 0:
                 String questions_intro = getString(R.string.survey_questions_intro);
                 showTranscription(questions_intro);
                 flagWaitingForTemiToFinishSpeaking = true;
                 temi.speak(TtsRequest.create(questions_intro, false));
                 break;
-            case 6:
+            case 1:
                 askSurveyQuestion(R.string.survey_question_1);
                 break;
-            case 7:
-            case 9:
-            case 11:
-            case 13:
-            case 15:
-            case 17:
-            case 19:
-            case 21:
-            case 23:
-            case 25:
-            case 27:
-            case 29:
+            case 2: case 4: case 6: case 8: case 10: case 12: case 14:
+            case 16: case 18: case 20: case 22: case 24: case 26: case 28:
                 flagWaitingForUserResponse = true;
                 temi.wakeup(Collections.singletonList(SttLanguage.SYSTEM));
                 findViewById(R.id.isRecordingImg).setVisibility(View.VISIBLE);
 
                 currentSequenceStep++;
                 break;
-            case 8:
+            case 3:
                 askSurveyQuestion(R.string.survey_question_3);
                 break;
-            case 10:
+            case 5:
                 askSurveyQuestion(R.string.survey_question_4);
                 break;
-            case 12:
+            case 7:
                 askSurveyQuestion(R.string.survey_question_5);
                 break;
-            case 14:
+            case 11:
                 askSurveyQuestion(R.string.survey_question_6);
                 break;
-            case 16:
+            case 13:
                 askSurveyQuestion(R.string.survey_question_7);
                 break;
-            case 18:
+            case 15:
                 askSurveyQuestion(R.string.survey_question_8);
                 break;
-            case 20:
+            case 17:
                 askSurveyQuestion(R.string.survey_question_9);
                 break;
-            case 22:
+            case 19:
                 askSurveyQuestion(R.string.survey_question_10);
                 break;
-            case 24:
+            case 21:
                 askSurveyQuestion(R.string.survey_question_11);
                 break;
-            case 26:
+            case 23:
                 askSurveyQuestion(R.string.survey_question_12);
                 break;
-            case 28:
+            case 25:
                 askSurveyQuestion(R.string.survey_question_13);
                 break;
-            case 30:
+            case 27:
                 String suggestions = getString(R.string.survey_suggestions);
                 showTranscription(suggestions);
                 flagWaitingForTemiToFinishSpeaking = true;
                 temi.speak(TtsRequest.create(suggestions, false));
                 break;
-            case 31: // End of sequence GREETING
+            case 29: // End of sequence GREETING
                 String goodbye_string = getString(R.string.survey_goodbye_string);
                 showTranscription(goodbye_string);
                 flagWaitingForTemiToFinishSpeaking = true;
@@ -532,6 +539,7 @@ public class MainActivity extends AppCompatActivity implements
                 break;
         }
     }
+
     private void askSurveyQuestion(int questionResId) {
         String question = getString(questionResId);
         showTranscription(question);
@@ -688,19 +696,14 @@ public class MainActivity extends AppCompatActivity implements
             case 0:
                 showTranscription("DEGBUG: In Sequence: handleSequenceBrainGame");
                 flagRepeatSentenceRequest = false;
-                String introducingBrainGame = getString(R.string.bg_introduction);
+                String introducingBrainGame = getString(R.string.bg_introduction_short);
                 flagWaitingForTemiToFinishSpeaking = true;
                 temi.speak(TtsRequest.create(introducingBrainGame, false));
                 // step/case incremeted by the statusChange of tts
                 break;
 
-            case 1:
-            case 3:
-            case 5:
-            case 7:
-            case 9:
-            case 11:
-            case 14:
+            case 1: case 3: case 5: case 7:
+            case 9: case 11: case 14:
                 /*
                 waitHandler.postDelayed(() -> {
                     temi.tiltAngle(20);
@@ -757,7 +760,16 @@ public class MainActivity extends AppCompatActivity implements
                 }
                 else
                 {
-                    String nextSentence = getString(R.string.bg_sentence1_correct) + getString(R.string.bg_sentence2);
+                    String nextSentence = "";
+                    if(checkForDontKnowAnswer())
+                    {
+                        nextSentence = getString(R.string.bg_dont_know_answer);
+                    }
+                    else
+                    {
+                        nextSentence = getString(R.string.bg_sorry_wrong);
+                    }
+                    nextSentence += getString(R.string.bg_sentence1_correct) + getString(R.string.bg_sentence2);
                     flagWaitingForTemiToFinishSpeaking = true;
                     temi.speak(TtsRequest.create(nextSentence, false));
                     // step/case incremeted by the statusChange of tts
@@ -915,9 +927,37 @@ public class MainActivity extends AppCompatActivity implements
     {
         return myAsrResultString.contains("wiederhole") | myAsrResultString.contains("noch mal") | myAsrResultString.contains("nicht verstanden");
     }
+    private boolean checkForDontKnowAnswer()
+    {
+        return myAsrResultString.contains("weiß ich nicht") | myAsrResultString.contains("kenne ich nicht") | myAsrResultString.contains("unbekannt");
+    }
 
     public void relocateTemi()
-    {
+    {   /* //Use similar structure as fillDropdownMenu
+        boolean found = false;
+        String lowerCaseAsrResult = myAsrResultString.toLowerCase();
+
+        if(myAsrResultString.contains("basisstation")) {
+            found = true;
+            destination = "home base";
+            confirm();
+        }
+
+        for (String location : validLocations) {
+            if (lowerCaseAsrResult.contains(location)) {
+                destination = location;
+                found = true;
+                confirm();
+                break;
+            }
+        }
+
+        if (!found) {
+            String unknownPlace = "Entschuldige diesen Ort kenne ich leider nicht.";
+            showTranscription(unknownPlace);
+            temi.speak(TtsRequest.create(unknownPlace, false));
+        }*/
+
         if(myAsrResultString.contains("tür"))
         {
             destination = "tür";
@@ -1106,7 +1146,7 @@ public class MainActivity extends AppCompatActivity implements
 
     private void fillDropdownMenu() {
         List<String> locationList = temi.getLocations();
-        locationList.addAll(otherLocations);
+        locationList.addAll(validLocations);
 
         // Remove duplicates
         Set<String> set = new HashSet<>(locationList);
@@ -1233,21 +1273,21 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     public void addLocations(String[] locations) {
-        otherLocations.addAll(Arrays.asList(locations));
+        validLocations.addAll(Arrays.asList(locations));
 
         // Remove duplicates
-        Set<String> set = new HashSet<>(otherLocations);
-        otherLocations = new ArrayList<>(set);
+        Set<String> set = new HashSet<>(validLocations);
+        validLocations = new ArrayList<>(set);
 
         String floorx = "";
 
-        for (String element : otherLocations) {
+        for (String element : validLocations) {
             if (element.startsWith("floor")) {
                 floorx = element;
             }
         }
 
-        otherLocations.remove(floorx);
+        validLocations.remove(floorx);
 
         runOnUiThread(this::fillDropdownMenu);
     }
