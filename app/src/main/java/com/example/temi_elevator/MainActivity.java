@@ -51,6 +51,7 @@ import java.util.Date;
 import com.robotemi.sdk.listeners.OnConversationStatusChangedListener;
 import com.robotemi.sdk.listeners.OnRobotReadyListener;
 import com.robotemi.sdk.TtsRequest;
+import com.bumptech.glide.Glide;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -105,11 +106,6 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         temi.setKioskModeOn(true);
-
-        if(!temi.isKioskModeOn()){
-            temi.setKioskModeOn(true);
-        }
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -117,6 +113,7 @@ public class MainActivity extends AppCompatActivity implements
         transportMode();
 
         myExecutorService = Executors.newSingleThreadExecutor();
+
         init(savedInstanceState);
 
         createLogFile();
@@ -177,8 +174,10 @@ public class MainActivity extends AppCompatActivity implements
                 }
         );
 
-        /* /Sequence Window Launcher*/
+        /* Robot Face Display */
         findViewById(R.id.imgOverlayButton).setOnClickListener(view ->  {
+            Glide.with(this).asGif().load(R.drawable.smileblink_crop).into((android.widget.ImageView) findViewById(R.id.overlay_image));
+
             findViewById(R.id.overlay_image).setVisibility(View.VISIBLE);
             findViewById(R.id.img_close_button).setVisibility(View.VISIBLE);
         });
@@ -188,11 +187,12 @@ public class MainActivity extends AppCompatActivity implements
             findViewById(R.id.img_close_button).setVisibility(View.GONE);
         });
 
+        /* Repeat Button */
         findViewById(R.id.repeatSequenceStep).setOnClickListener(view ->  {
-            if(currentSequence == Sequence.SEQUENCE_BRAIN_GAME){
-                currentSequenceStep -= 2;
-            }else if((currentSequence == null)){
+            if(currentSequence == null){
                 showTranscription("Keine Sequenz ausgewählt");
+            }else if(currentSequence == Sequence.SEQUENCE_BRAIN_GAME){
+                currentSequenceStep -= 2;
             }else{
                 currentSequenceStep--;
             }
@@ -226,6 +226,8 @@ public class MainActivity extends AppCompatActivity implements
         transcription = findViewById(R.id.transcription);
         String readyToTranscript = "Bereit... Drücken Sie die Taste 'Hören', um die Transkription zu starten.";
         transcription.append(readyToTranscript + "\n"); //don't scrollToBottom here, results in app crash
+
+        transcription.append("Kiosk Mode is on: " + temi.isKioskModeOn()); //check if kiosk mode is on
 
         logToFile(readyToTranscript + "\n");
     }
@@ -297,7 +299,7 @@ public class MainActivity extends AppCompatActivity implements
     private final Map<String[], CommandAction> commandsMap = new HashMap<>();
     private void initCommandsMap() {
         commandsMap.put(new String[]{"gehe", "geh", "fahre", "fahr"}, command -> relocateTemi());
-        commandsMap.put(new String[]{"folge mir"}, command -> followMe());
+        commandsMap.put(new String[]{"folge mir", "komm mit mir"}, command -> followMe());
         commandsMap.put(new String[]{"transkription starten", "aufnahme beginnen", "aufnahme starten"}, command -> findViewById(R.id.listen).performClick());
         commandsMap.put(new String[]{"transkription beenden", "aufnahme beenden"}, command -> findViewById(R.id.endTranscription).performClick());
         commandsMap.put(new String[]{"applikation beenden", "app beenden"}, command -> findViewById(R.id.quitButton).performClick());
@@ -350,7 +352,6 @@ public class MainActivity extends AppCompatActivity implements
             }
         }
 
-        //showTranscription("DEGBUG: In der analyzeVoiceCommand...");
         chooseCurrentSequence();
     }
 
@@ -1050,7 +1051,7 @@ public class MainActivity extends AppCompatActivity implements
 
     private void followMe() {
         Log.i(TAG, "Follow the user");
-        //code to follow the user and check the listeners
+        temi.beWithMe();
     }
 
     @Override

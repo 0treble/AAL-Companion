@@ -10,6 +10,7 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="com.robotemi.sdk.permission.RUN_SDK_SERVICE" />
+    <uses-permission android:name="com.robotemi.sdk.permission.KIOSK" />
     <uses-feature android:name="android.hardware.camera.any" />
     <uses-permission android:name="android.hardware.microphone.any" />
     <uses-permission android:name="android.permission.CAMERA" />

@@ -5,15 +5,9 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 
 import com.robotemi.sdk.*;
 import com.robotemi.sdk.Robot;
-import com.robotemi.sdk.constants.Page;
-import com.robotemi.sdk.listeners.OnGoToLocationStatusChangedListener;
-import com.robotemi.sdk.navigation.model.SpeedLevel;
-import com.robotemi.sdk.listeners.OnConversationStatusChangedListener;
-import com.robotemi.sdk.listeners.OnRobotReadyListener;
 
 import java.util.ArrayList;
 import java.util.List;
