@@ -695,7 +695,7 @@ public class MainActivity extends AppCompatActivity implements
 
         switch (currentSequenceStep) {
             case 0:
-                showTranscription("DEGBUG: In Sequence: handleSequenceBrainGame");
+                showTranscription("DEGBUG: Start Sequence: handleSequenceBrainGame");
                 flagRepeatSentenceRequest = false;
                 String introducingBrainGame = getString(R.string.bg_introduction_short);
                 flagWaitingForTemiToFinishSpeaking = true;
@@ -705,11 +705,7 @@ public class MainActivity extends AppCompatActivity implements
 
             case 1: case 3: case 5: case 7:
             case 9: case 11: case 14:
-                /*
-                waitHandler.postDelayed(() -> {
-                    temi.tiltAngle(20);
-                }, 5000);
-                */
+
                 flagWaitingForUserResponse = true;
                 temi.wakeup(Collections.singletonList(SttLanguage.SYSTEM));
                 findViewById(R.id.isRecordingImg).setVisibility(View.VISIBLE);
@@ -728,7 +724,6 @@ public class MainActivity extends AppCompatActivity implements
                     flagWaitingForTemiToFinishSpeaking = true;
                     temi.speak(TtsRequest.create(sentence1, false));
                     // step/case incremeted by the statusChange of tts
-
                 }
                 else
                 {
@@ -751,7 +746,6 @@ public class MainActivity extends AppCompatActivity implements
                     chooseCurrentSequence();
                     break;
                 }
-
                 if(((myAsrResultString.contains("taube") || myAsrResultString.contains("spatz")) && myAsrResultString.contains("dach")) | flagRepeatSentenceRequest)
                 {
                     String nextSentence = getString(R.string.bg_answer_correct) + getString(R.string.bg_sentence2);
@@ -797,7 +791,16 @@ public class MainActivity extends AppCompatActivity implements
                 }
                 else
                 {
-                    String nextSentence = getString(R.string.bg_sentence2_correct) + getString(R.string.bg_sentence3);
+                    String nextSentence = "";
+                    if(checkForDontKnowAnswer())
+                    {
+                        nextSentence = getString(R.string.bg_dont_know_answer);
+                    }
+                    else
+                    {
+                        nextSentence = getString(R.string.bg_sorry_wrong);
+                    }
+                    nextSentence += "Test " + getString(R.string.bg_sentence2_correct) + getString(R.string.bg_sentence3);
                     flagWaitingForTemiToFinishSpeaking = true;
                     temi.speak(TtsRequest.create(nextSentence, false));
                     // step/case incremeted by the statusChange of tts
@@ -824,7 +827,16 @@ public class MainActivity extends AppCompatActivity implements
                 }
                 else
                 {
-                    String nextSentence = getString(R.string.bg_sentence3_correct) + getString(R.string.bg_sentence4);
+                    String nextSentence = "";
+                    if(checkForDontKnowAnswer())
+                    {
+                        nextSentence = getString(R.string.bg_dont_know_answer);
+                    }
+                    else
+                    {
+                        nextSentence = getString(R.string.bg_sorry_wrong);
+                    }
+                    nextSentence += getString(R.string.bg_sentence3_correct) + getString(R.string.bg_sentence4);
                     flagWaitingForTemiToFinishSpeaking = true;
                     temi.speak(TtsRequest.create(nextSentence, false));
                     // step/case incremeted by the statusChange of tts
@@ -851,7 +863,16 @@ public class MainActivity extends AppCompatActivity implements
                 }
                 else
                 {
-                    String nextSentence = getString(R.string.bg_sentence4_correct) + getString(R.string.bg_sentence5);
+                    String nextSentence = "";
+                    if(checkForDontKnowAnswer())
+                    {
+                        nextSentence = getString(R.string.bg_dont_know_answer);
+                    }
+                    else
+                    {
+                        nextSentence = getString(R.string.bg_sorry_wrong);
+                    }
+                    nextSentence += getString(R.string.bg_sentence4_correct) + getString(R.string.bg_sentence5);
                     flagWaitingForTemiToFinishSpeaking = true;
                     temi.speak(TtsRequest.create(nextSentence, false));
                     // step/case incremeted by the statusChange of tts
@@ -878,7 +899,16 @@ public class MainActivity extends AppCompatActivity implements
                 }
                 else
                 {
-                    String nextSentence = getString(R.string.bg_sentence5_correct);
+                    String nextSentence = "";
+                    if(checkForDontKnowAnswer())
+                    {
+                        nextSentence = getString(R.string.bg_dont_know_answer);
+                    }
+                    else
+                    {
+                        nextSentence = getString(R.string.bg_sorry_wrong);
+                    }
+                    nextSentence += getString(R.string.bg_sentence5_correct);
                     flagWaitingForTemiToFinishSpeaking = true;
                     temi.speak(TtsRequest.create(nextSentence, false));
                     // step/case incremeted by the statusChange of tts
@@ -930,7 +960,10 @@ public class MainActivity extends AppCompatActivity implements
     }
     private boolean checkForDontKnowAnswer()
     {
-        return myAsrResultString.contains("weiß ich nicht") | myAsrResultString.contains("kenne ich nicht") | myAsrResultString.contains("unbekannt");
+        return    myAsrResultString.contains("weiß ich nicht")
+                | myAsrResultString.contains("kenne ich nicht")
+                | myAsrResultString.contains("unbekannt")
+                | myAsrResultString.contains("keine ahnung");
     }
 
     public void relocateTemi()
