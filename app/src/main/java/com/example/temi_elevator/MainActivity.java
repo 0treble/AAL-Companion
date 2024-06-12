@@ -33,6 +33,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.view.menu.ShowableListMenu;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -105,7 +106,12 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        temi.setKioskModeOn(true);
+        temi.requestToBeKioskApp();
+
+        if (!temi.isSelectedKioskApp()){
+            temi.setKioskModeOn(true);
+        }
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -148,8 +154,9 @@ public class MainActivity extends AppCompatActivity implements
 
         findViewById(R.id.quitButton).setOnClickListener(view -> {
             logToFile(transcription.getText().toString());
-            temi.setKioskModeOn(false);
-            temi.setHardButtonsDisabled(false);
+            if (temi.isSelectedKioskApp()){
+                temi.setKioskModeOn(false);
+            }
             temi.setGoToSpeed(SpeedLevel.SLOW);
             enable_menu();
         });
@@ -178,8 +185,7 @@ public class MainActivity extends AppCompatActivity implements
         findViewById(R.id.imgOverlayButton).setOnClickListener(view ->  {
             Glide.with(this).asGif().load(R.drawable.smileblink_crop).into((android.widget.ImageView) findViewById(R.id.overlay_image));
 
-            findViewById(R.id.overlay_image).setVisibility(View.VISIBLE);
-            findViewById(R.id.img_close_button).setVisibility(View.VISIBLE);
+            showFace();
         });
 
         findViewById(R.id.img_close_button).setOnClickListener(view ->  {
@@ -204,6 +210,12 @@ public class MainActivity extends AppCompatActivity implements
 
             chooseCurrentSequence();
         });
+    }
+
+    private void showFace()
+    {
+        findViewById(R.id.overlay_image).setVisibility(View.VISIBLE);
+        findViewById(R.id.img_close_button).setVisibility(View.VISIBLE);
     }
 
     private void setupThemeButton() {
@@ -370,28 +382,34 @@ public class MainActivity extends AppCompatActivity implements
         {
             case GREETING:
                 scrollToBottom();
+                showFace();
                 handleSequenceGreeting();
                 break;
             case SEQUENCE_ALEXA:
                 scrollToBottom();
+                showFace();
                 handleSequenceAlexa();
                 break;
             case AAL_SEQUENCE:
                 scrollToBottom();
+                showFace();
                 handleAALSequence();
                 break;
             case SEQUENCE_BRAIN_GAME:
                 //scrollToBottom();
+                showFace();
                 handleSequenceBrainGame();
                 break;
             case QUESTIONNAIRE:
                 scrollToBottom();
+                showFace();
                 handleSequenceQuestionnaire();
                 break;
             default:
                 showTranscription("Error default in switch(currentsequence)");
                 break;
         }
+
     }
 
     @Override
@@ -444,14 +462,19 @@ public class MainActivity extends AppCompatActivity implements
                 String livingroom_string = getString(R.string.livingroom_string);
                 //showTranscription(livingroom_string);
                 waitHandler.postDelayed(() -> {
-                }, 5000);
+                    if (this.flagWaitingForTemiToFinishSpeaking) {
+
+                        temi.speak(TtsRequest.create(livingroom_string, false));
+                    }
+                }, 10000);
                 flagWaitingForTemiToFinishSpeaking = true;
-                temi.speak(TtsRequest.create(livingroom_string, false));
+                //flagWaitingForTemiToFinishSpeaking = true;
+                //temi.speak(TtsRequest.create(livingroom_string, false));
                 // step increment done by the onTtsStatusChanged() when temi finished speaking previous string
                 break;
             case 4:
-                waitHandler.postDelayed(() -> {
-                }, 3000);
+                //waitHandler.postDelayed(() -> {
+                //}, 3000);
                 String introduction_string = getString(R.string.introduction_string);
                 //showTranscription(introduction_string);
                 temi.speak(TtsRequest.create(introduction_string, false));
@@ -697,7 +720,7 @@ public class MainActivity extends AppCompatActivity implements
             case 0:
                 showTranscription("DEGBUG: Start Sequence: handleSequenceBrainGame");
                 flagRepeatSentenceRequest = false;
-                String introducingBrainGame = getString(R.string.bg_introduction_short);
+                String introducingBrainGame = getString(R.string.bg_introduction);
                 flagWaitingForTemiToFinishSpeaking = true;
                 temi.speak(TtsRequest.create(introducingBrainGame, false));
                 // step/case incremeted by the statusChange of tts
@@ -960,10 +983,7 @@ public class MainActivity extends AppCompatActivity implements
     }
     private boolean checkForDontKnowAnswer()
     {
-        return    myAsrResultString.contains("weiß ich nicht")
-                | myAsrResultString.contains("kenne ich nicht")
-                | myAsrResultString.contains("unbekannt")
-                | myAsrResultString.contains("keine ahnung");
+        return    myAsrResultString.contains("weiß ich nicht") | myAsrResultString.contains("kenne ich nicht") | myAsrResultString.contains("unbekannt") | myAsrResultString.contains("keine ahnung");
     }
 
     public void relocateTemi()
