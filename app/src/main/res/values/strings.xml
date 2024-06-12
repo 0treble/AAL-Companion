@@ -1,20 +1,34 @@
 <resources>
     <string name="app_name">TemiVoice</string>
     <string name="confirm">Bestätigen</string>
-    <string name="top_view_text">Bitte wählen Sie einen Raum und Temi wird sie dort hin bringen!</string>
+    <string name="top_view_text">Bitte wählen Sie einen Raum und Temi
+        wird sie dort hin bringen!</string>
     <string name="ja">Zurück zur Basisstation</string>
     <string name="vielen_dank_temi">Vielen Dank Temi</string>
     <string-array name="spinner_items">
         <item>Default</item>
     </string-array>
 
-    <string name="greeting_string">Herzlich Willkommen in der AAL Wohnung der htw saar! Mein Name ist Temi. Bitte folgen Sie mir ins Wohnzimmer.</string>
-    <string name="livingroom_string">Sie können ihren Mantel oder ihre Jacke hier ablegen. Nehmen Sie doch bitte erst einmal Platz.</string>
-    <string name="introduction_string">Hallo mein Name ist Temi. Ich bin ein Roboter. Ich wurde entwickelt, um Menschen zu unterstützen. Wenn du mir etwas sagen möchtest, sprich mich bitte mit Hey Temi an. Im Verlauf dieser Untersuchung haben wir einigen Szenarien vorbereitet, in denen du meine Fähigkeiten kennenlernen kannst. Du kannst die nächste Aktion starten, indem du sagst   Hey Temi was kannst du noch?</string>
+    <string name="greeting_string">Herzlich Willkommen in der AAL Wohnung der htw saar! Mein Name
+        ist Temi. Bitte folgen Sie mir ins Wohnzimmer.</string>
+    <string name="livingroom_string">Sie können ihren Mantel oder ihre Jacke hier ablegen.
+        Nehmen Sie doch bitte erst einmal Platz.</string>
+    <string name="introduction_string">Hallo mein Name ist Temi. Ich bin ein Roboter.
+        Ich wurde entwickelt, um Menschen zu unterstützen. Wenn sie mir etwas sagen möchten,
+        sprechen sie mich bitte mit  Hey Temi  an. Im Verlauf dieser Untersuchung haben wir
+        einigen Szenarien vorbereitet, in denen sie meine Fähigkeiten kennenlernen können.
+        Sie können die nächste Aktion starten, indem du sagst
+        Hey Temi was kannst du noch  oder Hey Temi lass uns weitermachen.
+        Wenn Sie bereit sind, sagen Sie  Hey Temi lass uns weitermachen    .</string>
 
     <!-- Survey Sequence Strings -->
-    <string name="survey_greeting_string">Hallo, vielen Dank für Ihre Teilnahme am Forschungsprojekt VOICE (zur Erforschung der Nutzbarkeit und Akzeptanz von KI basierten Robotik-Systemen im Alltag). Ich bin Temi und freue mich schon darauf Sie kennenzulernen. Aber bevor wir anfangen folgen Sie mir bitte ins Wohnzimmer</string>
-    <string name="survey_livingroom_string">Bitte nehmen Sie doch Platz. Mein Team wird gleich mit Ihnen noch kurz die Einzelheiten des heutigen Tages durchgehen, danach geht’s mit einer kurzen Führung weiter</string>
+    <string name="survey_greeting_string">Hallo, vielen Dank für Ihre Teilnahme am
+        Forschungsprojekt VOICE (zur Erforschung der Nutzbarkeit und Akzeptanz von KI basierten
+        Robotik-Systemen im Alltag). Ich bin Temi und freue mich schon darauf Sie kennenzulernen.
+        Aber bevor wir anfangen folgen Sie mir bitte ins Wohnzimmer</string>
+    <string name="survey_livingroom_string">Bitte nehmen Sie doch Platz. Mein Team wird gleich mit
+        Ihnen noch kurz die Einzelheiten des heutigen Tages durchgehen,
+        danach geht’s mit einer kurzen Führung weiter</string>
     <string name="survey_start_phrase">Hey Temi lass uns anfangen</string>
     <string name="survey_to_kitchen"> Ok! Folgen Sie mir bitte. Es ist wichtig viel zu trinken. Daher haben wir Ihnen Getränke bereitgestellt. Hier wären wir. Bitte bedienen Sie sich. Wenn ich Ihnen etwas zu den hier verbauten (Dingen) erzählen soll, sagen Sie bitte‚ Hey Temi, was kannst du mir zur Küche‘ sagen, andernfalls können wir auch mit‚Hey Temi, lass uns weitergehen‘ mit der Besichtigung fortfahren. </string>
     <string name="survey_goodbye_string">Ich habe mich gefreut, Sie kennenzulernen und ich möchte mich bei Ihne bedanken, dass Sie an unserer Studie teilgenommen haben. Vielen Dank und alles Gute. </string>

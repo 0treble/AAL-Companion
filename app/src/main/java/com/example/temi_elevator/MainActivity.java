@@ -716,6 +716,8 @@ public class MainActivity extends AppCompatActivity implements
     private void handleSequenceBrainGame() {
         showTranscription("DEGBUG: in handleBrainGame: Schritt = " + currentSequenceStep);
 
+        String nextSentence = "";
+
         switch (currentSequenceStep) {
             case 0:
                 showTranscription("DEGBUG: Start Sequence: handleSequenceBrainGame");
@@ -769,16 +771,21 @@ public class MainActivity extends AppCompatActivity implements
                     chooseCurrentSequence();
                     break;
                 }
+
+
                 if(((myAsrResultString.contains("taube") || myAsrResultString.contains("spatz")) && myAsrResultString.contains("dach")) | flagRepeatSentenceRequest)
                 {
-                    String nextSentence = getString(R.string.bg_answer_correct) + getString(R.string.bg_sentence2);
+                    if(flagRepeatSentenceRequest == false)  // answer therefore was correct
+                    {
+                        nextSentence += getString(R.string.bg_answer_correct);
+                    }
+                    nextSentence += getString(R.string.bg_sentence2);
                     flagWaitingForTemiToFinishSpeaking = true;
                     temi.speak(TtsRequest.create(nextSentence, false));
                     // step/case incremeted by the statusChange of tts
                 }
                 else
                 {
-                    String nextSentence = "";
                     if(checkForDontKnowAnswer())
                     {
                         nextSentence = getString(R.string.bg_dont_know_answer);
@@ -807,14 +814,17 @@ public class MainActivity extends AppCompatActivity implements
 
                 if((myAsrResultString.contains("macht") && myAsrResultString.contains("sommer")) | flagRepeatSentenceRequest)
                 {
-                    String nextSentence = getString(R.string.bg_answer_correct) + getString(R.string.bg_sentence3);
+                    if(flagRepeatSentenceRequest == false)  // answer therefore was correct
+                    {
+                        nextSentence += getString(R.string.bg_answer_correct);
+                    }
+                    nextSentence += getString(R.string.bg_sentence3);
                     flagWaitingForTemiToFinishSpeaking = true;
                     temi.speak(TtsRequest.create(nextSentence, false));
                     // step/case incremeted by the statusChange of tts
                 }
                 else
                 {
-                    String nextSentence = "";
                     if(checkForDontKnowAnswer())
                     {
                         nextSentence = getString(R.string.bg_dont_know_answer);
@@ -843,14 +853,17 @@ public class MainActivity extends AppCompatActivity implements
 
                 if((myAsrResultString.contains("torheit") && myAsrResultString.contains("nicht")) | flagRepeatSentenceRequest)
                 {
-                    String nextSentence = getString(R.string.bg_answer_correct) + getString(R.string.bg_sentence4);
+                    if(flagRepeatSentenceRequest == false)  // answer therefore was correct
+                    {
+                        nextSentence += getString(R.string.bg_answer_correct);
+                    }
+                    nextSentence += getString(R.string.bg_sentence4);
                     flagWaitingForTemiToFinishSpeaking = true;
                     temi.speak(TtsRequest.create(nextSentence, false));
                     // step/case incremeted by the statusChange of tts
                 }
                 else
                 {
-                    String nextSentence = "";
                     if(checkForDontKnowAnswer())
                     {
                         nextSentence = getString(R.string.bg_dont_know_answer);
@@ -879,14 +892,17 @@ public class MainActivity extends AppCompatActivity implements
 
                 if((myAsrResultString.contains("wird") && myAsrResultString.contains("kalt")) | flagRepeatSentenceRequest)
                 {
-                    String nextSentence = getString(R.string.bg_answer_correct) + getString(R.string.bg_sentence5);
+                    if(flagRepeatSentenceRequest == false)  // answer therefore was correct
+                    {
+                        nextSentence += getString(R.string.bg_answer_correct);
+                    }
+                    nextSentence += getString(R.string.bg_sentence5);
                     flagWaitingForTemiToFinishSpeaking = true;
                     temi.speak(TtsRequest.create(nextSentence, false));
                     // step/case incremeted by the statusChange of tts
                 }
                 else
                 {
-                    String nextSentence = "";
                     if(checkForDontKnowAnswer())
                     {
                         nextSentence = getString(R.string.bg_dont_know_answer);
@@ -915,14 +931,18 @@ public class MainActivity extends AppCompatActivity implements
 
                 if((myAsrResultString.contains("schnaps") | flagRepeatSentenceRequest))
                 {
-                    String nextSentence = getString(R.string.bg_answer_correct);
+                    if(flagRepeatSentenceRequest == false)  // answer therefore was correct
+                    {
+                        nextSentence += getString(R.string.bg_answer_correct);
+                    }
+                    nextSentence += getString(R.string.bg_answer_correct);
                     flagWaitingForTemiToFinishSpeaking = true;
                     temi.speak(TtsRequest.create(nextSentence, false));
                     // step/case incremeted by the statusChange of tts
                 }
                 else
                 {
-                    String nextSentence = "";
+                    if(checkForDontKnowAnswer())
                     if(checkForDontKnowAnswer())
                     {
                         nextSentence = getString(R.string.bg_dont_know_answer);
@@ -950,14 +970,14 @@ public class MainActivity extends AppCompatActivity implements
                 showTranscription("DEGBUG: myAsrResultString = " + myAsrResultString);
                 if(myAsrResultString.contains("ja"))
                 {
-                    String nextSentence = getString(R.string.bg_finish_answer_positive);
+                    nextSentence = getString(R.string.bg_finish_answer_positive);
                     flagWaitingForTemiToFinishSpeaking = true;
                     temi.speak(TtsRequest.create(nextSentence, false));
                     // step/case incremeted by the statusChange of tts
                 }
                 else
                 {
-                    String nextSentence = getString(R.string.bg_finish_answer_negative);
+                    nextSentence = getString(R.string.bg_finish_answer_negative);
                     flagWaitingForTemiToFinishSpeaking = true;
                     temi.speak(TtsRequest.create(nextSentence, false));
                     // step/case incremeted by the statusChange of tts
