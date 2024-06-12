@@ -9,23 +9,33 @@
         <item>Default</item>
     </string-array>
 
-    <string name="greeting_string">Herzlich Willkommen in der AAL Wohnung der htw saar! Mein Name
-        ist Temi. Bitte folgen Sie mir ins Wohnzimmer.</string>
-    <string name="livingroom_string">Sie können ihren Mantel oder ihre Jacke hier ablegen.
-        Nehmen Sie doch bitte erst einmal Platz.</string>
-    <string name="introduction_string">Hallo mein Name ist Temi. Ich bin ein Roboter.
-        Ich wurde entwickelt, um Menschen zu unterstützen. Wenn sie mir etwas sagen möchten,
-        sprechen sie mich bitte mit  Hey Temi  an. Im Verlauf dieser Untersuchung haben wir
-        einigen Szenarien vorbereitet, in denen sie meine Fähigkeiten kennenlernen können.
-        Sie können die nächste Aktion starten, indem du sagst
+    <string name="greeting_welcome_door"> Herzlich Willkommen in der AAL Wohnung der htw saar! Mein Name
+        ist Temi. Vielen Dank für Ihre Teilnahme am Forschungsprojekt VOICE
+        (zur Erforschung der Nutzbarkeit und Akzeptanz von KI basierten
+        Robotik-Systemen im Alltag). Ich bin Temi und freue mich schon darauf Sie kennenzulernen.
+        Aber bevor wir anfangen folgen Sie mir bitte ins Wohnzimmer.</string>
+    <string name="greeting_livingroom_have_a_seat">Sie können ihren Mantel oder ihre Jacke hier ablegen.
+        Nehmen Sie doch bitte erst einmal Platz. Meine Kollegin wird gleich mit Ihnen noch kurz
+        die Einzelheiten des heutigen Tages durchgehen, danach geht's mit einer kurzen Führung
+        durch die Wohnung weiter. Ich werde erstmal hier stehen bleiben. </string>
+    <string name="greeting_introduction">ok. Hallo nochmal. Mein Name ist Temi. Ich bin ein
+        Assistenzroboter und wurde entwickelt, um um Menschen in ihrem Alltag zu unterstützen.
+        Wenn Sie mir etwas sagen möchten, sprechen Sie mich bitte mit  Hey Temi  gefolgt von ihrem
+        Anliegen an.
+        Wir befinden uns aktuell in der Musterwohnung zum Theme Ambient Assistet Living der htw saar.
+        Die Wohnung ist mit weiteren Sprachassistenzsystemen ausgestattet.
+        Zusammen mit meinen Freunden Alexa und Vivi werde ich Ihnen heute versuchen aufzuzeigen,
+        wie wir Ihnen tatkräftig zur Seite stehen können.  Im Verlauf dieser Untersuchung haben wir
+        einige Szenarien vorbereitet, in denen sie meine Fähigkeiten kennenlernen können.
+        Sie können die nächste Aktion starten, indem sie sagen,
         Hey Temi was kannst du noch  oder Hey Temi lass uns weitermachen.
-        Wenn Sie bereit sind, sagen Sie  Hey Temi lass uns weitermachen    .</string>
+        In einem ersten Schritt möchte ich Ihnen eine kleine Führung durch unsere AAL Wohnung geben
+        und ihnen dabei einige Besonderheiten erklären. Dazu würde ich Sie zunächst einmal in
+        die Küche führen. Wenn sie bereit sind, mir in die Küche zu folgen, sagen Sie einfach
+        Hey Temi zeig mir die Küche.</string>
 
     <!-- Survey Sequence Strings -->
-    <string name="survey_greeting_string">Hallo, vielen Dank für Ihre Teilnahme am
-        Forschungsprojekt VOICE (zur Erforschung der Nutzbarkeit und Akzeptanz von KI basierten
-        Robotik-Systemen im Alltag). Ich bin Temi und freue mich schon darauf Sie kennenzulernen.
-        Aber bevor wir anfangen folgen Sie mir bitte ins Wohnzimmer</string>
+
     <string name="survey_livingroom_string">Bitte nehmen Sie doch Platz. Mein Team wird gleich mit
         Ihnen noch kurz die Einzelheiten des heutigen Tages durchgehen,
         danach geht’s mit einer kurzen Führung weiter</string>

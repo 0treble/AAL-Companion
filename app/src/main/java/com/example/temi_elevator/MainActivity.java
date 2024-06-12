@@ -433,6 +433,7 @@ public class MainActivity extends AppCompatActivity implements
 
     public void handleSequenceGreeting() //version from 28.05 saved in the commit and on the desktop txt file
     {
+        String nextSentence = "";
         switch (currentSequenceStep)
         {
             case 0:
@@ -441,50 +442,43 @@ public class MainActivity extends AppCompatActivity implements
                 // step increment done by the onGoToStatusListener()
                 break;
             case 1:
-                waitHandler.postDelayed(() -> {
-                    temi.tiltAngle(20);
-                }, 5000);
-                String greeting_string = getString(R.string.greeting_string);
-                //showTranscription(greeting_string);
+                nextSentence = getString(R.string.greeting_welcome_door);
                 flagWaitingForTemiToFinishSpeaking = true;  /// SUPER IMPORTANT BEFORE EVERY speaking-COMMAND!!!!
                 /// so that the next task is started AFTER arriving at destination
-                temi.speak(TtsRequest.create(greeting_string, false));
+                temi.speak(TtsRequest.create(nextSentence, false));
                 // step increment done by the onTtsStatusChanged() when temi finished speaking previous string
                 break;
             case 2:
-                waitHandler.postDelayed(() -> {
-                }, 3000);
                 flagWaitingForTemiToArrive = true;
                 temi.goTo("wohnzimmer");
+                // step increment done by the onGoToStatusListener
                 break;
             case 3:
-
-                String livingroom_string = getString(R.string.livingroom_string);
-                //showTranscription(livingroom_string);
-                waitHandler.postDelayed(() -> {
-                    if (this.flagWaitingForTemiToFinishSpeaking) {
-
-                        temi.speak(TtsRequest.create(livingroom_string, false));
-                    }
-                }, 10000);
+                nextSentence = getString(R.string.greeting_livingroom_have_a_seat);
                 flagWaitingForTemiToFinishSpeaking = true;
-                //flagWaitingForTemiToFinishSpeaking = true;
-                //temi.speak(TtsRequest.create(livingroom_string, false));
+                temi.speak(TtsRequest.create(nextSentence, false));
                 // step increment done by the onTtsStatusChanged() when temi finished speaking previous string
                 break;
             case 4:
-                //waitHandler.postDelayed(() -> {
-                //}, 3000);
-                String introduction_string = getString(R.string.introduction_string);
-                //showTranscription(introduction_string);
-                temi.speak(TtsRequest.create(introduction_string, false));
-                waitHandler.postDelayed(() -> {
-                }, 3000);
-                // step increment done by the onTtsStatusChanged() when temi finished speaking previous string
+                myAsrResultString = "";
+                if((myAsrResultString.contains("stell") | myAsrResultString.contains("stelle"))
+                        & myAsrResultString.contains("dich vor") | myAsrResultString.contains("beginne die untersuchung"))
+                {
+                    flagWaitingForTemiToArrive = true;
+                    temi.goTo("wohnzimmer");
+                    // step increment done by the onGoToStatusListener
+                }
+                break;
+            case 5:
+                nextSentence = getString(R.string.greeting_introduction);
+                flagWaitingForTemiToFinishSpeaking = true;
+                temi.speak(TtsRequest.create(nextSentence, false));
+                break;
+            case 6:
                 currentSequenceStep = 0;
-                currentSequence = null;
                 break;
             default:
+                currentSequenceStep = 0;
                 showTranscription("Error: Default in Sequenz GREETING!");
                 break;
         }
