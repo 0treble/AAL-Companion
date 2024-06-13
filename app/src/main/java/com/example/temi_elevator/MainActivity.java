@@ -33,7 +33,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.appcompat.view.menu.ShowableListMenu;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -68,6 +67,7 @@ public class MainActivity extends AppCompatActivity implements
     private String destination = "";
     private int destinationFloor = -1; // is used to reset when temi on destination Floor arrives
     private String newDest = ""; // is used to save a destination from MQTT
+    @SuppressLint("StaticFieldLeak")
     private static MainActivity instance;
     private final Robot temi = Robot.getInstance();
     private List<String> validLocations = new ArrayList<>();
@@ -199,16 +199,16 @@ public class MainActivity extends AppCompatActivity implements
                 showTranscription("Keine Sequenz ausgewählt");
             }else if(currentSequence == Sequence.SEQUENCE_BRAIN_GAME){
                 currentSequenceStep -= 2;
+                chooseCurrentSequence();
             }else{
                 currentSequenceStep--;
+                chooseCurrentSequence();
             }
 
             //for error avoidance
             if(currentSequenceStep < 0){
                 currentSequenceStep = 0;
             }
-
-            chooseCurrentSequence();
         });
     }
 
@@ -433,7 +433,7 @@ public class MainActivity extends AppCompatActivity implements
 
     public void handleSequenceGreeting() //version from 28.05 saved in the commit and on the desktop txt file
     {
-        String nextSentence = "";
+        String nextSentence;
         switch (currentSequenceStep)
         {
             case 0:
@@ -460,9 +460,7 @@ public class MainActivity extends AppCompatActivity implements
                 // step increment done by the onTtsStatusChanged() when temi finished speaking previous string
                 break;
             case 4:
-                myAsrResultString = "";
-                if((myAsrResultString.contains("stell") | myAsrResultString.contains("stelle"))
-                        & myAsrResultString.contains("dich vor") | myAsrResultString.contains("beginne die untersuchung"))
+                if(myAsrResultString.contains("stell dich vor") | myAsrResultString.contains("stelle dich vor") | myAsrResultString.contains("beginne die untersuchung"))
                 {
                     flagWaitingForTemiToArrive = true;
                     temi.goTo("wohnzimmer");
@@ -769,13 +767,11 @@ public class MainActivity extends AppCompatActivity implements
 
                 if(((myAsrResultString.contains("taube") || myAsrResultString.contains("spatz")) && myAsrResultString.contains("dach")) | flagRepeatSentenceRequest)
                 {
-                    if(flagRepeatSentenceRequest == false)  // answer therefore was correct
+                    if(!flagRepeatSentenceRequest)  // answer therefore was correct
                     {
                         nextSentence += getString(R.string.bg_answer_correct);
                     }
                     nextSentence += getString(R.string.bg_sentence2);
-                    flagWaitingForTemiToFinishSpeaking = true;
-                    temi.speak(TtsRequest.create(nextSentence, false));
                     // step/case incremeted by the statusChange of tts
                 }
                 else
@@ -789,10 +785,10 @@ public class MainActivity extends AppCompatActivity implements
                         nextSentence = getString(R.string.bg_sorry_wrong);
                     }
                     nextSentence += getString(R.string.bg_sentence1_correct) + getString(R.string.bg_sentence2);
-                    flagWaitingForTemiToFinishSpeaking = true;
-                    temi.speak(TtsRequest.create(nextSentence, false));
                     // step/case incremeted by the statusChange of tts
                 }
+                flagWaitingForTemiToFinishSpeaking = true;
+                temi.speak(TtsRequest.create(nextSentence, false));
                 flagRepeatSentenceRequest = false;
                 break;
             // when answer is transcripted - onAsrResult calls handle-func again to continue with step/case 4
@@ -808,13 +804,11 @@ public class MainActivity extends AppCompatActivity implements
 
                 if((myAsrResultString.contains("macht") && myAsrResultString.contains("sommer")) | flagRepeatSentenceRequest)
                 {
-                    if(flagRepeatSentenceRequest == false)  // answer therefore was correct
+                    if(!flagRepeatSentenceRequest)  // answer therefore was correct
                     {
                         nextSentence += getString(R.string.bg_answer_correct);
                     }
                     nextSentence += getString(R.string.bg_sentence3);
-                    flagWaitingForTemiToFinishSpeaking = true;
-                    temi.speak(TtsRequest.create(nextSentence, false));
                     // step/case incremeted by the statusChange of tts
                 }
                 else
@@ -828,10 +822,10 @@ public class MainActivity extends AppCompatActivity implements
                         nextSentence = getString(R.string.bg_sorry_wrong);
                     }
                     nextSentence += "Test " + getString(R.string.bg_sentence2_correct) + getString(R.string.bg_sentence3);
-                    flagWaitingForTemiToFinishSpeaking = true;
-                    temi.speak(TtsRequest.create(nextSentence, false));
                     // step/case incremeted by the statusChange of tts
                 }
+                flagWaitingForTemiToFinishSpeaking = true;
+                temi.speak(TtsRequest.create(nextSentence, false));
                 flagRepeatSentenceRequest = false;
                 break;
             // when answer is transcripted - onAsrResult calls handle-func again to continue with step/case 4
@@ -847,13 +841,11 @@ public class MainActivity extends AppCompatActivity implements
 
                 if((myAsrResultString.contains("torheit") && myAsrResultString.contains("nicht")) | flagRepeatSentenceRequest)
                 {
-                    if(flagRepeatSentenceRequest == false)  // answer therefore was correct
+                    if(!flagRepeatSentenceRequest)  // answer therefore was correct
                     {
                         nextSentence += getString(R.string.bg_answer_correct);
                     }
                     nextSentence += getString(R.string.bg_sentence4);
-                    flagWaitingForTemiToFinishSpeaking = true;
-                    temi.speak(TtsRequest.create(nextSentence, false));
                     // step/case incremeted by the statusChange of tts
                 }
                 else
@@ -867,10 +859,10 @@ public class MainActivity extends AppCompatActivity implements
                         nextSentence = getString(R.string.bg_sorry_wrong);
                     }
                     nextSentence += getString(R.string.bg_sentence3_correct) + getString(R.string.bg_sentence4);
-                    flagWaitingForTemiToFinishSpeaking = true;
-                    temi.speak(TtsRequest.create(nextSentence, false));
                     // step/case incremeted by the statusChange of tts
                 }
+                flagWaitingForTemiToFinishSpeaking = true;
+                temi.speak(TtsRequest.create(nextSentence, false));
                 flagRepeatSentenceRequest = false;
                 break;
             // when answer is transcripted - onAsrResult calls handle-func again to continue with step/case 4
@@ -886,13 +878,11 @@ public class MainActivity extends AppCompatActivity implements
 
                 if((myAsrResultString.contains("wird") && myAsrResultString.contains("kalt")) | flagRepeatSentenceRequest)
                 {
-                    if(flagRepeatSentenceRequest == false)  // answer therefore was correct
+                    if(!flagRepeatSentenceRequest)  // answer therefore was correct
                     {
                         nextSentence += getString(R.string.bg_answer_correct);
                     }
                     nextSentence += getString(R.string.bg_sentence5);
-                    flagWaitingForTemiToFinishSpeaking = true;
-                    temi.speak(TtsRequest.create(nextSentence, false));
                     // step/case incremeted by the statusChange of tts
                 }
                 else
@@ -906,10 +896,10 @@ public class MainActivity extends AppCompatActivity implements
                         nextSentence = getString(R.string.bg_sorry_wrong);
                     }
                     nextSentence += getString(R.string.bg_sentence4_correct) + getString(R.string.bg_sentence5);
-                    flagWaitingForTemiToFinishSpeaking = true;
-                    temi.speak(TtsRequest.create(nextSentence, false));
                     // step/case incremeted by the statusChange of tts
                 }
+                flagWaitingForTemiToFinishSpeaking = true;
+                temi.speak(TtsRequest.create(nextSentence, false));
                 flagRepeatSentenceRequest = false;
                 break;
             // when answer is transcripted - onAsrResult calls handle-func again to continue with step/case 4
@@ -925,18 +915,15 @@ public class MainActivity extends AppCompatActivity implements
 
                 if((myAsrResultString.contains("schnaps") | flagRepeatSentenceRequest))
                 {
-                    if(flagRepeatSentenceRequest == false)  // answer therefore was correct
+                    if(!flagRepeatSentenceRequest)  // answer therefore was correct
                     {
                         nextSentence += getString(R.string.bg_answer_correct);
                     }
                     nextSentence += getString(R.string.bg_answer_correct);
-                    flagWaitingForTemiToFinishSpeaking = true;
-                    temi.speak(TtsRequest.create(nextSentence, false));
                     // step/case incremeted by the statusChange of tts
                 }
                 else
                 {
-                    if(checkForDontKnowAnswer())
                     if(checkForDontKnowAnswer())
                     {
                         nextSentence = getString(R.string.bg_dont_know_answer);
@@ -946,10 +933,10 @@ public class MainActivity extends AppCompatActivity implements
                         nextSentence = getString(R.string.bg_sorry_wrong);
                     }
                     nextSentence += getString(R.string.bg_sentence5_correct);
-                    flagWaitingForTemiToFinishSpeaking = true;
-                    temi.speak(TtsRequest.create(nextSentence, false));
                     // step/case incremeted by the statusChange of tts
                 }
+                flagWaitingForTemiToFinishSpeaking = true;
+                temi.speak(TtsRequest.create(nextSentence, false));
                 flagRepeatSentenceRequest = false;
                 break;
 
@@ -965,17 +952,15 @@ public class MainActivity extends AppCompatActivity implements
                 if(myAsrResultString.contains("ja"))
                 {
                     nextSentence = getString(R.string.bg_finish_answer_positive);
-                    flagWaitingForTemiToFinishSpeaking = true;
-                    temi.speak(TtsRequest.create(nextSentence, false));
                     // step/case incremeted by the statusChange of tts
                 }
                 else
                 {
                     nextSentence = getString(R.string.bg_finish_answer_negative);
-                    flagWaitingForTemiToFinishSpeaking = true;
-                    temi.speak(TtsRequest.create(nextSentence, false));
                     // step/case incremeted by the statusChange of tts
                 }
+                flagWaitingForTemiToFinishSpeaking = true;
+                temi.speak(TtsRequest.create(nextSentence, false));
                 break;
 
             case 16:
@@ -1001,31 +986,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     public void relocateTemi()
-    {   /* //Use similar structure as fillDropdownMenu
-        boolean found = false;
-        String lowerCaseAsrResult = myAsrResultString.toLowerCase();
-
-        if(myAsrResultString.contains("basisstation")) {
-            found = true;
-            destination = "home base";
-            confirm();
-        }
-
-        for (String location : validLocations) {
-            if (lowerCaseAsrResult.contains(location)) {
-                destination = location;
-                found = true;
-                confirm();
-                break;
-            }
-        }
-
-        if (!found) {
-            String unknownPlace = "Entschuldige diesen Ort kenne ich leider nicht.";
-            showTranscription(unknownPlace);
-            temi.speak(TtsRequest.create(unknownPlace, false));
-        }*/
-
+    {
         if(myAsrResultString.contains("tür"))
         {
             destination = "tür";
@@ -1104,8 +1065,6 @@ public class MainActivity extends AppCompatActivity implements
 
     public void logToFile(String logMessage) {
         if (logFile != null) {
-            // timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
-            //String logEntry = timestamp + " - " + logMessage;
             try (FileWriter writer = new FileWriter(logFile, true)) {
                 writer.append(logMessage).append("\n");
             } catch (IOException e) {

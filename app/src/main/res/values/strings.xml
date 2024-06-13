@@ -16,10 +16,10 @@
         Aber bevor wir anfangen folgen Sie mir bitte ins Wohnzimmer.</string>
     <string name="greeting_livingroom_have_a_seat">Sie können ihren Mantel oder ihre Jacke hier ablegen.
         Nehmen Sie doch bitte erst einmal Platz. Meine Kollegin wird gleich mit Ihnen noch kurz
-        die Einzelheiten des heutigen Tages durchgehen, danach geht's mit einer kurzen Führung
+        die Einzelheiten des heutigen Tages durchgehen, danach gehts mit einer kurzen Führung
         durch die Wohnung weiter. Ich werde erstmal hier stehen bleiben. </string>
-    <string name="greeting_introduction">ok. Hallo nochmal. Mein Name ist Temi. Ich bin ein
-        Assistenzroboter und wurde entwickelt, um um Menschen in ihrem Alltag zu unterstützen.
+    <string name="greeting_introduction">okay. Hallo nochmal. Mein Name ist Temi. Ich bin ein
+        Assistenzroboter und wurde entwickelt, um Menschen in ihrem Alltag zu unterstützen.
         Wenn Sie mir etwas sagen möchten, sprechen Sie mich bitte mit  Hey Temi  gefolgt von ihrem
         Anliegen an.
         Wir befinden uns aktuell in der Musterwohnung zum Theme Ambient Assistet Living der htw saar.
@@ -38,9 +38,9 @@
 
     <string name="survey_livingroom_string">Bitte nehmen Sie doch Platz. Mein Team wird gleich mit
         Ihnen noch kurz die Einzelheiten des heutigen Tages durchgehen,
-        danach geht’s mit einer kurzen Führung weiter</string>
+        danach gehts mit einer kurzen Führung weiter</string>
     <string name="survey_start_phrase">Hey Temi lass uns anfangen</string>
-    <string name="survey_to_kitchen"> Ok! Folgen Sie mir bitte. Es ist wichtig viel zu trinken. Daher haben wir Ihnen Getränke bereitgestellt. Hier wären wir. Bitte bedienen Sie sich. Wenn ich Ihnen etwas zu den hier verbauten (Dingen) erzählen soll, sagen Sie bitte‚ Hey Temi, was kannst du mir zur Küche‘ sagen, andernfalls können wir auch mit‚Hey Temi, lass uns weitergehen‘ mit der Besichtigung fortfahren. </string>
+    <string name="survey_to_kitchen"> Okay! Folgen Sie mir bitte. Es ist wichtig viel zu trinken. Daher haben wir Ihnen Getränke bereitgestellt. Hier wären wir. Bitte bedienen Sie sich. Wenn ich Ihnen etwas zu den hier verbauten (Dingen) erzählen soll, sagen Sie bitte‚ Hey Temi, was kannst du mir zur Küche‘ sagen, andernfalls können wir auch mit‚Hey Temi, lass uns weitergehen‘ mit der Besichtigung fortfahren. </string>
     <string name="survey_goodbye_string">Ich habe mich gefreut, Sie kennenzulernen und ich möchte mich bei Ihne bedanken, dass Sie an unserer Studie teilgenommen haben. Vielen Dank und alles Gute. </string>
     <string name="survey_questions_intro">Bevor wir Schluss machen, möchte ich Sie bitten mir ein paar Fragen zu beantworten. Bitte beantworten Sie die Fragen auf einer Skala von 1 bis 6. 1= trifft völlig zu; 6= trifft gar nicht zu</string>
     <string name="survey_question_1">Meine Sprache war einfach und verständlich.</string>
