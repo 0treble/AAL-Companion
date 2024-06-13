@@ -42,7 +42,7 @@ class ClientReceiverRunnable_location_find implements Runnable {
                 }
 
                 String[] locations = locationsList.toArray(new String[0]);
-                MainActivity.getInstance().addLocations(locations);
+                //MainActivity.getInstance().addLocations(locations);
             } catch (JSONException e) {
                 e.printStackTrace();
             }

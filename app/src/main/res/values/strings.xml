@@ -1,8 +1,6 @@
 <resources>
     <string name="app_name">TemiVoice</string>
-    <string name="confirm">Bestätigen</string>
-    <string name="top_view_text">Bitte wählen Sie einen Raum und Temi
-        wird sie dort hin bringen!</string>
+    <string name="top_view_text">Wählen Sie einen Kontakt, den Sie anrufen möchten:</string>
     <string name="ja">Zurück zur Basisstation</string>
     <string name="vielen_dank_temi">Vielen Dank Temi</string>
     <string-array name="spinner_items">
@@ -118,4 +116,5 @@
     <string name="img_overlay">Bild-Overlay</string>
     <string name="repeatLastSequenceStep">Schritt wiederholen</string>
     <string name="img_description">WALL-E Bild</string>
+    <string name="call">Anrufen</string>
 </resources>

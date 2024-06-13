@@ -37,11 +37,11 @@
             android:text="@string/sequenceButtonText"
             android:textColor="?attr/colorOnPrimary"
             android:textSize="20sp"
-            app:layout_constraintBottom_toBottomOf="@+id/confirmLocationButton"
+            app:layout_constraintBottom_toBottomOf="@+id/confirmCallButton"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.984"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/confirmLocationButton"
+            app:layout_constraintTop_toTopOf="@+id/confirmCallButton"
             app:layout_constraintVertical_bias="0.0" />
 
         <Spinner
@@ -59,13 +59,13 @@
             tools:ignore="VisualLintBounds" />
 
         <Button
-            android:id="@+id/confirmLocationButton"
+            android:id="@+id/confirmCallButton"
             android:layout_width="176dp"
             android:layout_height="74dp"
             android:layout_marginEnd="16dp"
             android:backgroundTint="?attr/colorPrimary"
             android:elegantTextHeight="true"
-            android:text="@string/confirm"
+            android:text="@string/call"
             android:textColor="?attr/colorOnPrimary"
             android:textSize="20sp"
             app:layout_constraintBottom_toBottomOf="@+id/dropdownMenu"

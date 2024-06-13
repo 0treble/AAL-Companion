@@ -38,6 +38,9 @@ import com.robotemi.sdk.listeners.OnTelepresenceEventChangedListener;
 import com.robotemi.sdk.listeners.OnConversationStatusChangedListener;
 import com.robotemi.sdk.listeners.OnRobotReadyListener;
 import com.robotemi.sdk.TtsRequest;
+import android.os.Parcel;
+import android.os.Parcelable;
+import com.robotemi.sdk.constants.Platform;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -73,13 +76,13 @@ public class MainActivity extends AppCompatActivity implements
 
     // Member variables
     private final String TAG = "MainActivity";
-    private String destination = "";
+    private String contact = "";
     private int destinationFloor = -1; // is used to reset when temi on destination Floor arrives
     private String newDest = ""; // is used to save a destination from MQTT
     @SuppressLint("StaticFieldLeak")
     private static MainActivity instance;
     private final Robot temi = Robot.getInstance();
-    private List<String> validLocations = new ArrayList<>();
+    private final List<UserInfo> validContacts = new ArrayList<>();
     private int myfloorNumber = 0;
     private boolean waitingForFloor = false;
     private boolean waitingForReset = false;
@@ -161,7 +164,8 @@ public class MainActivity extends AppCompatActivity implements
         findViewById(R.id.endTranscription).setOnClickListener(view -> {
             showTranscription("Transkription beended.");
             findViewById(R.id.isRecordingImg).setVisibility(View.INVISIBLE);
-            startVideoCall("Hristo"); // Replace "user_id" with the actual user ID
+            startVideoMeeting(contact); // Replace "user_id" with the actual user ID
+            //Who is Participant(peerId=638fb4837f2a4210c3313a5c89be0747)? Admin!
         });
 
         findViewById(R.id.quitButton).setOnClickListener(view -> {
@@ -250,8 +254,6 @@ public class MainActivity extends AppCompatActivity implements
         transcription = findViewById(R.id.transcription);
         String readyToTranscript = "Bereit... Drücken Sie die Taste 'Hören', um die Transkription zu starten.";
         transcription.append(readyToTranscript + "\n"); //don't scrollToBottom here, results in app crash
-
-        transcription.append("Kiosk Mode is on: " + temi.isKioskModeOn()); //check if kiosk mode is on
 
         logToFile(readyToTranscript + "\n");
     }
@@ -1001,43 +1003,35 @@ public class MainActivity extends AppCompatActivity implements
     {
         if(myAsrResultString.contains("tür"))
         {
-            destination = "tür";
-            confirm();
+            temi.goTo("tür");
         }
         else if(myAsrResultString.contains("basisstation"))
         {
-            destination = "home base";
-            confirm();
+            temi.goTo("home base");
         }
         else if(myAsrResultString.contains("wohnzimmer"))
         {
-            destination = "wohnzimmer";
-            confirm();
+            temi.goTo("wohnzimmer");
         }
         else if(myAsrResultString.contains("küche"))
         {
-            destination = "küche";
-            confirm();
+            temi.goTo("küche");
         }
         else if(myAsrResultString.contains("büro"))
         {
-            destination = "büro";
-            confirm();
+            temi.goTo("büro");
         }
         else if(myAsrResultString.contains("esszimmer"))
         {
-            destination = "esszimmer";
-            confirm();
+            temi.goTo("esszimmer");
         }
         else if(myAsrResultString.contains("waschbecken"))
         {
-            destination = "waschbecken";
-            confirm();
+            temi.goTo("waschbecken");
         }
         else if(myAsrResultString.contains("alexa"))
         {
-            destination = "alexa";
-            confirm();
+            temi.goTo("alexa");
         }
         else
         {   // default
@@ -1060,7 +1054,7 @@ public class MainActivity extends AppCompatActivity implements
 
     /* Text Field to TXT File*/
     private void createLogFile() {
-        String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
+        String timestamp = new SimpleDateFormat("yyMMdd_HHmmss", Locale.getDefault()).format(new Date());
         String filename = "log_" + timestamp + ".txt";
 
         try {
@@ -1077,6 +1071,8 @@ public class MainActivity extends AppCompatActivity implements
 
     public void logToFile(String logMessage) {
         if (logFile != null) {
+            String timestamp = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
+            String logEntry = timestamp + " - " + logMessage;
             try (FileWriter writer = new FileWriter(logFile, true)) {
                 writer.append(logMessage).append("\n");
             } catch (IOException e) {
@@ -1104,18 +1100,33 @@ public class MainActivity extends AppCompatActivity implements
         Log.i("Telepresence", "Call Event: " + callEventModel);
     }
 
-    public void startVideoCall(String userId) {
-        if (temi != null) {
-            List<Participant> participants = Arrays.asList(
-                    new Participant(userId, Platform.MOBILE),
-                    new Participant(userId, Platform.TEMI_CENTER)
-            );
-
-            showTranscription(participants.toString());
-
-            temi.startMeeting(participants, false, false );
+    private void startTelepresenceToCenter() {
+        UserInfo target = temi.getAdminInfo();
+        if (target == null) {
+            showTranscription("target is null.");
+            return;
         }
+        temi.startTelepresence(target.getName(), target.getUserId(), Platform.TEMI_CENTER);
     }
+
+    private void startVideoMeeting(@NotNull String target) {
+        //UserInfo target = temi.getAdminInfo();  //returns Admin info
+        if (target.isEmpty()) {
+            showTranscription("No contact chosen.");
+            return;
+        }
+
+        List<Participant> participants = Arrays.asList(
+                new Participant(target, Platform.MOBILE),
+                new Participant(target, Platform.TEMI_CENTER)
+        );
+
+        showTranscription(participants.toString());
+
+        String resp = temi.startMeeting(participants, true, false);
+        showTranscription("startMeeting result :" + resp);
+    }
+
 /*
     private void joinMeeting(String meetingLink) {
         LinkBasedMeeting meeting = new LinkBasedMeeting(
@@ -1183,8 +1194,8 @@ public class MainActivity extends AppCompatActivity implements
         });
 
         // Add click listener for confirm button
-        Button confirm_button = findViewById(R.id.confirmLocationButton);
-        confirm_button.setOnClickListener(v -> confirm());
+        Button confirm_button = findViewById(R.id.confirmCallButton);
+        confirm_button.setOnClickListener(v -> startVideoMeeting(contact));
 
         // Add click listener for arrived button
         Button yes_button = findViewById(R.id.confirmArrivedButton);
@@ -1198,8 +1209,8 @@ public class MainActivity extends AppCompatActivity implements
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                destination = parent.getItemAtPosition(position).toString();
-                Log.i(TAG, "Destination = " + destination);
+                contact = parent.getItemAtPosition(position).toString();
+                Log.i(TAG, "Contact = " + contact);
             }
 
             @Override
@@ -1227,31 +1238,26 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void fillDropdownMenu() {
-        List<String> locationList = temi.getLocations();
-        locationList.addAll(validLocations);
+        List<UserInfo> contactList = new ArrayList<>(temi.getAllContact());
+        contactList.addAll(validContacts);
 
         // Remove duplicates
-        Set<String> set = new HashSet<>(locationList);
-        locationList = new ArrayList<>(set);
+        Set<UserInfo> set = new HashSet<>(contactList);
+        contactList = new ArrayList<>(set);
 
-        String floorx = "";
-
-        // Find the current floor and remove it from the list
-        for (String element : locationList) {
-            if (element.startsWith("floor")) {
-                this.myfloorNumber = Integer.parseInt(element.substring(5));
-                floorx = element;
-            }
+        // Convert UserInfo objects to strings for display
+        List<String> contactNames = new ArrayList<>();
+        for (UserInfo userInfo : contactList) {
+            contactNames.add(userInfo.getName());
         }
-        // removing the floorNumber indicator
-        locationList.remove(floorx);
 
-        Log.i(TAG, "Temi befindet sich auf floor: " + this.myfloorNumber);
+        // Log the contact list for transcription
+        showTranscription(contactNames.toString());
 
         // Set adapter for dropdown menu
-        String[] locations = locationList.toArray(new String[0]);
+        String[] contacts = contactNames.toArray(new String[0]);
         Spinner dropdownMenu = findViewById(R.id.dropdownMenu);
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.dropdown_menu_text_view, locations);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.dropdown_menu_text_view, contacts);
         adapter.setDropDownViewResource(R.layout.dropdown_menu_pick_text_view);
         dropdownMenu.setAdapter(adapter);
     }
@@ -1293,8 +1299,8 @@ public class MainActivity extends AppCompatActivity implements
     private void confirm() {
         //hideModeElements();
         List<String> locationList = temi.getLocations();
-        if (locationList.contains(destination)) {
-            temi.goTo(destination);
+        if (locationList.contains(contact)) {
+            //temi.goTo(destination);
             this.showArrivedMessage();
 
             waitHandler.postDelayed(() -> {
@@ -1353,7 +1359,7 @@ public class MainActivity extends AppCompatActivity implements
             confirmYesButton.setVisibility(View.VISIBLE);
         });
     }
-
+/*
     public void addLocations(String[] locations) {
         validLocations.addAll(Arrays.asList(locations));
 
@@ -1372,7 +1378,7 @@ public class MainActivity extends AppCompatActivity implements
         validLocations.remove(floorx);
 
         runOnUiThread(this::fillDropdownMenu);
-    }
+    }*/
 
     public static MainActivity getInstance() {
         return instance;
@@ -1411,7 +1417,7 @@ public class MainActivity extends AppCompatActivity implements
             Button confirmYesButton = findViewById(R.id.confirmArrivedButton);
 
             Button confirmElevatorButton = findViewById(R.id.confirmFinishButton);
-            Button confirm_button = findViewById(R.id.confirmLocationButton);
+            Button confirm_button = findViewById(R.id.confirmCallButton);
             Spinner spinner = findViewById(R.id.dropdownMenu);
             TextView textView = findViewById(R.id.topTextView);
             findViewById(R.id.isRecordingImg).setVisibility(View.INVISIBLE);
