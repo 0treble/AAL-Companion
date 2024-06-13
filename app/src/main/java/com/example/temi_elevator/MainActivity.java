@@ -1,9 +1,11 @@
 package com.example.temi_elevator;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Handler;
 import android.util.Log;
 import android.os.Bundle;
@@ -26,6 +28,16 @@ import com.robotemi.sdk.Robot;
 import com.robotemi.sdk.constants.Page;
 import com.robotemi.sdk.listeners.OnGoToLocationStatusChangedListener;
 import com.robotemi.sdk.navigation.model.SpeedLevel;
+import com.robotemi.sdk.constants.*;
+import com.robotemi.sdk.telepresence.CallState;
+import com.robotemi.sdk.telepresence.LinkBasedMeeting;
+import com.robotemi.sdk.telepresence.Participant;
+import com.robotemi.sdk.model.CallEventModel;
+import com.robotemi.sdk.listeners.OnTelepresenceStatusChangedListener;
+import com.robotemi.sdk.listeners.OnTelepresenceEventChangedListener;
+import com.robotemi.sdk.listeners.OnConversationStatusChangedListener;
+import com.robotemi.sdk.listeners.OnRobotReadyListener;
+import com.robotemi.sdk.TtsRequest;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -48,19 +60,16 @@ import java.text.SimpleDateFormat;
 import java.util.Locale;
 import java.util.Date;
 
-import com.robotemi.sdk.listeners.OnConversationStatusChangedListener;
-import com.robotemi.sdk.listeners.OnRobotReadyListener;
-import com.robotemi.sdk.TtsRequest;
 import com.bumptech.glide.Glide;
 
 import org.jetbrains.annotations.NotNull;
-
 public class MainActivity extends AppCompatActivity implements
         OnRobotReadyListener,
         Robot.AsrListener,
         Robot.TtsListener,
         OnConversationStatusChangedListener,
-        OnGoToLocationStatusChangedListener {
+        OnGoToLocationStatusChangedListener,
+        OnTelepresenceEventChangedListener {
 
     // Member variables
     private final String TAG = "MainActivity";
@@ -102,6 +111,8 @@ public class MainActivity extends AppCompatActivity implements
         temi.addOnConversationStatusChangedListener(this);
         temi.addTtsListener(this);
         temi.addOnGoToLocationStatusChangedListener(this);
+        temi.addOnTelepresenceStatusChangedListener(telepresenceStatusChangedListener);
+        temi.addOnTelepresenceEventChangedListener(this);
     }
 
     @Override
@@ -150,6 +161,7 @@ public class MainActivity extends AppCompatActivity implements
         findViewById(R.id.endTranscription).setOnClickListener(view -> {
             showTranscription("Transkription beended.");
             findViewById(R.id.isRecordingImg).setVisibility(View.INVISIBLE);
+            startVideoCall("Hristo"); // Replace "user_id" with the actual user ID
         });
 
         findViewById(R.id.quitButton).setOnClickListener(view -> {
@@ -194,7 +206,7 @@ public class MainActivity extends AppCompatActivity implements
         });
 
         /* Repeat Button */
-        findViewById(R.id.repeatSequenceStep).setOnClickListener(view ->  {
+        findViewById(R.id.repeatButton).setOnClickListener(view ->  {
             if(currentSequence == null){
                 showTranscription("Keine Sequenz ausgewählt");
             }else if(currentSequence == Sequence.SEQUENCE_BRAIN_GAME){
@@ -319,7 +331,7 @@ public class MainActivity extends AppCompatActivity implements
         commandsMap.put(new String[]{"stopp","stop","abbrechen","abbruch" }, command -> stopCurrentSequence());
         commandsMap.put(new String[]{"gesprächsmodus", "dialogmodus", "gesprächs modus"}, command -> conversationMode = !conversationMode);
         commandsMap.put(new String[]{"erinnere mich", "erinnerung setzen", "setze eine erinnerung"}, command -> setReminder());
-        commandsMap.put(new String[]{"wiederholen", "erneut", "wiederhole", "noch mal", "nicht verstanden"}, command -> findViewById(R.id.repeatSequenceStep).performClick());
+        commandsMap.put(new String[]{"wiederholen", "erneut", "wiederhole", "noch mal", "nicht verstanden"}, command -> findViewById(R.id.repeatButton).performClick());
         /* Sequences */
         commandsMap.put(new String[]{"gäste begrüßen", "begrüßung starten", "willkommenssequenz starten", "sequenz 1 starten",
                 "sequenz 1 beginnen"}, command -> {
@@ -1075,6 +1087,49 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
+    /* Videocall start */
+    private final OnTelepresenceStatusChangedListener telepresenceStatusChangedListener = new OnTelepresenceStatusChangedListener("") {
+        @Override
+        public void onTelepresenceStatusChanged(CallState callState) {
+            Log.i("Telepresence", "CallState " + callState + ", " + callState.getLowLightMode());
+        }
+    };
+
+    public void onTelepresenceStatusChanged(CallState callState) {
+        Log.i("Telepresence", "CallState " + callState + ", " + callState.getLowLightMode());
+    }
+
+    @Override
+    public void onTelepresenceEventChanged(@NotNull CallEventModel callEventModel) {
+        Log.i("Telepresence", "Call Event: " + callEventModel);
+    }
+
+    public void startVideoCall(String userId) {
+        if (temi != null) {
+            List<Participant> participants = Arrays.asList(
+                    new Participant(userId, Platform.MOBILE),
+                    new Participant(userId, Platform.TEMI_CENTER)
+            );
+
+            showTranscription(participants.toString());
+
+            temi.startMeeting(participants, false, false );
+        }
+    }
+/*
+    private void joinMeeting(String meetingLink) {
+        LinkBasedMeeting meeting = new LinkBasedMeeting(
+                meetingLink,
+                "YOUR_MEETING_ID", // Replace with actual meeting ID
+                "YOUR_MEETING_PASSWORD", // Replace with actual meeting password
+                "YOUR_DISPLAY_NAME", // Replace with display name
+                "YOUR_EMAIL" // Replace with email
+        );
+        temi.joinMeeting(meeting);
+    }*/
+
+    /* Videocall end */
+
     private void followMe() {
         Log.i(TAG, "Follow the user");
         temi.beWithMe();
@@ -1394,6 +1449,8 @@ public class MainActivity extends AppCompatActivity implements
         temi.removeOnRobotReadyListener(this);
         temi.removeAsrListener(this);
         temi.removeOnConversationStatusChangedListener(this);
+        temi.removeOnTelepresenceStatusChangedListener(telepresenceStatusChangedListener);
+        temi.removeOnTelepresenceEventChangedListener(this);
     }
 
     @Override

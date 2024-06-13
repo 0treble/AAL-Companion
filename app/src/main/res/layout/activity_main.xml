@@ -240,11 +240,11 @@
                 android:text="@string/img_overlay"
                 android:textColor="?attr/colorOnPrimary"
                 app:layout_constraintBottom_toBottomOf="@+id/QRCodeButton"
-                app:layout_constraintEnd_toStartOf="@+id/repeatSequenceStep"
+                app:layout_constraintEnd_toStartOf="@+id/repeatButton"
                 app:layout_constraintStart_toEndOf="@+id/themeButton" />
 
             <Button
-                android:id="@+id/repeatSequenceStep"
+                android:id="@+id/repeatButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="16dp"
