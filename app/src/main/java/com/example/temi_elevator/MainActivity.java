@@ -86,7 +86,7 @@ public class MainActivity extends AppCompatActivity implements
     private ActivityResultLauncher<Intent> sequenceResultLauncher;
     private ExecutorService myExecutorService;
     private String myAsrResultString = "";
-    enum Sequence {GREETING, SEQUENCE_ALEXA, AAL_SEQUENCE, SEQUENCE_BRAIN_GAME, QUESTIONNAIRE}
+    enum Sequence {GREETING, SEQUENCE_ALEXA, AAL_SEQUENCE, SEQUENCE_BRAIN_GAME, QUESTIONNAIRE, KITCHEN}
     private Sequence currentSequence;
     int currentSequenceStep = 0;
     private boolean flagWaitingForTemiToArrive = false;
@@ -167,6 +167,8 @@ public class MainActivity extends AppCompatActivity implements
             temi.setGoToSpeed(SpeedLevel.SLOW);
             enable_menu();
         });
+
+
 
         /* Sequence Window Launcher*/
         findViewById(R.id.sequenceWindowButton).setOnClickListener(view -> {
@@ -306,6 +308,7 @@ public class MainActivity extends AppCompatActivity implements
         if(flagWaitingForUserResponse & status == IDLE)
         {
             flagWaitingForUserResponse = false;
+
             chooseCurrentSequence();
         }
     }
@@ -353,6 +356,11 @@ public class MainActivity extends AppCompatActivity implements
         });
         commandsMap.put(new String[]{"fragebogen starten", "fragebogensequenz starten", "fragebogen beginnen" }, command -> {
             currentSequence = Sequence.QUESTIONNAIRE;
+            currentSequenceStep = 0;
+            chooseCurrentSequence();
+        });
+        commandsMap.put(new String[]{"führung durch die küche starten" }, command -> {
+            currentSequence = Sequence.KITCHEN;
             currentSequenceStep = 0;
             chooseCurrentSequence();
         });
@@ -412,6 +420,11 @@ public class MainActivity extends AppCompatActivity implements
                 showFace();
                 handleSequenceQuestionnaire();
                 break;
+            case KITCHEN:
+                scrollToBottom();
+                showFace();
+                handleSequenceKitchen();
+                break;
             default:
                 showTranscription("Error default in switch(currentsequence)");
                 break;
@@ -451,9 +464,19 @@ public class MainActivity extends AppCompatActivity implements
             case 1:
                 nextSentence = getString(R.string.greeting_welcome_door);
                 flagWaitingForTemiToFinishSpeaking = true;  /// SUPER IMPORTANT BEFORE EVERY speaking-COMMAND!!!!
-                /// so that the next task is started AFTER arriving at destination
                 temi.speak(TtsRequest.create(nextSentence, false));
                 // step increment done by the onTtsStatusChanged() when temi finished speaking previous string
+                /// so that the next task is started AFTER arriving at destination
+                /*
+                waitHandler.postDelayed(() -> {
+                    if (this.waitingForFinish) {
+
+                        temi.speak(TtsRequest.create(nextSentence, false));
+                        // step increment done by the onTtsStatusChanged() when temi finished speaking previous string
+                    }
+                }, 5000);
+                */
+
                 break;
             case 2:
                 flagWaitingForTemiToArrive = true;
@@ -467,10 +490,10 @@ public class MainActivity extends AppCompatActivity implements
                 // step increment done by the onTtsStatusChanged() when temi finished speaking previous string
                 break;
             case 4:
-                if(myAsrResultString.contains("stell dich vor") | myAsrResultString.contains("stelle dich vor") | myAsrResultString.contains("beginne die untersuchung"))
+                if(myAsrResultString.contains("stell dich vor") | myAsrResultString.contains("stelle dich vor") | myAsrResultString.contains("beginne die untersuchung") | myAsrResultString.contains("starte die untersuchung"))
                 {
                     flagWaitingForTemiToArrive = true;
-                    temi.goTo("wohnzimmer");
+                    temi.goTo("wohnzimmersitzgruppe");
                     // step increment done by the onGoToStatusListener
                 }
                 break;
@@ -481,6 +504,7 @@ public class MainActivity extends AppCompatActivity implements
                 break;
             case 6:
                 currentSequenceStep = 0;
+                currentSequence = Sequence.KITCHEN;
                 break;
             default:
                 currentSequenceStep = 0;
@@ -607,7 +631,7 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-    private void handleAALSequence() {
+    private void handleAALSequence() {  // Sequence to presesnt the AAL appartment at the Digitaltag 2024
         switch (currentSequenceStep) {
             case 0:
                 flagWaitingForTemiToArrive = true;
@@ -721,7 +745,7 @@ public class MainActivity extends AppCompatActivity implements
             case 0:
                 showTranscription("DEGBUG: Start Sequence: handleSequenceBrainGame");
                 flagRepeatSentenceRequest = false;
-                String introducingBrainGame = getString(R.string.bg_introduction);
+                String introducingBrainGame = getString(R.string.bg_introduction_short);
                 flagWaitingForTemiToFinishSpeaking = true;
                 temi.speak(TtsRequest.create(introducingBrainGame, false));
                 // step/case incremeted by the statusChange of tts
@@ -730,9 +754,10 @@ public class MainActivity extends AppCompatActivity implements
             case 1: case 3: case 5: case 7:
             case 9: case 11: case 14:
 
-                flagWaitingForUserResponse = true;
                 temi.wakeup(Collections.singletonList(SttLanguage.SYSTEM));
                 findViewById(R.id.isRecordingImg).setVisibility(View.VISIBLE);
+                flagWaitingForUserResponse = true;
+
 
                 // when answer is transcripted - onAsrResult calls handle-func again to continue with step/case 2
 
@@ -764,14 +789,13 @@ public class MainActivity extends AppCompatActivity implements
 
             case 4:
                 showTranscription("DEGBUG: myAsrResultString = " + myAsrResultString);
-                if(!flagRepeatSentenceRequest & checkRepeatRequest()) {
+                if(checkRepeatRequest()) {
                     currentSequenceStep -= 2;
                     flagRepeatSentenceRequest = true;
+                    myAsrResultString = "";
                     chooseCurrentSequence();
                     break;
                 }
-
-
                 if(((myAsrResultString.contains("taube") || myAsrResultString.contains("spatz")) && myAsrResultString.contains("dach")) | flagRepeatSentenceRequest)
                 {
                     if(!flagRepeatSentenceRequest)  // answer therefore was correct
@@ -779,7 +803,6 @@ public class MainActivity extends AppCompatActivity implements
                         nextSentence += getString(R.string.bg_answer_correct);
                     }
                     nextSentence += getString(R.string.bg_sentence2);
-                    // step/case incremeted by the statusChange of tts
                 }
                 else
                 {
@@ -794,17 +817,17 @@ public class MainActivity extends AppCompatActivity implements
                     nextSentence += getString(R.string.bg_sentence1_correct) + getString(R.string.bg_sentence2);
                     // step/case incremeted by the statusChange of tts
                 }
+                flagRepeatSentenceRequest = false;
                 flagWaitingForTemiToFinishSpeaking = true;
                 temi.speak(TtsRequest.create(nextSentence, false));
-                flagRepeatSentenceRequest = false;
+                // when answer is transcripted - onAsrResult calls handle-func again to continue with step/case 6
                 break;
-            // when answer is transcripted - onAsrResult calls handle-func again to continue with step/case 4
-
             case 6:
                 showTranscription("DEGBUG: InHandle myAsrResultString = " + myAsrResultString);
-                if(!flagRepeatSentenceRequest & checkRepeatRequest()) {
+                if(checkRepeatRequest()) {
                     currentSequenceStep -= 2;
                     flagRepeatSentenceRequest = true;
+                    myAsrResultString = "";
                     chooseCurrentSequence();
                     break;
                 }
@@ -828,7 +851,7 @@ public class MainActivity extends AppCompatActivity implements
                     {
                         nextSentence = getString(R.string.bg_sorry_wrong);
                     }
-                    nextSentence += "Test " + getString(R.string.bg_sentence2_correct) + getString(R.string.bg_sentence3);
+                    nextSentence += getString(R.string.bg_sentence2_correct) + getString(R.string.bg_sentence3);
                     // step/case incremeted by the statusChange of tts
                 }
                 flagWaitingForTemiToFinishSpeaking = true;
@@ -842,6 +865,7 @@ public class MainActivity extends AppCompatActivity implements
                 if(!flagRepeatSentenceRequest & checkRepeatRequest()) {
                     currentSequenceStep -= 2;
                     flagRepeatSentenceRequest = true;
+                    myAsrResultString = "";
                     chooseCurrentSequence();
                     break;
                 }
@@ -879,6 +903,7 @@ public class MainActivity extends AppCompatActivity implements
                 if(!flagRepeatSentenceRequest & checkRepeatRequest()) {
                     currentSequenceStep -= 2;
                     flagRepeatSentenceRequest = true;
+                    myAsrResultString = "";
                     chooseCurrentSequence();
                     break;
                 }
@@ -916,6 +941,7 @@ public class MainActivity extends AppCompatActivity implements
                 if(!flagRepeatSentenceRequest & checkRepeatRequest()) {
                     currentSequenceStep -= 2;
                     flagRepeatSentenceRequest = true;
+                    myAsrResultString = "";
                     chooseCurrentSequence();
                     break;
                 }
@@ -966,6 +992,7 @@ public class MainActivity extends AppCompatActivity implements
                     nextSentence = getString(R.string.bg_finish_answer_negative);
                     // step/case incremeted by the statusChange of tts
                 }
+
                 flagWaitingForTemiToFinishSpeaking = true;
                 temi.speak(TtsRequest.create(nextSentence, false));
                 break;
@@ -991,6 +1018,78 @@ public class MainActivity extends AppCompatActivity implements
     {
         return    myAsrResultString.contains("weiß ich nicht") | myAsrResultString.contains("kenne ich nicht") | myAsrResultString.contains("unbekannt") | myAsrResultString.contains("keine ahnung");
     }
+
+
+
+    private void handleSequenceKitchen()
+    {
+        String nextSentence = "";
+        switch(currentSequenceStep)
+        {
+            case 0:                                                     // this is the corresponding voice command
+                if(checkForContinueNextSequence() | myAsrResultString.contains("führung durch die küche starten"))
+                {
+                    nextSentence = getString(R.string.kt_letsgo);
+                    flagWaitingForTemiToFinishSpeaking = true;
+                    // step increment done by ConversationStatusListener
+                }
+                else
+                {
+                    nextSentence = getString(R.string.insufficant_answer);
+                }
+                //flagWaitingForTemiToFinishSpeaking = true; // HIER NICHT!!!!
+                temi.speak(TtsRequest.create(nextSentence, false));
+                break;
+            case 1:
+                flagWaitingForTemiToArrive = true;
+                temi.goTo("küche");
+                // step increment done by LocationStatusListener
+                break;
+            case 2:
+                nextSentence = getString(R.string.kt_takeDrink);
+                temi.speak(TtsRequest.create(nextSentence, false));
+                currentSequenceStep++;
+                break;
+            case 3:
+                if(myAsrResultString.contains("was kannst du mir zur küche sagen")
+                    | (myAsrResultString.contains("zeige") & myAsrResultString.contains("küche")))
+                {
+                    nextSentence = getString(R.string.aal_kitchen_intro)
+                            //               + getString(R.string.aal_kitchen_details1)
+                            //               + getString(R.string.aal_kitchen_details2)
+                            + getString(R.string.aal_kitchen_summary);
+                }
+
+                    nextSentence += getString(R.string.kt_tour_finished);
+
+                flagWaitingForTemiToFinishSpeaking = true; // HIER NICHT!!!!
+                temi.speak(TtsRequest.create(nextSentence, false));
+                break;
+            case 4:
+                currentSequenceStep = 0;
+                currentSequence = Sequence.SEQUENCE_ALEXA;
+                break;
+            default:
+                showTranscription("DEGBUG: default in handleSequenceBrainGame !");
+                currentSequenceStep = 0;
+                break;
+        }
+    }
+
+
+    private boolean checkForContinueNextSequence()
+    {
+        return myAsrResultString.contains("lass uns weitermachen")
+                | myAsrResultString.contains("ich bin bereit")
+                | myAsrResultString.contains("es kann weitergehen")
+                | myAsrResultString.contains("weiter")
+                | myAsrResultString.contains("was jetzt");
+    }
+
+
+
+
+
 
     public void relocateTemi()
     {
