@@ -44,6 +44,5 @@ class ClientReceiverRunnable_floor implements Runnable {
                 e.printStackTrace();
             }
         }
-
     }
 }

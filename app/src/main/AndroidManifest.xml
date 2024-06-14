@@ -62,6 +62,10 @@
             android:value="true" />
 
         <meta-data
+            android:name="com.robotemi.sdk.metadata.MEETINGS"
+            android:value="true" />
+
+        <meta-data
             android:name="com.robotemi.sdk.metadata.OVERRIDE_NLU"
             android:value="true"/>
 

@@ -1,71 +1,65 @@
 package com.example.temi_elevator;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
-import android.os.Build;
+import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
-import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.ScrollView;
-
 import android.widget.Toast;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 
-import com.robotemi.sdk.*;
-import com.robotemi.sdk.Robot;
-import com.robotemi.sdk.constants.Page;
-import com.robotemi.sdk.listeners.OnGoToLocationStatusChangedListener;
-import com.robotemi.sdk.navigation.model.SpeedLevel;
-import com.robotemi.sdk.constants.*;
-import com.robotemi.sdk.telepresence.CallState;
-import com.robotemi.sdk.telepresence.LinkBasedMeeting;
-import com.robotemi.sdk.telepresence.Participant;
-import com.robotemi.sdk.model.CallEventModel;
-import com.robotemi.sdk.listeners.OnTelepresenceStatusChangedListener;
-import com.robotemi.sdk.listeners.OnTelepresenceEventChangedListener;
-import com.robotemi.sdk.listeners.OnConversationStatusChangedListener;
-import com.robotemi.sdk.listeners.OnRobotReadyListener;
-import com.robotemi.sdk.TtsRequest;
-import android.os.Parcel;
-import android.os.Parcelable;
-import com.robotemi.sdk.constants.Platform;
-
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 
+import com.bumptech.glide.Glide;
+import com.robotemi.sdk.Robot;
+import com.robotemi.sdk.SttLanguage;
+import com.robotemi.sdk.TtsRequest;
+import com.robotemi.sdk.UserInfo;
+import com.robotemi.sdk.constants.Page;
+import com.robotemi.sdk.constants.Platform;
+import com.robotemi.sdk.listeners.OnConversationStatusChangedListener;
+import com.robotemi.sdk.listeners.OnGoToLocationStatusChangedListener;
+import com.robotemi.sdk.listeners.OnRobotReadyListener;
+import com.robotemi.sdk.listeners.OnTelepresenceEventChangedListener;
+import com.robotemi.sdk.listeners.OnTelepresenceStatusChangedListener;
+import com.robotemi.sdk.model.CallEventModel;
+import com.robotemi.sdk.navigation.model.SpeedLevel;
+import com.robotemi.sdk.telepresence.CallState;
+import com.robotemi.sdk.telepresence.Participant;
+
+import org.jetbrains.annotations.NotNull;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Collections;
-import java.text.SimpleDateFormat;
-import java.util.Locale;
-import java.util.Date;
 
-import com.bumptech.glide.Glide;
-
-import org.jetbrains.annotations.NotNull;
 public class MainActivity extends AppCompatActivity implements
         OnRobotReadyListener,
         Robot.AsrListener,
@@ -76,14 +70,13 @@ public class MainActivity extends AppCompatActivity implements
 
     // Member variables
     private final String TAG = "MainActivity";
-    private String contact = "";
+    private UserInfo contact;
     private int destinationFloor = -1; // is used to reset when temi on destination Floor arrives
     private String newDest = ""; // is used to save a destination from MQTT
     @SuppressLint("StaticFieldLeak")
     private static MainActivity instance;
     private final Robot temi = Robot.getInstance();
     private final List<UserInfo> validContacts = new ArrayList<>();
-    private int myfloorNumber = 0;
     private boolean waitingForFloor = false;
     private boolean waitingForReset = false;
     private boolean waitingForFinish = false;
@@ -130,7 +123,7 @@ public class MainActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_main);
 
         instance = this;
-        transportMode();
+        setupVideoCall();
 
         myExecutorService = Executors.newSingleThreadExecutor();
 
@@ -140,7 +133,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void init(Bundle savedInstanceState) {
-        transcriptMode();
+        startTranscription();
         setupThemeButton();
         initCommandsMap();
 
@@ -164,8 +157,6 @@ public class MainActivity extends AppCompatActivity implements
         findViewById(R.id.endTranscription).setOnClickListener(view -> {
             showTranscription("Transkription beended.");
             findViewById(R.id.isRecordingImg).setVisibility(View.INVISIBLE);
-            startVideoMeeting(contact); // Replace "user_id" with the actual user ID
-            //Who is Participant(peerId=638fb4837f2a4210c3313a5c89be0747)? Admin!
         });
 
         findViewById(R.id.quitButton).setOnClickListener(view -> {
@@ -226,6 +217,8 @@ public class MainActivity extends AppCompatActivity implements
                 currentSequenceStep = 0;
             }
         });
+        /* Call Button */
+        findViewById(R.id.confirmCallButton).setOnClickListener(view -> startVideoMeeting(contact));
     }
 
     private void showFace()
@@ -250,7 +243,7 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-    private void transcriptMode() {
+    private void startTranscription() {
         transcription = findViewById(R.id.transcription);
         String readyToTranscript = "Bereit... Drücken Sie die Taste 'Hören', um die Transkription zu starten.";
         transcription.append(readyToTranscript + "\n"); //don't scrollToBottom here, results in app crash
@@ -1071,8 +1064,8 @@ public class MainActivity extends AppCompatActivity implements
 
     public void logToFile(String logMessage) {
         if (logFile != null) {
-            String timestamp = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
-            String logEntry = timestamp + " - " + logMessage;
+            //String timestamp = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
+            //String logEntry = timestamp + " - " + logMessage;
             try (FileWriter writer = new FileWriter(logFile, true)) {
                 writer.append(logMessage).append("\n");
             } catch (IOException e) {
@@ -1084,41 +1077,145 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     /* Videocall start */
+
+    private void setupVideoCall() {
+        Log.i(TAG, "Entered transportMode");
+        setContentView(R.layout.activity_main);
+
+        // Add listener to check when the robot is ready
+        temi.addOnRobotReadyListener(isReady -> {
+            if (isReady) {
+                initializeTemi();
+            } else {
+                // Retry after a short delay if not ready
+                new Handler().postDelayed(this::retryInitialization, 1000);
+            }
+        });
+
+        // Add click listener for arrived button
+        Button yes_button = findViewById(R.id.confirmArrivedButton);
+        yes_button.setOnClickListener(v -> arrived());
+
+        // Add listener for dropdown menu
+        Spinner spinner = findViewById(R.id.dropdownMenu);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                Object item = parent.getItemAtPosition(position);
+                showTranscription("Loaded item object: " + item.toString());
+
+                if (item instanceof UserInfo) {
+                    contact = (UserInfo) item;
+                    showTranscription("Contact = " + contact.getName());
+                } else {
+                    showTranscription("Selected item is not an instance of UserInfo");
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                Log.e(TAG, "Nothing is selected");
+            }
+        });
+    }
+    private void retryInitialization() {
+        Log.i(TAG, "Retrying initialization...");
+        temi.addOnRobotReadyListener(isReady -> {
+            if (isReady) {
+                initializeTemi();
+            } else {
+                // Retry again after a short delay
+                new Handler().postDelayed(this::retryInitialization, 1000);
+            }
+        });
+    }
+
+    private void initializeTemi() {
+        refreshTemiUi();
+        updateValidContacts(); // Ensure validContacts is updated
+        fillDropdownMenu();
+        temi.setHardButtonsDisabled(true);
+        temi.setGoToSpeed(SpeedLevel.SLOW);
+    }
+
+    private void updateValidContacts() {
+        List<UserInfo> allContacts = temi.getAllContact();
+        validContacts.clear();
+        validContacts.addAll(allContacts);
+    }
+
+    private void fillDropdownMenu() {
+        List<UserInfo> contactList = new ArrayList<>(temi.getAllContact());
+        contactList.addAll(validContacts);
+
+        // Remove duplicates
+        Set<UserInfo> set = new HashSet<>(contactList);
+        contactList = new ArrayList<>(set);
+
+        // Convert UserInfo objects to strings for display
+        List<String> contactNames = new ArrayList<>();
+        for (UserInfo userInfo : contactList) {
+            contactNames.add(userInfo.getName());
+            showTranscription("Contact added: " + userInfo.getName());
+        }
+        /*
+        // Log the contact list for transcription
+        for (UserInfo userInfo : contactList) {
+            showTranscription("Contact: " + userInfo.getName() + " : " + userInfo.getUserId() + " : " + userInfo.getRole());
+        }*/
+        /*  Contact: Mario : 638fb4837f2a4210c3313a5c89be0747 : 0
+            Contact: sander991 : 5ecc126841b0af8f6cc72feadc090fa3 : 1
+            Contact: Hristo : 58c5f1e537525756a295857c7bce8e91 : 1
+            Contact: Chris : 17b6a96e6079f842f6e1684a15a7c0cc : 0
+            Contact: eric : 4730f86644ae309b1d097002ff075da3 : 0
+            Contact: Orlando Gtz : 2378ee1e0716e6cf4e5f2f0ed10b2a44 : 1 */
+
+        // Set adapter for dropdown menu
+        String[] contacts = contactNames.toArray(new String[0]);
+        Spinner dropdownMenu = findViewById(R.id.dropdownMenu);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.dropdown_menu_text_view, contacts);
+        adapter.setDropDownViewResource(R.layout.dropdown_menu_pick_text_view);
+        dropdownMenu.setAdapter(adapter);
+
+        // Set tag to hold the contact list
+        dropdownMenu.setTag(contactList);
+    }
+
     private final OnTelepresenceStatusChangedListener telepresenceStatusChangedListener = new OnTelepresenceStatusChangedListener("") {
         @Override
         public void onTelepresenceStatusChanged(CallState callState) {
             Log.i("Telepresence", "CallState " + callState + ", " + callState.getLowLightMode());
         }
     };
-
+/*
     public void onTelepresenceStatusChanged(CallState callState) {
         Log.i("Telepresence", "CallState " + callState + ", " + callState.getLowLightMode());
     }
-
+*/
     @Override
     public void onTelepresenceEventChanged(@NotNull CallEventModel callEventModel) {
         Log.i("Telepresence", "Call Event: " + callEventModel);
     }
 
-    private void startTelepresenceToCenter() {
+    /*private void startTelepresenceToCenter() {
         UserInfo target = temi.getAdminInfo();
         if (target == null) {
             showTranscription("target is null.");
             return;
         }
         temi.startTelepresence(target.getName(), target.getUserId(), Platform.TEMI_CENTER);
-    }
+    }*/
 
-    private void startVideoMeeting(@NotNull String target) {
+    private void startVideoMeeting(UserInfo target) {
         //UserInfo target = temi.getAdminInfo();  //returns Admin info
-        if (target.isEmpty()) {
+        if (target == null) {
             showTranscription("No contact chosen.");
             return;
         }
 
         List<Participant> participants = Arrays.asList(
-                new Participant(target, Platform.MOBILE),
-                new Participant(target, Platform.TEMI_CENTER)
+                new Participant(target.getUserId(), Platform.MOBILE),
+                new Participant(target.getUserId(), Platform.TEMI_CENTER)
         );
 
         showTranscription(participants.toString());
@@ -1160,11 +1257,9 @@ public class MainActivity extends AppCompatActivity implements
 
         int currentNightMode = getResources().getConfiguration().uiMode & android.content.res.Configuration.UI_MODE_NIGHT_MASK;
         if (currentNightMode == android.content.res.Configuration.UI_MODE_NIGHT_NO) {
-            // Night mode is not active, activate it
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES); // Night mode is not active, activate it
         } else {
-            // Night mode is active, deactivate it
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO); // Night mode is active, deactivate it
         }
         recreate(); // Recreate activity to apply theme change
     }
@@ -1176,90 +1271,6 @@ public class MainActivity extends AppCompatActivity implements
         } else {
             theme_button.setText(R.string.light_theme); // Show "Light Mode"
         }
-    }
-
-    private void transportMode() {
-        Log.i(TAG, "Entered transportMode");
-        setContentView(R.layout.activity_main);
-
-        // Add listener to check when the robot is ready
-        temi.addOnRobotReadyListener(isReady -> {
-            if (isReady) {
-                refreshTemiUi();
-                fillDropdownMenu();
-                temi.setHardButtonsDisabled(true);
-                temi.setGoToSpeed(SpeedLevel.SLOW);
-            }
-
-        });
-
-        // Add click listener for confirm button
-        Button confirm_button = findViewById(R.id.confirmCallButton);
-        confirm_button.setOnClickListener(v -> startVideoMeeting(contact));
-
-        // Add click listener for arrived button
-        Button yes_button = findViewById(R.id.confirmArrivedButton);
-        yes_button.setOnClickListener(v -> arrived());
-
-        Button menu_button = findViewById(R.id.quitButton);
-        menu_button.setOnClickListener(v -> enable_menu());
-
-        // Add listener for dropdown menu
-        Spinner spinner = findViewById(R.id.dropdownMenu);
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                contact = parent.getItemAtPosition(position).toString();
-                Log.i(TAG, "Contact = " + contact);
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                Log.e(TAG, "Nothing is selected");
-            }
-        });
-    }
-
-    private void enable_menu() {
-        temi.startPage(Page.HOME);
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Enter a Number");
-        final EditText input = new EditText(this);
-        builder.setView(input);
-        builder.setPositiveButton("Go to Home", (dialog, which) -> {
-            try {
-                temi.startPage(Page.HOME);
-            } catch (NumberFormatException e) {
-                Log.i(TAG, "not a valid number");
-            }
-        });
-        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
-    }
-
-    private void fillDropdownMenu() {
-        List<UserInfo> contactList = new ArrayList<>(temi.getAllContact());
-        contactList.addAll(validContacts);
-
-        // Remove duplicates
-        Set<UserInfo> set = new HashSet<>(contactList);
-        contactList = new ArrayList<>(set);
-
-        // Convert UserInfo objects to strings for display
-        List<String> contactNames = new ArrayList<>();
-        for (UserInfo userInfo : contactList) {
-            contactNames.add(userInfo.getName());
-        }
-
-        // Log the contact list for transcription
-        showTranscription(contactNames.toString());
-
-        // Set adapter for dropdown menu
-        String[] contacts = contactNames.toArray(new String[0]);
-        Spinner dropdownMenu = findViewById(R.id.dropdownMenu);
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.dropdown_menu_text_view, contacts);
-        adapter.setDropDownViewResource(R.layout.dropdown_menu_pick_text_view);
-        dropdownMenu.setAdapter(adapter);
     }
 
     private void scrollToBottom() {
@@ -1293,7 +1304,7 @@ public class MainActivity extends AppCompatActivity implements
             }, 60000);
         });
     }
-
+/*
     // confirming the destination choice
     @SuppressLint("SetTextI18n")
     private void confirm() {
@@ -1311,7 +1322,7 @@ public class MainActivity extends AppCompatActivity implements
 
             this.waitingForFinish = true;
         } else {
-            temi.goTo("aufzug");
+            temi.goTo("home base");
 
             this.waitingForFloor = true;
             TextView textView = findViewById(R.id.elevatorTextView);
@@ -1326,7 +1337,7 @@ public class MainActivity extends AppCompatActivity implements
                 }
             }, 60000);
         }
-    }
+    }*/
 
     // tells the initial temi to reset and resets itself when the user arrives at the destination
     public void arrived() {
@@ -1389,7 +1400,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     public int getMyfloorNumber() {
-        return this.myfloorNumber;
+        return 0;
     }
 
     public int getDestinationFloor() {
@@ -1417,7 +1428,6 @@ public class MainActivity extends AppCompatActivity implements
             Button confirmYesButton = findViewById(R.id.confirmArrivedButton);
 
             Button confirmElevatorButton = findViewById(R.id.confirmFinishButton);
-            Button confirm_button = findViewById(R.id.confirmCallButton);
             Spinner spinner = findViewById(R.id.dropdownMenu);
             TextView textView = findViewById(R.id.topTextView);
             findViewById(R.id.isRecordingImg).setVisibility(View.INVISIBLE);
@@ -1425,7 +1435,6 @@ public class MainActivity extends AppCompatActivity implements
             confirmTextView.setVisibility(View.INVISIBLE);
             confirmYesButton.setVisibility(View.INVISIBLE);
             confirmElevatorButton.setVisibility(View.INVISIBLE);
-            confirm_button.setVisibility(View.VISIBLE);
             spinner.setVisibility(View.VISIBLE);
             textView.setVisibility(View.VISIBLE);
         });
@@ -1445,6 +1454,23 @@ public class MainActivity extends AppCompatActivity implements
         super.onRestoreInstanceState(savedInstanceState);
         String transcript = savedInstanceState.getString("transcript");
         transcription.setText(transcript);
+    }
+
+    private void enable_menu() {
+        temi.startPage(Page.HOME);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Enter a Number");
+        final EditText input = new EditText(this);
+        builder.setView(input);
+        builder.setPositiveButton("Go to Home", (dialog, which) -> {
+            try {
+                temi.startPage(Page.HOME);
+            } catch (NumberFormatException e) {
+                Log.i(TAG, "not a valid number");
+            }
+        });
+        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
     }
 
     @Override
