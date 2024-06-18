@@ -10,23 +10,51 @@
     <Button
         android:id="@+id/sequence4Button"
         android:layout_width="600dp"
-        android:layout_height="250dp"
-        android:layout_marginEnd="16dp"
+        android:layout_height="150dp"
+        android:layout_marginEnd="4dp"
         android:backgroundTint="?attr/colorPrimary"
         android:text="@string/sequence4"
         android:textColor="?attr/colorOnPrimary"
         android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="@+id/sequence3Button"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintHorizontal_bias="0.509"
         app:layout_constraintStart_toEndOf="@+id/sequence3Button"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0" />
+        app:layout_constraintTop_toTopOf="@+id/sequence3Button"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <Button
+        android:id="@+id/sequence6Button"
+        android:layout_width="600dp"
+        android:layout_height="150dp"
+        android:backgroundTint="?attr/colorPrimary"
+        android:text="@string/sequence6"
+        android:textColor="?attr/colorOnPrimary"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/sequence3Button"
+        app:layout_constraintTop_toBottomOf="@+id/sequence3Button"
+        app:layout_constraintVertical_bias="0.413" />
+
+    <Button
+        android:id="@+id/sequence5Button"
+        android:layout_width="600dp"
+        android:layout_height="150dp"
+        android:backgroundTint="?attr/colorPrimary"
+        android:text="@string/sequence5"
+        android:textColor="?attr/colorOnPrimary"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/sequence4Button"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toEndOf="@+id/sequence6Button"
+        app:layout_constraintTop_toTopOf="@+id/sequence6Button"
+        app:layout_constraintVertical_bias="0.0" />
 
     <Button
         android:id="@+id/sequence1Button"
         android:layout_width="600dp"
-        android:layout_height="250dp"
+        android:layout_height="150dp"
         android:layout_marginTop="16dp"
         android:backgroundTint="?attr/colorPrimary"
         android:text="@string/sequence1"
@@ -40,30 +68,29 @@
     <Button
         android:id="@+id/sequence2Button"
         android:layout_width="600dp"
-        android:layout_height="250dp"
+        android:layout_height="150dp"
         android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
+        android:layout_marginEnd="28dp"
         android:backgroundTint="?attr/colorPrimary"
         android:text="@string/sequence2"
         android:textColor="?attr/colorOnPrimary"
         android:textSize="20sp"
+        app:layout_constraintBottom_toTopOf="@+id/sequence4Button"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
 
     <Button
         android:id="@+id/sequence3Button"
         android:layout_width="600dp"
-        android:layout_height="250dp"
+        android:layout_height="150dp"
+        android:layout_marginTop="48dp"
         android:backgroundTint="?attr/colorPrimary"
         android:text="@string/sequence3"
         android:textColor="?attr/colorOnPrimary"
         android:textSize="20sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.033"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/sequence1Button"
-        app:layout_constraintVertical_bias="0.17" />
+        app:layout_constraintStart_toStartOf="@+id/sequence1Button"
+        app:layout_constraintTop_toBottomOf="@+id/sequence1Button" />
 
     <Button
         android:id="@+id/backButton"

@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.hardware.usb.UsbRequest;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -86,7 +87,8 @@ public class MainActivity extends AppCompatActivity implements
     private ActivityResultLauncher<Intent> sequenceResultLauncher;
     private ExecutorService myExecutorService;
     private String myAsrResultString = "";
-    enum Sequence {GREETING, SEQUENCE_ALEXA, AAL_SEQUENCE, SEQUENCE_BRAIN_GAME, QUESTIONNAIRE, KITCHEN}
+    enum Sequence {GREETING, SEQUENCE_ALEXA, AAL_SEQUENCE, SEQUENCE_BRAIN_GAME, QUESTIONNAIRE,
+                    KITCHEN, ASSISTANCE_QUESTIONAIRE, ALEXA_INTERACTION}
     private Sequence currentSequence;
     int currentSequenceStep = 0;
     private boolean flagWaitingForTemiToArrive = false;
@@ -322,6 +324,7 @@ public class MainActivity extends AppCompatActivity implements
     private void initCommandsMap() {
         commandsMap.put(new String[]{"gehe", "geh", "fahre", "fahr"}, command -> relocateTemi());
         commandsMap.put(new String[]{"folge mir", "komm mit mir"}, command -> followMe());
+        commandsMap.put(new String[]{"kontaktperson anrufen", "anruf starten", "ruf an"}, command -> findViewById(R.id.confirmCallButton).performClick());
         commandsMap.put(new String[]{"transkription starten", "aufnahme beginnen", "aufnahme starten"}, command -> findViewById(R.id.listen).performClick());
         commandsMap.put(new String[]{"transkription beenden", "aufnahme beenden"}, command -> findViewById(R.id.endTranscription).performClick());
         commandsMap.put(new String[]{"applikation beenden", "app beenden"}, command -> findViewById(R.id.quitButton).performClick());
@@ -331,7 +334,7 @@ public class MainActivity extends AppCompatActivity implements
         commandsMap.put(new String[]{"erinnere mich", "erinnerung setzen", "setze eine erinnerung"}, command -> setReminder());
         commandsMap.put(new String[]{"wiederholen", "erneut", "wiederhole", "noch mal", "nicht verstanden"}, command -> findViewById(R.id.repeatButton).performClick());
         /* Sequences */
-        commandsMap.put(new String[]{"gäste begrüßen", "begrüßung starten", "willkommenssequenz starten", "sequenz 1 starten",
+        commandsMap.put(new String[]{"gäste begrüßen", "begrüßung starten", "begrüßung", "willkommenssequenz starten", "sequenz 1 starten",
                 "sequenz 1 beginnen"}, command -> {
             currentSequence = Sequence.GREETING;
             currentSequenceStep = 0;
@@ -343,24 +346,34 @@ public class MainActivity extends AppCompatActivity implements
             currentSequenceStep = 0;
             chooseCurrentSequence();
         });
-        commandsMap.put(new String[]{"aal sequenz", "sequenz 2 starten", "rundgang starten"}, command -> {
+        commandsMap.put(new String[]{"aal sequenz", "sequenz 2 starten", "rundgang starten", "sequenz aal"}, command -> {
             currentSequence = Sequence.AAL_SEQUENCE;
             currentSequenceStep = 0;
             chooseCurrentSequence();
         });
 
-        commandsMap.put(new String[]{"gedächtnisspiel", "denksport"}, command -> {
+        commandsMap.put(new String[]{"gedächtnisspiel", "denksport", "sequenz gedächtnisspiel"}, command -> {
             currentSequence = Sequence.SEQUENCE_BRAIN_GAME;
             currentSequenceStep = 0;
             chooseCurrentSequence();
         });
-        commandsMap.put(new String[]{"fragebogen starten", "fragebogensequenz starten", "fragebogen beginnen" }, command -> {
+        commandsMap.put(new String[]{"fragebogen starten", "fragebogensequenz starten", "fragebogen beginnen", "sequenz fragebogen" }, command -> {
             currentSequence = Sequence.QUESTIONNAIRE;
             currentSequenceStep = 0;
             chooseCurrentSequence();
         });
-        commandsMap.put(new String[]{"führung durch die küche starten" }, command -> {
+        commandsMap.put(new String[]{"führung durch die küche starten", "sequenz küche" }, command -> {
             currentSequence = Sequence.KITCHEN;
+            currentSequenceStep = 0;
+            chooseCurrentSequence();
+        });
+        commandsMap.put(new String[]{"unterstützungsbedarf", "sequenz unterstützungsbedarf" }, command -> {
+            currentSequence = Sequence.ASSISTANCE_QUESTIONAIRE;
+            currentSequenceStep = 0;
+            chooseCurrentSequence();
+        });
+        commandsMap.put(new String[]{"alexa interaktion", "sequenz alexa" }, command -> {
+            currentSequence = Sequence.ALEXA_INTERACTION;
             currentSequenceStep = 0;
             chooseCurrentSequence();
         });
@@ -424,6 +437,16 @@ public class MainActivity extends AppCompatActivity implements
                 scrollToBottom();
                 showFace();
                 handleSequenceKitchen();
+                break;
+            case ASSISTANCE_QUESTIONAIRE:
+                scrollToBottom();
+                showFace();
+                handleSequenceAssistanceQuestionaire();
+                break;
+            case ALEXA_INTERACTION:
+                scrollToBottom();
+                showFace();
+                handleSequenceAlexaInteraction();
                 break;
             default:
                 showTranscription("Error default in switch(currentsequence)");
@@ -1047,8 +1070,8 @@ public class MainActivity extends AppCompatActivity implements
                 break;
             case 2:
                 nextSentence = getString(R.string.kt_takeDrink);
+                // flagWaitingForTemiToFinishSpeaking = true;
                 temi.speak(TtsRequest.create(nextSentence, false));
-                currentSequenceStep++;
                 break;
             case 3:
                 if(myAsrResultString.contains("was kannst du mir zur küche sagen")
@@ -1060,14 +1083,16 @@ public class MainActivity extends AppCompatActivity implements
                             + getString(R.string.aal_kitchen_summary);
                 }
 
-                    nextSentence += getString(R.string.kt_tour_finished);
+
+
+                    nextSentence += getString(R.string.aq_introduction);
 
                 flagWaitingForTemiToFinishSpeaking = true; // HIER NICHT!!!!
                 temi.speak(TtsRequest.create(nextSentence, false));
                 break;
             case 4:
                 currentSequenceStep = 0;
-                currentSequence = Sequence.SEQUENCE_ALEXA;
+                currentSequence = Sequence.ASSISTANCE_QUESTIONAIRE;
                 break;
             default:
                 showTranscription("DEGBUG: default in handleSequenceBrainGame !");
@@ -1087,7 +1112,62 @@ public class MainActivity extends AppCompatActivity implements
     }
 
 
+    private void handleSequenceAssistanceQuestionaire()
+    {
+        String nextString = "";
+        switch (currentSequenceStep)
+        {
+            case 0:
+                // called when user says "Hey Temi ich bin bereit"
+                if(checkForContinueNextSequence())
+                {
+                    nextString = getString(R.string.aq_ans_ready)
+                            + getString(R.string.aq_remind_no_hey_temi)
+                            + getString(R.string.aq_question_1);
+                    flagWaitingForTemiToFinishSpeaking = true;  // when finised speaking inc step
+                }
+                else
+                {
+                    nextString = getString(R.string.aq_ans_unsufficiant) + getString(R.string.aq_introduction);
+                    currentSequenceStep = 0;
+                }
 
+                temi.speak(TtsRequest.create(nextString));
+                break;
+            case 1:
+            case 3:
+                temi.wakeup(Collections.singletonList(SttLanguage.SYSTEM));
+                findViewById(R.id.isRecordingImg).setVisibility(View.VISIBLE);
+                flagWaitingForUserResponse = true;
+                currentSequenceStep++;
+                break;
+            case 2:
+                nextString = getString(R.string.aq_question_2);
+                flagWaitingForTemiToFinishSpeaking = true;
+                temi.speak(TtsRequest.create(nextString));
+                break;
+            case 4:
+                nextString = getString(R.string.aq_thanks) + getString(R.string.ai_introduction);
+                flagWaitingForTemiToFinishSpeaking = true;
+                temi.speak(TtsRequest.create(nextString));
+                break;
+            case 5:
+
+                currentSequenceStep = 0;
+                currentSequence = Sequence.ALEXA_INTERACTION;
+                break;
+            default:
+                showTranscription("DEFAULT: in der handleSequenceAssistanceQuestionaire!");
+                currentSequenceStep = 0;
+                break;
+        }
+    }
+
+
+    private void handleSequenceAlexaInteraction()
+    {
+        showTranscription("DEBUG: In der handleAlexaSequence");
+    }
 
 
 
@@ -1200,16 +1280,28 @@ public class MainActivity extends AppCompatActivity implements
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                Object item = parent.getItemAtPosition(position);
-                showTranscription("Loaded item object: " + item.toString());
+                try {
+                    String selectedName = (String) parent.getItemAtPosition(position);
+                    showTranscription("Selected item: " + selectedName);
 
-                if (item instanceof UserInfo) {
-                    contact = (UserInfo) item;
-                    showTranscription("Contact = " + contact.getName());
-                } else {
-                    showTranscription("Selected item is not an instance of UserInfo");
+                    ContactMapWrapper wrapper = (ContactMapWrapper) parent.getTag();
+                    if (wrapper != null) {
+                        Map<String, UserInfo> contactMap = wrapper.getContactMap();
+                        contact = contactMap.get(selectedName);
+                        if (contact != null) {
+                            showTranscription("Contact = " + contact.getName());
+                        } else {
+                            showTranscription("Selected contact not found in map");
+                        }
+                    } else {
+                        showTranscription("Contact map wrapper is null");
+                    }
+                } catch (Exception e) {
+                    Log.e(TAG, "Error selecting contact", e);
+                    showTranscription("Error selecting contact: " + e.getMessage());
                 }
             }
+
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
@@ -1237,6 +1329,18 @@ public class MainActivity extends AppCompatActivity implements
         temi.setGoToSpeed(SpeedLevel.SLOW);
     }
 
+    public class ContactMapWrapper {
+        private final Map<String, UserInfo> contactMap;
+
+        public ContactMapWrapper(Map<String, UserInfo> contactMap) {
+            this.contactMap = contactMap;
+        }
+
+        public Map<String, UserInfo> getContactMap() {
+            return contactMap;
+        }
+    }
+
     private void updateValidContacts() {
         List<UserInfo> allContacts = temi.getAllContact();
         validContacts.clear();
@@ -1244,19 +1348,32 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void fillDropdownMenu() {
-        List<UserInfo> contactList = new ArrayList<>(temi.getAllContact());
-        contactList.addAll(validContacts);
+        try {
+            List<UserInfo> allContacts = temi.getAllContact();
+            if (allContacts == null) {
+                showTranscription("All contacts are null");
+                return;
+            }
 
-        // Remove duplicates
-        Set<UserInfo> set = new HashSet<>(contactList);
-        contactList = new ArrayList<>(set);
+            // Combine and remove duplicates
+            Set<UserInfo> contactSet = new HashSet<>(allContacts);
+            contactSet.addAll(validContacts);
 
-        // Convert UserInfo objects to strings for display
-        List<String> contactNames = new ArrayList<>();
-        for (UserInfo userInfo : contactList) {
-            contactNames.add(userInfo.getName());
-            showTranscription("Contact added: " + userInfo.getName());
-        }
+            List<UserInfo> contactList = new ArrayList<>(contactSet);
+
+            // Create a map for contact names to UserInfo objects
+            Map<String, UserInfo> contactMap = new HashMap<>();
+            List<String> contactNames = new ArrayList<>();
+
+            for (UserInfo userInfo : contactList) {
+                if (userInfo != null && userInfo.getName() != null) {
+                    contactNames.add(userInfo.getName());
+                    contactMap.put(userInfo.getName(), userInfo);
+                    showTranscription("Contact added: " + userInfo.getName());
+                } else {
+                    showTranscription("Skipped null user or user with null name");
+                }
+            }
         /*
         // Log the contact list for transcription
         for (UserInfo userInfo : contactList) {
@@ -1269,15 +1386,22 @@ public class MainActivity extends AppCompatActivity implements
             Contact: eric : 4730f86644ae309b1d097002ff075da3 : 0
             Contact: Orlando Gtz : 2378ee1e0716e6cf4e5f2f0ed10b2a44 : 1 */
 
-        // Set adapter for dropdown menu
-        String[] contacts = contactNames.toArray(new String[0]);
-        Spinner dropdownMenu = findViewById(R.id.dropdownMenu);
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.dropdown_menu_text_view, contacts);
-        adapter.setDropDownViewResource(R.layout.dropdown_menu_pick_text_view);
-        dropdownMenu.setAdapter(adapter);
+            // Log contacts for debugging
+            showTranscription("Total contacts added: " + contactNames.size());
 
-        // Set tag to hold the contact list
-        dropdownMenu.setTag(contactList);
+            // Set adapter for dropdown menu
+            String[] contacts = contactNames.toArray(new String[0]);
+            Spinner dropdownMenu = findViewById(R.id.dropdownMenu);
+            ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.dropdown_menu_text_view, contacts);
+            adapter.setDropDownViewResource(R.layout.dropdown_menu_pick_text_view);
+            dropdownMenu.setAdapter(adapter);
+
+            // Set tag to hold the contact map
+            dropdownMenu.setTag(new ContactMapWrapper(contactMap));
+        } catch (Exception e) {
+            Log.e(TAG, "Error filling dropdown menu", e);
+            showTranscription("Error filling dropdown menu: " + e.getMessage());
+        }
     }
 
     private final OnTelepresenceStatusChangedListener telepresenceStatusChangedListener = new OnTelepresenceStatusChangedListener("") {
@@ -1306,7 +1430,7 @@ public class MainActivity extends AppCompatActivity implements
     }*/
 
     private void startVideoMeeting(UserInfo target) {
-        //UserInfo target = temi.getAdminInfo();  //returns Admin info
+        //target.getUserId() for Hristo: "58c5f1e537525756a295857c7bce8e91"
         if (target == null) {
             showTranscription("No contact chosen.");
             return;

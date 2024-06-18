@@ -45,6 +45,22 @@ public class SequenceActivity extends AppCompatActivity {
             }
         });
 
+        Button button5 = findViewById(R.id.sequence5Button);
+        button5.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setResultAndFinish(MainActivity.Sequence.ALEXA_INTERACTION);
+            }
+        });
+
+        Button button6 = findViewById(R.id.sequence6Button);
+        button6.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setResultAndFinish(MainActivity.Sequence.KITCHEN);
+            }
+        });
+
         Button backButton = findViewById(R.id.backButton);
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override

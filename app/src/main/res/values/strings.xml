@@ -21,7 +21,8 @@
         Wenn Sie mir etwas sagen möchten, sprechen Sie mich bitte mit  Hey Temi  gefolgt von ihrem
         Anliegen an. Ich werde Ihnen dann so gut antworten wie ich kann.
         Ich hoffe, es geht Ihnen gut und Sie haben gut hergefunden.
-        Wir befinden uns aktuell in der Musterwohnung zum Theme Ambient Assistet Living der htw saar.
+        Wir befinden uns aktuell in der Musterwohnung zum Thema alltagsunterstützende
+        Assistenzsysteme der htw saar.
         Die Wohnung ist mit weiteren Sprachassistenzsystemen ausgestattet.
         Zusammen mit meinen Freunden Alexa und Vivi werde ich Ihnen heute versuchen aufzuzeigen,
         wie wir Ihnen tatkräftig zur Seite stehen können. Meine Freundin Vivi z.B. nutzt ihre
@@ -51,8 +52,38 @@
         Wohnzimmer zurückgehen. Wenn Sie bereit sind sagen Sie  Hey Temi lass uns weitermachen.</string>
 
 
-    <!-- Survey Sequence Strings -->
+    <!-- Assistance Questionaire Sequence Strings -->
+    <string name="aq_introduction">Gerne würde ich Ihnen noch einige Fragen zu ihrem
+        Unterstützungsbedarf stellen. Bei ihrer Antwort brauchen Sie mich dabei nicht extra
+        mit  Hey Temi  ansprechen. Wenn ich Ihnen die Frage gestellt habe, höre ich
+        automatisch zu. Wenn Sie das verstanden haben und bereit sind, sagen Sie Hey ja ich bin
+        bereit. Ansonsten kann ich den Frageablauf auch erneut erklären.  </string>
 
+    <string name="aq_ans_unsufficiant">Entschuldigung das habe ich nicht korrekt verstanden.
+        Ich werde das Vorgehen noch einmal erklären.</string>
+    <string name="aq_ans_ready">Alles klar. Los gehts.  </string>
+    <string name="aq_remind_no_hey_temi">Wie gesagt, sie brauchen mich nicht mit Hey Temi anzusprechen.
+        Sprechen Sie einfahc drauf los</string>
+    <string name="aq_question_1">Die erste Frage lautet  Wenn
+        ich in Ihrem Haushalt verfügbar wäre, worin könnte ich Sie unterstützen</string>
+    <string name="aq_question_2">Ich könnte Sie beispielsweise an die Medikamenteneinnahme
+    erinnern, falls Sie welche einnehmen. Würde Ihnen das gefallen?         </string>
+    <string name="aq_thanks">Vielen Dank. Ich habe mir deine Antworten gemerkt. </string>
+
+    <!-- Alexa interaction Sequence Strings -->
+    <string name="ai_introduction">Als nächstes mächte ich Ihnen ein weiteres Sprachassistenzsystem
+        namens    Alexa    vorstellen. Diese befindet sich rechts auf der Komode
+        im Wohnzimmer. Bevor wir jedoch dorthin
+        zurückgehen, möchte ich Ihnen die Bedinung der Alexa  noch hier erklären. Grund dafür ist,
+        das Alexa anfängt zuzuhören, wenn ihr Name im Raum gesagt wird.
+        Wenn wir gleich im Wohnzimmer sind, würde ich Sie bitten zu sagen   Alexa schließe
+        den Rolladen. Danach können Sie Alexa auch bitten, dass Licht ein oder auszuschalten.
+        Nehmen Sie doch bitte ihr Glas und sagen Sie  Hey Temi lass uns weitermachen, um ins
+        Wohnzimmer zu gehen.
+        </string>
+
+
+    <!-- Survey Sequence Strings -->
     <string name="survey_livingroom_string">Bitte nehmen Sie doch Platz. Mein Team wird gleich mit
         Ihnen noch kurz die Einzelheiten des heutigen Tages durchgehen,
         danach gehts mit einer kurzen Führung weiter</string>
@@ -83,7 +114,7 @@
     <string name="aal_kitchen_details2">Zum einen sind Kühlschrank, Backofen und Geschirrspüler etwas erhöht angebracht. Dadurch muss man sich zur Nutzung nicht bücken. Dies ist insbesondere für ältere Menschen von Vorteil, da mit zunehmendem Alter die Rückenbeweglichkeit nachlässt. Auch für jüngere Menschen ist es von Vorteil, denn jeder Mensch hat es ja gerne bequem. Beispielsweise sieht mein menschlicher Programmierer sofort, ob noch kühles Bier vorhanden ist.</string>
     <string name="aal_sink_details">Zum anderen lässt mit zunehmendem Alter auch die Schulterbeweglichkeit nach. Daher sind im Hängeschrank elektrisch höhenverstellbare Regalböden eingebaut. Sie sehen die Schalter dazu rechts an der Arbeitsplatte. Interessant ist, dass diese höhenverstellbaren Regalböden nachträglich in einen bestehenden Hängeschrank eingebaut werden können.</string>
     <string name="aal_worktop_details">Links an der Arbeitsplatte sehen Sie weitere Schalter. Sie sind für die Arbeitsplatte selbst. Denn auch ihre Höhe kann man elektrisch verstellen und so individuell auf den Nutzer anpassen, z.B. für Rollstuhlfahrer.</string>
-    <string name="aal_kitchen_summary">Soweit in aller Kürze zu den wichtigsten und leicht erkennbaren Erleichterungen. Bitte folgen Sie mir nun in das Wohnzimmer.</string>
+    <string name="aal_kitchen_summary">Soweit in aller Kürze zu den wichtigsten und leicht erkennbaren Erleichterungen.</string>
     <string name="aal_livingroom_intro">Wir befinden uns nun in dem Teil der Musterwohnung, der nachträglich mit relativ geringem Aufwand aufgerüstet wurde. Beispielsweise sehen Sie rechts neben der Balkontür einen Aufwickler für den Rollladengurt. Auf diese Weise lässt sich sehr einfach und sehr schnell ein Rollladenheber nachrüsten, ohne einen teuren Motor aufwändig zu installieren. Dieser Rollladengurt-Aufwickler verfügt auch über eine Fernbedienung, so dass er auch für Menschen mit Bewegungseinschränkungen leicht zu bedienen ist.</string>
     <string name="aal_livingroom_details1">Ebenfalls sind in diesem Raum 2 digitale Assistenzsysteme installiert. Zum einen die Uschi von Amazon. Alexa darf ich nicht sagen, sonst meldet sie sich immer sofort. Die will dann immer mitreden, wenn sich erwachsene Leute wie wir unterhalten.</string>
     <string name="aal_livingroom_details2">Und zum anderen ist das System VIVAIcare mit der Sprachsteuerung VIVI installiert. Wie sie funktioniert wird Ihnen ein menschlicher Kollege von mir erläutern. Ich bin überzeugt, dass er es ebenso kompetent macht wie ich. Auch bei Fragen zu mir wird er Ihnen Auskunft geben.</string>
@@ -128,6 +159,8 @@
     <string name="sequence3">AAL-Sequenz</string>
     <string name="sequence4">Gedächtnisspiel</string>
     <string name="sequence5">Küchenrundgang</string>
+    <string name="sequence6">Alexa-Interaktion</string>
+
     <string name="back">Zurück</string>
     <string name="next">Weiter</string>
     <string name="repeat">Wiederholen</string>

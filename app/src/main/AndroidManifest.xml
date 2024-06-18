@@ -11,7 +11,7 @@
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="com.robotemi.sdk.permission.RUN_SDK_SERVICE" />
     <uses-permission android:name="com.robotemi.sdk.permission.KIOSK" />
-    <uses-permission android:name="com.robotemi.sdk.permission.MEETINGS" />
+   
     <uses-feature android:name="android.hardware.camera.any" />
     <uses-permission android:name="android.hardware.microphone.any" />
     <uses-permission android:name="android.permission.CAMERA" />
@@ -54,16 +54,17 @@
             android:name="com.robotemi.sdk.metadata.PERMISSIONS"
             android:value="com.robotemi.permission.settings,
                            com.robotemi.permission.sequence,
-                           com.robotemi.permission.meetings,
+
                            com.robotemi.permission.map" />
+
+        <meta-data
+            android:name="com.robotemi.sdk.metadata.SKILL"
+            android:value="@string/app_name" />
 
         <meta-data
             android:name="com.robotemi.sdk.metadata.KIOSK"
             android:value="true" />
 
-        <meta-data
-            android:name="com.robotemi.sdk.metadata.MEETINGS"
-            android:value="true" />
 
         <meta-data
             android:name="com.robotemi.sdk.metadata.OVERRIDE_NLU"
