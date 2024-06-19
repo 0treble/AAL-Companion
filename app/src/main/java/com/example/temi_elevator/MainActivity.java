@@ -519,6 +519,7 @@ public class MainActivity extends AppCompatActivity implements
                     temi.goTo("wohnzimmersitzgruppe");
                     // step increment done by the onGoToStatusListener
                 }
+
                 break;
             case 5:
                 nextSentence = getString(R.string.greeting_introduction);
@@ -1070,17 +1071,21 @@ public class MainActivity extends AppCompatActivity implements
                 break;
             case 2:
                 nextSentence = getString(R.string.kt_takeDrink);
-                // flagWaitingForTemiToFinishSpeaking = true;
+                //flagWaitingForTemiToFinishSpeaking = true;
                 temi.speak(TtsRequest.create(nextSentence, false));
+                currentSequenceStep++;
                 break;
             case 3:
-                if(myAsrResultString.contains("was kannst du mir zur küche sagen")
-                    | (myAsrResultString.contains("zeige") & myAsrResultString.contains("küche")))
+                if(myAsrResultString.contains("küche"))
                 {
                     nextSentence = getString(R.string.aal_kitchen_intro)
                             //               + getString(R.string.aal_kitchen_details1)
                             //               + getString(R.string.aal_kitchen_details2)
                             + getString(R.string.aal_kitchen_summary);
+                }
+                else
+                {
+                    nextSentence = getString(R.string.kt_no_tour);
                 }
 
 
@@ -1129,13 +1134,14 @@ public class MainActivity extends AppCompatActivity implements
                 else
                 {
                     nextString = getString(R.string.aq_ans_unsufficiant) + getString(R.string.aq_introduction);
-                    currentSequenceStep = 0;
+                    //currentSequenceStep = 0;
                 }
 
                 temi.speak(TtsRequest.create(nextString));
                 break;
             case 1:
             case 3:
+            case 5:
                 temi.wakeup(Collections.singletonList(SttLanguage.SYSTEM));
                 findViewById(R.id.isRecordingImg).setVisibility(View.VISIBLE);
                 flagWaitingForUserResponse = true;
@@ -1147,12 +1153,16 @@ public class MainActivity extends AppCompatActivity implements
                 temi.speak(TtsRequest.create(nextString));
                 break;
             case 4:
+                nextString = getString(R.string.aq_question_3);
+                flagWaitingForTemiToFinishSpeaking = true;
+                temi.speak(TtsRequest.create(nextString));
+                break;
+            case 6:
                 nextString = getString(R.string.aq_thanks) + getString(R.string.ai_introduction);
                 flagWaitingForTemiToFinishSpeaking = true;
                 temi.speak(TtsRequest.create(nextString));
                 break;
-            case 5:
-
+            case 7:
                 currentSequenceStep = 0;
                 currentSequence = Sequence.ALEXA_INTERACTION;
                 break;
@@ -1167,6 +1177,48 @@ public class MainActivity extends AppCompatActivity implements
     private void handleSequenceAlexaInteraction()
     {
         showTranscription("DEBUG: In der handleAlexaSequence");
+        String nextSentence = "";
+        switch(currentSequenceStep) {
+            case 0:
+                if (checkForContinueNextSequence()) {
+                    nextSentence = getString(R.string.ai_ready);
+                    flagWaitingForTemiToFinishSpeaking = true;
+                    // step increment done by ConversationStatusListener
+                }
+                else
+                {
+                    nextSentence = getString(R.string.ai_not_ready) + getString(R.string.ai_introduction);
+                }
+                //flagWaitingForTemiToFinishSpeaking = true; // HIER NICHT!!!!
+                temi.speak(TtsRequest.create(nextSentence, false));
+                break;
+            case 1:
+                flagWaitingForTemiToArrive = true;
+                temi.goTo("wohnzimmersitzgruppe");
+                // step increment done by LocationStatusListener
+                break;
+            case 2:
+                nextSentence = getString(R.string.ai_ready_livingroom);
+                temi.speak(TtsRequest.create(nextSentence));
+                currentSequenceStep++;
+                break;
+            case 3:
+                if (checkForContinueNextSequence() | myAsrResultString.contains("bin fertig")) {
+                    nextSentence = getString(R.string.ai_finished) + getString(R.string.bg_info);
+                    flagWaitingForTemiToFinishSpeaking = true;
+                    // step increment done by ConversationStatusListener
+                }
+                else
+                {
+                    nextSentence = getString(R.string.ai_not_understood);
+                }
+                //flagWaitingForTemiToFinishSpeaking = true; // HIER NICHT!!!!
+                temi.speak(TtsRequest.create(nextSentence, false));
+                break;
+            case 4:
+                currentSequenceStep = 0;
+                currentSequence = Sequence.SEQUENCE_BRAIN_GAME;
+        }
     }
 
 

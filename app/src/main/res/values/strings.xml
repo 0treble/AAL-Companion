@@ -9,7 +9,7 @@
 
     <string name="greeting_welcome_door"> Herzlich Willkommen in der AAL Wohnung der htw saar! Mein Name
         ist Temi. Vielen Dank für Ihre Teilnahme am Forschungsprojekt VOICE
-        zur Erforschung der Nutzbarkeit und Akzeptanz von KI basierten
+        zur Erforschung der Nutzbarkeit und Akzeptanz von K I basierten
         Robotik-Systemen im Alltag. Ich bin Temi und freue mich schon darauf Sie kennenzulernen.
         Aber bevor wir anfangen folgen Sie mir bitte ins Wohnzimmer.</string>
     <string name="greeting_livingroom_have_a_seat">Sie können ihren Mantel oder ihre Jacke hier ablegen.
@@ -46,8 +46,9 @@
         wir Ihnen Getränke bereitgestellt. Bitte bedienen Sie sich und nehmen Sie gerne Platz.
         Wenn sie möchten, erkläre ich Ihnen einige Besonderheiten dieser Küche.
         Wenn Sie daran Interesse haben sagen Sie Hey Temi was kannst du mir zur Küche sagen.
-        Andernfalls könne wir auch mit der Besichtigung fortfahren. Sagen Sie dazu  Hey Temi lass
+        Andernfalls könne wir auch mit der Untersuchung fortfahren. Sagen Sie dazu  Hey Temi lass
         uns weitermachen.</string>
+    <string name="kt_no_tour">Kein Problem. Dann machen wir weiter.</string>
     <string name="kt_tour_finished">Nehmen Sie ihr Getränk und lassen sie uns zurück ins
         Wohnzimmer zurückgehen. Wenn Sie bereit sind sagen Sie  Hey Temi lass uns weitermachen.</string>
 
@@ -56,7 +57,7 @@
     <string name="aq_introduction">Gerne würde ich Ihnen noch einige Fragen zu ihrem
         Unterstützungsbedarf stellen. Bei ihrer Antwort brauchen Sie mich dabei nicht extra
         mit  Hey Temi  ansprechen. Wenn ich Ihnen die Frage gestellt habe, höre ich
-        automatisch zu. Wenn Sie das verstanden haben und bereit sind, sagen Sie Hey ja ich bin
+        automatisch zu. Wenn Sie das verstanden haben und bereit sind, sagen Sie Hey Temi ja ich bin
         bereit. Ansonsten kann ich den Frageablauf auch erneut erklären.  </string>
 
     <string name="aq_ans_unsufficiant">Entschuldigung das habe ich nicht korrekt verstanden.
@@ -66,21 +67,31 @@
         Sprechen Sie einfahc drauf los</string>
     <string name="aq_question_1">Die erste Frage lautet  Wenn
         ich in Ihrem Haushalt verfügbar wäre, worin könnte ich Sie unterstützen</string>
-    <string name="aq_question_2">Ich könnte Sie beispielsweise an die Medikamenteneinnahme
-    erinnern, falls Sie welche einnehmen. Würde Ihnen das gefallen?         </string>
+    <string name="aq_question_2">Vielen Dank für ihre Antwort. Ich könnte Sie beispielsweise auch an die Medikamenteneinnahme
+    erinnern, falls Sie welche einnehmen. Würde Ihnen das gefallen?       </string>
+    <string name="aq_question_3">Vielen Dank. Außerdem könnte ich Sie  im Laufe eines Tages auch erinnern, genug zu trinken.
+     Wäre das für sie hilfreich?  </string>
     <string name="aq_thanks">Vielen Dank. Ich habe mir deine Antworten gemerkt. </string>
 
     <!-- Alexa interaction Sequence Strings -->
     <string name="ai_introduction">Als nächstes mächte ich Ihnen ein weiteres Sprachassistenzsystem
         namens    Alexa    vorstellen. Diese befindet sich rechts auf der Komode
         im Wohnzimmer. Bevor wir jedoch dorthin
-        zurückgehen, möchte ich Ihnen die Bedinung der Alexa  noch hier erklären. Grund dafür ist,
+        zurückgehen, möchte ich Ihnen die Bedienung der Alexa  noch hier erklären. Grund dafür ist,
         das Alexa anfängt zuzuhören, wenn ihr Name im Raum gesagt wird.
         Wenn wir gleich im Wohnzimmer sind, würde ich Sie bitten zu sagen   Alexa schließe
         den Rolladen. Danach können Sie Alexa auch bitten, dass Licht ein oder auszuschalten.
         Nehmen Sie doch bitte ihr Glas und sagen Sie  Hey Temi lass uns weitermachen, um ins
         Wohnzimmer zu gehen.
         </string>
+    <string name="ai_ready">Alles klar. Ich bringe sie nun zurück ins Wohnzimmer, sodass sie dort Alexa bitten können, die Rollläden
+        zu öffnen oder das Licht einzuschalten.</string>
+    <string name="ai_not_ready">Kein Problem. Ich erkläre Alexa erneut. </string>
+    <string name="ai_ready_livingroom">Da wären wir. Die Sprachassistenz, deren Name ich jetzt nicht nennen kann, befinet sich rechts auf der Kommode.
+        Wenn sie fertig mit der Bedienung der Rolläden und des Lichtes sind, sagen Sie einfach  Hey Temi lass uns weitermachen. Dann übernehme ich wieder. </string>
+    <string name="ai_finished">Alles klar. Ich hoffe die Interaktion mit alexa hat funktioniert. </string>
+    <string name="ai_not_understood">Entschuldigung das habe ich wohl nicht korrekt verstanden. Wenn Sie fertig sind mit Alexa, sagen Sie
+         Hey Temi   ich bin fertig mit Alexa oder  Hey Temi  lass uns weitermachen. </string>
 
 
     <!-- Survey Sequence Strings -->
@@ -121,6 +132,8 @@
     <string name="aal_farewell">Ich würde mich freuen, wenn der kleine Rundgang Ihnen gefallen hat und Sie unsere AAL Musterwohnung weiterempfehlen würden. Ich selbst werde nun schweigen, denn es ist Freitagnachmittag und meine Arbeitszeit ist zu Ende. Überstunden bekomme ich nämlich nicht bezahlt.</string>
 
     <!-- BrainGame Sequence Strings -->
+    <string name="bg_info">Als  nächstes würde ich mit Ihnen ein kleines Gedächtnisspiel spielen.  Machen Sie es sich doch bitte auf dem Sofa gemütlich und
+        sagen Hey Temi   lass uns etwas spielen. </string>
     <string name="bg_introduction">Gerne würde ich mit Ihnen ein bischen spielen, damit wir feststellen können, ob oder wie gut wir uns verstehen oder uns unterhalten können. Das Spiel heißt alte Sprichwörter erkennen und vervollständigen.
                                     Ich gebe den ersten Teil eines Spruches vor und Sie vollenden ihn. Wenn Sie einen Satz nicht verstanden haben, bitten Sie mich einfach, ihn zu widerholen. Wenn Sie bereit sind sagen Sie ja, wenn ich das Spiel nochmal erklären soll, sagen sie nein. Sind Sie bereit?</string>
     <string name="bg_introduction_short">Kurzfassung: Wenn Sie bereit sind sagen Sie ja Sind Sie bereit?</string>
