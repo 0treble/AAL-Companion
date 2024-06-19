@@ -49,7 +49,7 @@ public class SequenceActivity extends AppCompatActivity {
         button5.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                setResultAndFinish(MainActivity.Sequence.ALEXA_INTERACTION);
+                setResultAndFinish(MainActivity.Sequence.KITCHEN);
             }
         });
 
@@ -57,7 +57,7 @@ public class SequenceActivity extends AppCompatActivity {
         button6.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                setResultAndFinish(MainActivity.Sequence.KITCHEN);
+                setResultAndFinish(MainActivity.Sequence.ALEXA_INTERACTION);
             }
         });
 
