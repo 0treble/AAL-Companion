@@ -86,7 +86,7 @@ public class MainActivity extends AppCompatActivity implements
     private ActivityResultLauncher<Intent> sequenceResultLauncher;
     private ExecutorService myExecutorService;
     private String myAsrResultString = "";
-    enum Sequence {GREETING, SEQUENCE_ALEXA, AAL_SEQUENCE, SEQUENCE_BRAIN_GAME, QUESTIONNAIRE,
+    enum Sequence {UNDEFINED, GREETING, SEQUENCE_ALEXA, AAL_SEQUENCE, SEQUENCE_BRAIN_GAME, QUESTIONNAIRE,
         KITCHEN, ASSISTANCE_QUESTIONAIRE, ALEXA_INTERACTION}
     private Sequence currentSequence;
     int currentSequenceStep = 0;
@@ -165,6 +165,8 @@ public class MainActivity extends AppCompatActivity implements
             if (temi.isSelectedKioskApp()){
                 temi.setKioskModeOn(false);
             }
+            currentSequence = Sequence.UNDEFINED;
+            showTranscription("Debug: currentSewuence = UNDEFINED");
             temi.setGoToSpeed(SpeedLevel.SLOW);
             enable_menu();
         });
@@ -400,7 +402,7 @@ public class MainActivity extends AppCompatActivity implements
             if (commandFound) break;
         }
 
-        if (!commandFound) {
+        if (!commandFound & currentSequence == Sequence.UNDEFINED) {
             handleUndefinedCommand();
         } else {
             chooseCurrentSequence();
@@ -825,7 +827,7 @@ public class MainActivity extends AppCompatActivity implements
 
             case 4:
                 showTranscription("DEGBUG: myAsrResultString = " + myAsrResultString);
-                if(checkRepeatRequest()) {
+                if(!flagRepeatSentenceRequest & checkRepeatRequest()) {
                     currentSequenceStep -= 2;
                     flagRepeatSentenceRequest = true;
                     myAsrResultString = "";
@@ -860,7 +862,7 @@ public class MainActivity extends AppCompatActivity implements
                 break;
             case 6:
                 showTranscription("DEGBUG: InHandle myAsrResultString = " + myAsrResultString);
-                if(checkRepeatRequest()) {
+                if(!flagRepeatSentenceRequest & checkRepeatRequest()) {
                     currentSequenceStep -= 2;
                     flagRepeatSentenceRequest = true;
                     myAsrResultString = "";
@@ -1170,7 +1172,7 @@ public class MainActivity extends AppCompatActivity implements
                 temi.speak(TtsRequest.create(nextString));
                 break;
             case 6:
-                nextString = getString(R.string.aq_thanks) + getString(R.string.ai_introduction);
+                nextString = getString(R.string.aq_thanks) + getString(R.string.ai_introduction_short);
                 flagWaitingForTemiToFinishSpeaking = true;
                 temi.speak(TtsRequest.create(nextString));
                 break;
@@ -1199,8 +1201,9 @@ public class MainActivity extends AppCompatActivity implements
                 }
                 else
                 {
-                    nextSentence = getString(R.string.ai_not_ready) + getString(R.string.ai_introduction);
+                    nextSentence = getString(R.string.ai_not_ready) + getString(R.string.ai_introduction_short);
                 }
+
                 //flagWaitingForTemiToFinishSpeaking = true; // HIER NICHT!!!!
                 temi.speak(TtsRequest.create(nextSentence, false));
                 break;
@@ -1391,6 +1394,8 @@ public class MainActivity extends AppCompatActivity implements
         fillDropdownMenu();
         temi.setHardButtonsDisabled(true);
         temi.setGoToSpeed(SpeedLevel.SLOW);
+        currentSequence = Sequence.UNDEFINED;
+        showTranscription("Debug: currentSequence = UNDEFINED");
     }
 
     public class ContactMapWrapper {

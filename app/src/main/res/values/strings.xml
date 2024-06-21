@@ -83,6 +83,7 @@
         Nehmen Sie doch bitte ihr Glas und sagen Sie  Hey Temi lass uns weitermachen, um ins
         Wohnzimmer zu gehen.
         </string>
+    <string name="ai_introduction_short">Alexa Interaktion Einführung Kurzfassung.Sag Hey temi lass uns weitermachen.</string>
     <string name="ai_ready">Alles klar. Ich bringe sie nun zurück ins Wohnzimmer, sodass sie dort Alexa bitten können, die Rollläden
         zu öffnen oder das Licht einzuschalten.</string>
     <string name="ai_not_ready">Kein Problem. Ich erkläre Alexa erneut. </string>
