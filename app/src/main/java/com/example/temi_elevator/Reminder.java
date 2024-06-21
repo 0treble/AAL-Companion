@@ -1,5 +1,6 @@
 package com.example.temi_elevator;
 
+import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -14,8 +15,8 @@ import java.util.List;
 
 public class Reminder {
 
-    private String message;
-    private long timeInMillis;
+    private final String message;
+    private final long timeInMillis;
 
     public Reminder(String message, long timeInMillis) {
         this.message = message;
@@ -32,9 +33,9 @@ public class Reminder {
 
     public static class ReminderManager {
 
-        private Context context;
-        private AlarmManager alarmManager;
-        private List<Reminder> reminders;
+        private final Context context;
+        private final AlarmManager alarmManager;
+        private final List<Reminder> reminders;
 
         public ReminderManager(Context context) {
             this.context = context;
@@ -42,6 +43,7 @@ public class Reminder {
             this.reminders = new ArrayList<>();
         }
 
+        @SuppressLint("MissingPermission")
         public void setReminder(Reminder reminder) {
             reminders.add(reminder);
             Intent intent = new Intent(context, ReminderReceiver.class);
@@ -56,6 +58,7 @@ public class Reminder {
         @Override
         public void onReceive(Context context, Intent intent) {
             String message = intent.getStringExtra("message");
+            assert message != null;
             Robot.getInstance().speak(TtsRequest.create(message, false));
         }
     }

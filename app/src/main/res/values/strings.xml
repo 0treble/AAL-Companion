@@ -167,12 +167,14 @@
     <string name="endTranscriptionButton">endTranscriptionButton</string>
     <string name="end_transcription">Transkription beenden</string>
     <string name="sequenceButtonText">Sequenz</string>
+    <string name="settingsButtonText">Einstellungen</string>
     <string name="sequence1">Begrüßungssequenz</string>
     <string name="sequence2">Alexa-Sequenz</string>
     <string name="sequence3">AAL-Sequenz</string>
     <string name="sequence4">Gedächtnisspiel</string>
     <string name="sequence5">Küchenrundgang</string>
     <string name="sequence6">Alexa-Interaktion</string>
+    <string name="sequence7">Befragung</string>
 
     <string name="back">Zurück</string>
     <string name="next">Weiter</string>
@@ -183,4 +185,14 @@
     <string name="repeatLastSequenceStep">Schritt wiederholen</string>
     <string name="img_description">WALL-E Bild</string>
     <string name="call">Anrufen</string>
+    <string name="speed">Sprachgeschwindigkeit</string>
+    <string name="pitch">Stimmhöhe</string>
+    <string name="save">Speichern</string>
+    <string name="voice_settings">Spracheinstellungen</string>
+    <string name="female">Weiblich</string>
+    <string name="male">Männlich</string>
+    <string name="unknown">Unbekannt</string>
+    <string name="_0">0</string>
+    <string name="_1_0">1.0</string>
+    <string name="gender">Geschlecht</string>
 </resources>

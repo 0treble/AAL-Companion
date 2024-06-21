@@ -2,72 +2,37 @@ package com.example.temi_elevator;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 import androidx.appcompat.app.AppCompatActivity;
 public class SequenceActivity extends AppCompatActivity {
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.sequence_window);
 
         Button button1 = findViewById(R.id.sequence1Button);
-        button1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setResultAndFinish(MainActivity.Sequence.GREETING);
-            }
-        });
+        button1.setOnClickListener(v -> setResultAndFinish(MainActivity.Sequence.GREETING));
 
         Button button2 = findViewById(R.id.sequence2Button);
-        button2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setResultAndFinish(MainActivity.Sequence.SEQUENCE_ALEXA);
-            }
-        });
+        button2.setOnClickListener(v -> setResultAndFinish(MainActivity.Sequence.SEQUENCE_ALEXA));
 
         Button button3 = findViewById(R.id.sequence3Button);
-        button3.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setResultAndFinish(MainActivity.Sequence.AAL_SEQUENCE);
-            }
-        });
+        button3.setOnClickListener(v -> setResultAndFinish(MainActivity.Sequence.AAL_SEQUENCE));
 
         Button button4 = findViewById(R.id.sequence4Button);
-        button4.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setResultAndFinish(MainActivity.Sequence.SEQUENCE_BRAIN_GAME);
-            }
-        });
+        button4.setOnClickListener(v -> setResultAndFinish(MainActivity.Sequence.SEQUENCE_BRAIN_GAME));
 
         Button button5 = findViewById(R.id.sequence5Button);
-        button5.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setResultAndFinish(MainActivity.Sequence.KITCHEN);
-            }
-        });
+        button5.setOnClickListener(v -> setResultAndFinish(MainActivity.Sequence.KITCHEN));
 
         Button button6 = findViewById(R.id.sequence6Button);
-        button6.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setResultAndFinish(MainActivity.Sequence.ALEXA_INTERACTION);
-            }
-        });
+        button6.setOnClickListener(v -> setResultAndFinish(MainActivity.Sequence.ALEXA_INTERACTION));
+
+        Button button7 = findViewById(R.id.sequence7Button);
+        button7.setOnClickListener(v -> setResultAndFinish(MainActivity.Sequence.QUESTIONNAIRE));
 
         Button backButton = findViewById(R.id.backButton);
-        backButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+        backButton.setOnClickListener(v -> finish());
     }
     private void setResultAndFinish(MainActivity.Sequence sequenceType) {
         Intent resultIntent = new Intent();

@@ -1,16 +1,27 @@
 <!-- sequence_window.xml -->
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/linearLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?attr/colorSurface">
 
     <Button
+        android:id="@+id/sequence7Button"
+        android:layout_width="600dp"
+        android:layout_height="100dp"
+        android:layout_marginBottom="112dp"
+        android:backgroundTint="?attr/colorPrimary"
+        android:text="@string/sequence7"
+        android:textColor="?attr/colorOnPrimary"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/sequence3Button" />
+
+    <Button
         android:id="@+id/sequence4Button"
         android:layout_width="600dp"
-        android:layout_height="150dp"
+        android:layout_height="100dp"
         android:layout_marginEnd="4dp"
         android:backgroundTint="?attr/colorPrimary"
         android:text="@string/sequence4"
@@ -26,7 +37,8 @@
     <Button
         android:id="@+id/sequence6Button"
         android:layout_width="600dp"
-        android:layout_height="150dp"
+        android:layout_height="100dp"
+        android:layout_marginTop="48dp"
         android:backgroundTint="?attr/colorPrimary"
         android:text="@string/sequence6"
         android:textColor="?attr/colorOnPrimary"
@@ -34,12 +46,12 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="@+id/sequence3Button"
         app:layout_constraintTop_toBottomOf="@+id/sequence3Button"
-        app:layout_constraintVertical_bias="0.413" />
+        app:layout_constraintVertical_bias="0.0" />
 
     <Button
         android:id="@+id/sequence5Button"
         android:layout_width="600dp"
-        android:layout_height="150dp"
+        android:layout_height="100dp"
         android:backgroundTint="?attr/colorPrimary"
         android:text="@string/sequence5"
         android:textColor="?attr/colorOnPrimary"
@@ -54,7 +66,7 @@
     <Button
         android:id="@+id/sequence1Button"
         android:layout_width="600dp"
-        android:layout_height="150dp"
+        android:layout_height="100dp"
         android:layout_marginTop="16dp"
         android:backgroundTint="?attr/colorPrimary"
         android:text="@string/sequence1"
@@ -68,7 +80,7 @@
     <Button
         android:id="@+id/sequence2Button"
         android:layout_width="600dp"
-        android:layout_height="150dp"
+        android:layout_height="100dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="28dp"
         android:backgroundTint="?attr/colorPrimary"
@@ -83,7 +95,7 @@
     <Button
         android:id="@+id/sequence3Button"
         android:layout_width="600dp"
-        android:layout_height="150dp"
+        android:layout_height="100dp"
         android:layout_marginTop="48dp"
         android:backgroundTint="?attr/colorPrimary"
         android:text="@string/sequence3"

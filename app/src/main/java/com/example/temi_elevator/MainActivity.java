@@ -29,6 +29,7 @@ import com.robotemi.sdk.Robot;
 import com.robotemi.sdk.SttLanguage;
 import com.robotemi.sdk.TtsRequest;
 import com.robotemi.sdk.UserInfo;
+import com.robotemi.sdk.constants.Gender;
 import com.robotemi.sdk.constants.Page;
 import com.robotemi.sdk.constants.Platform;
 import com.robotemi.sdk.listeners.OnConversationStatusChangedListener;
@@ -40,6 +41,7 @@ import com.robotemi.sdk.model.CallEventModel;
 import com.robotemi.sdk.navigation.model.SpeedLevel;
 import com.robotemi.sdk.telepresence.CallState;
 import com.robotemi.sdk.telepresence.Participant;
+import com.robotemi.sdk.voice.model.TtsVoice;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -84,6 +86,7 @@ public class MainActivity extends AppCompatActivity implements
     private TextView transcription;
     private ScrollView scrollView;
     private ActivityResultLauncher<Intent> sequenceResultLauncher;
+    private ActivityResultLauncher<Intent> settingsResultLauncher;
     private ExecutorService myExecutorService;
     private String myAsrResultString = "";
     enum Sequence {UNDEFINED, GREETING, SEQUENCE_ALEXA, AAL_SEQUENCE, SEQUENCE_BRAIN_GAME, QUESTIONNAIRE,
@@ -166,12 +169,10 @@ public class MainActivity extends AppCompatActivity implements
                 temi.setKioskModeOn(false);
             }
             currentSequence = Sequence.UNDEFINED;
-            showTranscription("Debug: currentSewuence = UNDEFINED");
+            showTranscription("Debug: currentSequence = UNDEFINED");
             temi.setGoToSpeed(SpeedLevel.SLOW);
             enable_menu();
         });
-
-
 
         /* Sequence Window Launcher*/
         findViewById(R.id.sequenceWindowButton).setOnClickListener(view -> {
@@ -188,6 +189,34 @@ public class MainActivity extends AppCompatActivity implements
                             currentSequence = Sequence.valueOf(sequenceTypeName);
                             currentSequenceStep = 0;
                             chooseCurrentSequence();
+                        }
+                    }
+                }
+        );
+
+        /* Settings Window Launcher*/
+        findViewById(R.id.settingsButton).setOnClickListener(view -> {
+            Intent intent = new Intent(MainActivity.this, Settings.class);
+            settingsResultLauncher.launch(intent);
+        });
+
+        settingsResultLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                        float speed = result.getData().getFloatExtra("SPEED", 0.5f);
+                        int pitch = result.getData().getIntExtra("PITCH", 0);
+                        Gender gender = Gender.valueOf(result.getData().getStringExtra("GENDER"));
+
+                        TtsVoice ttsVoice = new TtsVoice(gender, speed, pitch);
+
+                        showTranscription("Voice set to: " + ttsVoice);
+
+                        boolean isVoiceSet = temi.setTtsVoice(ttsVoice);
+                        if (isVoiceSet) {
+                            Log.i("MainActivity", "TTS voice settings updated successfully.");
+                        } else {
+                            Log.e("MainActivity", "Failed to update TTS voice settings.");
                         }
                     }
                 }
@@ -504,15 +533,6 @@ public class MainActivity extends AppCompatActivity implements
                 temi.speak(TtsRequest.create(nextSentence, false));
                 // step increment done by the onTtsStatusChanged() when temi finished speaking previous string
                 /// so that the next task is started AFTER arriving at destination
-                /*
-                waitHandler.postDelayed(() -> {
-                    if (this.waitingForFinish) {
-
-                        temi.speak(TtsRequest.create(nextSentence, false));
-                        // step increment done by the onTtsStatusChanged() when temi finished speaking previous string
-                    }
-                }, 5000);
-                */
 
                 break;
             case 2:
@@ -1061,7 +1081,7 @@ public class MainActivity extends AppCompatActivity implements
 
     private void handleSequenceKitchen()
     {
-        String nextSentence = "";
+        String nextSentence;
         switch(currentSequenceStep)
         {
             case 0:                                                     // this is the corresponding voice command
@@ -1133,7 +1153,7 @@ public class MainActivity extends AppCompatActivity implements
 
     private void handleSequenceAssistanceQuestionaire()
     {
-        String nextString = "";
+        String nextString;
         switch (currentSequenceStep)
         {
             case 0:
@@ -1191,7 +1211,7 @@ public class MainActivity extends AppCompatActivity implements
     private void handleSequenceAlexaInteraction()
     {
         showTranscription("DEBUG: In der handleAlexaSequence");
-        String nextSentence = "";
+        String nextSentence;
         switch(currentSequenceStep) {
             case 0:
                 if (checkForContinueNextSequence()) {
@@ -1310,8 +1330,6 @@ public class MainActivity extends AppCompatActivity implements
 
     public void logToFile(String logMessage) {
         if (logFile != null) {
-            //String timestamp = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
-            //String logEntry = timestamp + " - " + logMessage;
             try (FileWriter writer = new FileWriter(logFile, true)) {
                 writer.append(logMessage).append("\n");
             } catch (IOException e) {
@@ -1398,7 +1416,7 @@ public class MainActivity extends AppCompatActivity implements
         showTranscription("Debug: currentSequence = UNDEFINED");
     }
 
-    public class ContactMapWrapper {
+    public static class ContactMapWrapper {
         private final Map<String, UserInfo> contactMap;
 
         public ContactMapWrapper(Map<String, UserInfo> contactMap) {
@@ -1419,10 +1437,6 @@ public class MainActivity extends AppCompatActivity implements
     private void fillDropdownMenu() {
         try {
             List<UserInfo> allContacts = temi.getAllContact();
-            if (allContacts == null) {
-                showTranscription("All contacts are null");
-                return;
-            }
 
             // Combine and remove duplicates
             Set<UserInfo> contactSet = new HashSet<>(allContacts);
@@ -1435,7 +1449,7 @@ public class MainActivity extends AppCompatActivity implements
             List<String> contactNames = new ArrayList<>();
 
             for (UserInfo userInfo : contactList) {
-                if (userInfo != null && userInfo.getName() != null) {
+                if (userInfo != null) {
                     contactNames.add(userInfo.getName());
                     contactMap.put(userInfo.getName(), userInfo);
                     showTranscription("Contact added: " + userInfo.getName());
@@ -1443,11 +1457,6 @@ public class MainActivity extends AppCompatActivity implements
                     showTranscription("Skipped null user or user with null name");
                 }
             }
-        /*
-        // Log the contact list for transcription
-        for (UserInfo userInfo : contactList) {
-            showTranscription("Contact: " + userInfo.getName() + " : " + userInfo.getUserId() + " : " + userInfo.getRole());
-        }*/
         /*  Contact: Mario : 638fb4837f2a4210c3313a5c89be0747 : 0
             Contact: sander991 : 5ecc126841b0af8f6cc72feadc090fa3 : 1
             Contact: Hristo : 58c5f1e537525756a295857c7bce8e91 : 1
@@ -1479,24 +1488,11 @@ public class MainActivity extends AppCompatActivity implements
             Log.i("Telepresence", "CallState " + callState + ", " + callState.getLowLightMode());
         }
     };
-    /*
-        public void onTelepresenceStatusChanged(CallState callState) {
-            Log.i("Telepresence", "CallState " + callState + ", " + callState.getLowLightMode());
-        }
-    */
+
     @Override
     public void onTelepresenceEventChanged(@NotNull CallEventModel callEventModel) {
         Log.i("Telepresence", "Call Event: " + callEventModel);
     }
-
-    /*private void startTelepresenceToCenter() {
-        UserInfo target = temi.getAdminInfo();
-        if (target == null) {
-            showTranscription("target is null.");
-            return;
-        }
-        temi.startTelepresence(target.getName(), target.getUserId(), Platform.TEMI_CENTER);
-    }*/
 
     private void startVideoMeeting(UserInfo target) {
         //target.getUserId() for Hristo: "58c5f1e537525756a295857c7bce8e91"
@@ -1515,18 +1511,6 @@ public class MainActivity extends AppCompatActivity implements
         String resp = temi.startMeeting(participants, true, false);
         showTranscription("startMeeting result :" + resp);
     }
-
-/*
-    private void joinMeeting(String meetingLink) {
-        LinkBasedMeeting meeting = new LinkBasedMeeting(
-                meetingLink,
-                "YOUR_MEETING_ID", // Replace with actual meeting ID
-                "YOUR_MEETING_PASSWORD", // Replace with actual meeting password
-                "YOUR_DISPLAY_NAME", // Replace with display name
-                "YOUR_EMAIL" // Replace with email
-        );
-        temi.joinMeeting(meeting);
-    }*/
 
     /* Videocall end */
 
@@ -1596,40 +1580,6 @@ public class MainActivity extends AppCompatActivity implements
             }, 60000);
         });
     }
-/*
-    // confirming the destination choice
-    @SuppressLint("SetTextI18n")
-    private void confirm() {
-        //hideModeElements();
-        List<String> locationList = temi.getLocations();
-        if (locationList.contains(contact)) {
-            //temi.goTo(destination);
-            this.showArrivedMessage();
-
-            waitHandler.postDelayed(() -> {
-                if (this.waitingForFinish) {
-                    reset();
-                }
-            }, 60000);
-
-            this.waitingForFinish = true;
-        } else {
-            temi.goTo("home base");
-
-            this.waitingForFloor = true;
-            TextView textView = findViewById(R.id.elevatorTextView);
-            textView.setVisibility(View.VISIBLE);
-            textView.setText("Warten auf Stockwerk...");
-
-            // If no floor is received reset after 60 seconds
-            waitHandler.postDelayed(() -> {
-                if (this.waitingForFloor) {
-                    Log.w(TAG, "No Floor was received");
-                    reset();
-                }
-            }, 60000);
-        }
-    }*/
 
     // tells the initial temi to reset and resets itself when the user arrives at the destination
     public void arrived() {
@@ -1662,7 +1612,8 @@ public class MainActivity extends AppCompatActivity implements
             confirmYesButton.setVisibility(View.VISIBLE);
         });
     }
-/*
+/*  plan is to take this function and repurpose it for relocateTemi
+
     public void addLocations(String[] locations) {
         validLocations.addAll(Arrays.asList(locations));
 

@@ -46,6 +46,8 @@
 
         <activity android:name=".SequenceActivity" />
 
+        <activity android:name=".Settings" />
+
         <meta-data
             android:name="com.robotemi.sdk.metadata.SKILL"
             android:value="@string/app_name"/>
@@ -68,6 +70,10 @@
 
         <meta-data
             android:name="com.robotemi.sdk.metadata.OVERRIDE_NLU"
+            android:value="true"/>
+
+        <meta-data
+            android:name="com.robotemi.sdk.metadata.METADATA_OVERRIDE_TTS"
             android:value="true"/>
 
         <meta-data
