@@ -29,9 +29,8 @@
         Sturzsensoren, um immer ein Auge darauf zu haben, dass es Ihnen noch gut geht.
         Im Verlauf dieser Untersuchung haben wir
         einige Szenarien vorbereitet, in denen sie meine Fähigkeiten kennenlernen können.
-        Sie können die nächste Aktion starten, indem sie sagen,
-        Hey Temi lass uns weitermachen.
-        In einem ersten Schritt möchte ich Ihnen eine kleine Führung durch unsere AAL Wohnung geben
+        Damit wir uns gut verstehen, ist es wichtig, dass sie mich immer aussprechen lassen.
+        In einem ersten Schritt möchte ich Ihnen eine kleine Führung durch unsere Musterwohnung geben
         und ihnen dabei einige Besonderheiten erklären. Dazu würde ich Sie zunächst einmal in
         die Küche führen. Wenn sie bereit sind, mir in die Küche zu folgen, sagen Sie einfach
         Hey Temi lass uns weitermachen.</string>
@@ -145,11 +144,11 @@
     <string name="bg_sentence4">Der nächste Satz lautet: Wenn ein Freund weggeht, muss man die Türe schließen, sonst … </string>
     <string name="bg_sentence5">Nun noch ein letzter Satz: Dienst ist Dienst und …</string>
 
-    <string name="bg_sentence1_correct">Die richtige Anwort lautet: Besser den Spatz in der Hand, als die Taube auf dem Dach.</string>
-    <string name="bg_sentence2_correct">Die richtige Anwort lautet: Eine Schwalbe macht noch keinen Sommer.</string>
-    <string name="bg_sentence3_correct">Die richtige Anwort lautet: Alter schützt vor Torheit nicht.</string>
-    <string name="bg_sentence4_correct">Die richtige Anwort lautet: Wenn ein Freund weggeht, muss man die Türe schließen, sonst wird es kalt.</string>
-    <string name="bg_sentence5_correct">Die richtige Anwort lautet: Dienst ist Dienst und Schnaps ist Schnaps.</string>
+    <string name="bg_sentence1_correct">Die richtige Antwort lautet: Besser den Spatz in der Hand, als die Taube auf dem Dach.</string>
+    <string name="bg_sentence2_correct">Die richtige Antwort lautet: Eine Schwalbe macht noch keinen Sommer.</string>
+    <string name="bg_sentence3_correct">Die richtige Antwort lautet: Alter schützt vor Torheit nicht.</string>
+    <string name="bg_sentence4_correct">Die richtige Antwort lautet: Wenn ein Freund weggeht, muss man die Türe schließen, sonst wird es kalt.</string>
+    <string name="bg_sentence5_correct">Die richtige Antwort lautet: Dienst ist Dienst und Schnaps ist Schnaps.</string>
     <string name="bg_finish_question"   >Vielen Dank. Mir hat es viel Spaß gemacht mit Ihnen zu spielen. Hat es dir auch gefallen?</string>
     <string name="bg_finish_answer_positive">Das freut mich sehr.</string>
     <string name="bg_finish_answer_negative">Dann müssen meine Entwickler wohl noch etwas nachbessern!</string>
