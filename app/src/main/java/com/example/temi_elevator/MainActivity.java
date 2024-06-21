@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
-import android.hardware.usb.UsbRequest;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -88,7 +87,7 @@ public class MainActivity extends AppCompatActivity implements
     private ExecutorService myExecutorService;
     private String myAsrResultString = "";
     enum Sequence {GREETING, SEQUENCE_ALEXA, AAL_SEQUENCE, SEQUENCE_BRAIN_GAME, QUESTIONNAIRE,
-                    KITCHEN, ASSISTANCE_QUESTIONAIRE, ALEXA_INTERACTION}
+        KITCHEN, ASSISTANCE_QUESTIONAIRE, ALEXA_INTERACTION}
     private Sequence currentSequence;
     int currentSequenceStep = 0;
     private boolean flagWaitingForTemiToArrive = false;
@@ -379,20 +378,33 @@ public class MainActivity extends AppCompatActivity implements
         });
     }
 
+    private void handleUndefinedCommand() {
+        String undefinedCommandMessage = "Entschuldige, ich habe das nicht verstanden.";
+        showTranscription(undefinedCommandMessage);
+        temi.speak(TtsRequest.create(undefinedCommandMessage, false));
+    }
+
     public void analyzeVoiceCommand() {
 
         myAsrResultString = myAsrResultString.toLowerCase();
 
+        boolean commandFound = false;
         for (Map.Entry<String[], CommandAction> entry : commandsMap.entrySet()) {
             for (String command : entry.getKey()) {
                 if (myAsrResultString.contains(command)) {
                     entry.getValue().execute(myAsrResultString);
-                    return;
+                    commandFound = true;
+                    break;
                 }
             }
+            if (commandFound) break;
         }
 
-        chooseCurrentSequence();
+        if (!commandFound) {
+            handleUndefinedCommand();
+        } else {
+            chooseCurrentSequence();
+        }
     }
 
     public void stopCurrentSequence()
@@ -552,12 +564,12 @@ public class MainActivity extends AppCompatActivity implements
                 break;
             case 2: case 4: case 6: case 8: case 10: case 12: case 14:
             case 16: case 18: case 20: case 22: case 24: case 26: case 28:
-                flagWaitingForUserResponse = true;
-                temi.wakeup(Collections.singletonList(SttLanguage.SYSTEM));
-                findViewById(R.id.isRecordingImg).setVisibility(View.VISIBLE);
+            flagWaitingForUserResponse = true;
+            temi.wakeup(Collections.singletonList(SttLanguage.SYSTEM));
+            findViewById(R.id.isRecordingImg).setVisibility(View.VISIBLE);
 
-                currentSequenceStep++;
-                break;
+            currentSequenceStep++;
+            break;
             case 3:
                 askSurveyQuestion(R.string.survey_question_3);
                 break;
@@ -1090,7 +1102,7 @@ public class MainActivity extends AppCompatActivity implements
 
 
 
-                    nextSentence += getString(R.string.aq_introduction);
+                nextSentence += getString(R.string.aq_introduction);
 
                 flagWaitingForTemiToFinishSpeaking = true; // HIER NICHT!!!!
                 temi.speak(TtsRequest.create(nextSentence, false));
@@ -1462,11 +1474,11 @@ public class MainActivity extends AppCompatActivity implements
             Log.i("Telepresence", "CallState " + callState + ", " + callState.getLowLightMode());
         }
     };
-/*
-    public void onTelepresenceStatusChanged(CallState callState) {
-        Log.i("Telepresence", "CallState " + callState + ", " + callState.getLowLightMode());
-    }
-*/
+    /*
+        public void onTelepresenceStatusChanged(CallState callState) {
+            Log.i("Telepresence", "CallState " + callState + ", " + callState.getLowLightMode());
+        }
+    */
     @Override
     public void onTelepresenceEventChanged(@NotNull CallEventModel callEventModel) {
         Log.i("Telepresence", "Call Event: " + callEventModel);
