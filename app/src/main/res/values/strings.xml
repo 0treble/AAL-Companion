@@ -88,7 +88,7 @@
         zu öffnen oder das Licht einzuschalten.</string>
     <string name="ai_not_ready">Kein Problem. Ich erkläre Alexa erneut. </string>
     <string name="ai_ready_livingroom">Da wären wir. Die Sprachassistenz, deren Name ich jetzt nicht nennen kann, befinet sich rechts auf der Kommode.
-        Wenn sie fertig mit der Bedienung der Rolläden und des Lichtes sind, sagen Sie einfach  Hey Temi lass uns weitermachen. Dann übernehme ich wieder. </string>
+        Wenn sie fertig mit der Bedienung der Rollläden und des Lichtes sind, übernehme ich wieder. Sagen Sie dazu einfach  Hey temi lass uns weitermachen.  </string>
     <string name="ai_finished">Alles klar. Ich hoffe die Interaktion mit alexa hat funktioniert. </string>
     <string name="ai_not_understood">Entschuldigung das habe ich wohl nicht korrekt verstanden. Wenn Sie fertig sind mit Alexa, sagen Sie
          Hey Temi   ich bin fertig mit Alexa oder  Hey Temi  lass uns weitermachen. </string>
@@ -156,6 +156,19 @@
     <string name="bg_answer_correct">Das war richtig! Super!</string>
     <string name="bg_dont_know_answer">Kein Problem. </string>
     <string name="bg_sorry_wrong">Entschuldige, das habe ich wohl nicht korrekt verstanden. </string>
+
+    <!-- ViviInteraction Sequence String -->
+    <string name="vi_transition">Im nächsten Schritt würde ich Ihnen gerne ein weiteres Sprachassistenzsystem vorstellen, welches hier in der A A L Musterwohung eingerichtet ist.
+        Wenn Sie aber zunächst eine kurze Pause machen möchten, um vielleicht noch etwas zu trinken ist das auch kein Problem. Wenn Sie beriet sind weiterzumachen sagen Sie
+        einfach  Hey Temi lass uns weitermachen. </string>
+    <string name="vi_vivi_introduction_short">Kurzfassung vivi vorstellung.</string>
+    <string name="vi_vivi_introduction">Alles klar. Dann machen wir mal weiter. Hier links auf der Kommode sehen Sie das Assistenzsystem VivaiCare. Dabei handelt es sich um
+        ein stationäres Assistenzsystem, mit dem Sie genauso wie mit mir, durch Ansprechen interagieren können. Sie hört auf den Namen Vivi. Jetzt können Sie selbst versuchen,
+        sich mit Vivi zu unterhalten. zum Beispiel können sie Vivi sagen,  ich möchte mit dem Märchenonkel sprechen um gemeinsam mit vivi ein Geschichte zu spinnen. Alternativ
+        können sie vivi auch auffordern, mit Ihnen ein Quiz zu spielen. Probieren Sie es doch einfach einmal aus und vergessen Sie nicht den richtigen Ansprechnamen für Vivi.
+        Ich werde solange an der Wand warten. Wenn Sie fertig sind mit Vivi oder keine Lust mehr haben, werde ich wieder übernehmen. Sagen Sie dazu einfach Hey temi lass uns weitermachen.</string>
+    <string name="vi_not_understood">Entschuldigung das habe ich wohl nicht korrekt verstanden. Wenn Sie mit Vivi fertig sind, sagen Sie Hey Temi lass uns weitermachen.</string>
+    <string name="vi_finised">Alles klar. ich hoffe die Interaktion mit Vivi hat gut funktioniert. Dann machen wir mal weiter mit der Untersuchung.</string>
 
     <!-- Button Label Strings -->
     <string name="take_photo">Transport Modus</string>

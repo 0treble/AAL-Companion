@@ -62,6 +62,8 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import kotlin.sequences.Sequence;
+
 public class MainActivity extends AppCompatActivity implements
         OnRobotReadyListener,
         Robot.AsrListener,
@@ -90,7 +92,7 @@ public class MainActivity extends AppCompatActivity implements
     private ExecutorService myExecutorService;
     private String myAsrResultString = "";
     enum Sequence {UNDEFINED, GREETING, SEQUENCE_ALEXA, AAL_SEQUENCE, SEQUENCE_BRAIN_GAME, QUESTIONNAIRE,
-        KITCHEN, ASSISTANCE_QUESTIONAIRE, ALEXA_INTERACTION}
+        KITCHEN, ASSISTANCE_QUESTIONAIRE, ALEXA_INTERACTION, VIVI_INTERACTION}
     private Sequence currentSequence;
     int currentSequenceStep = 0;
     private boolean flagWaitingForTemiToArrive = false;
@@ -169,7 +171,8 @@ public class MainActivity extends AppCompatActivity implements
                 temi.setKioskModeOn(false);
             }
             currentSequence = Sequence.UNDEFINED;
-            showTranscription("Debug: currentSequence = UNDEFINED");
+            currentSequenceStep = 0;
+            showTranscription("Debug: currentSequence = UNDEFINED and currentSeqStep = 0");
             temi.setGoToSpeed(SpeedLevel.SLOW);
             enable_menu();
         });
@@ -407,6 +410,11 @@ public class MainActivity extends AppCompatActivity implements
             currentSequenceStep = 0;
             chooseCurrentSequence();
         });
+        commandsMap.put(new String[]{"sequenz vivi", "sequenz vivaicare", "sequenz stationäres assistenzsystem" }, command -> {
+            currentSequence = Sequence.VIVI_INTERACTION;
+            currentSequenceStep = 0;
+            chooseCurrentSequence();
+        });
     }
 
     private void handleUndefinedCommand() {
@@ -490,6 +498,11 @@ public class MainActivity extends AppCompatActivity implements
                 scrollToBottom();
                 showFace();
                 handleSequenceAlexaInteraction();
+                break;
+            case VIVI_INTERACTION:
+                scrollToBottom();
+                showFace();
+                handleSequenceViviInteraction();
                 break;
             default:
                 showTranscription("Error default in switch(currentsequence)");
@@ -1050,6 +1063,7 @@ public class MainActivity extends AppCompatActivity implements
                     nextSentence = getString(R.string.bg_finish_answer_negative);
                     // step/case incremeted by the statusChange of tts
                 }
+                nextSentence += getString(R.string.vi_transition);
 
                 flagWaitingForTemiToFinishSpeaking = true;
                 temi.speak(TtsRequest.create(nextSentence, false));
@@ -1058,6 +1072,7 @@ public class MainActivity extends AppCompatActivity implements
             case 16:
                 // Sequence-End
                 flagRepeatSentenceRequest = false;
+                currentSequence = Sequence.VIVI_INTERACTION;
                 currentSequenceStep = 0;
 
             default:
@@ -1256,6 +1271,42 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
+    private void handleSequenceViviInteraction()
+    {
+        String nextSentence = "";
+        switch(currentSequenceStep)
+        {
+            case 0:
+                temi.goTo("wohnzimmer");
+                nextSentence = getString(R.string.vi_vivi_introduction);
+                //flagWaitingForTemiToFinishSpeaking = true;
+                temi.speak(TtsRequest.create(nextSentence));
+                currentSequenceStep++;
+                // now user is talking to Vivi...
+                break;
+            case 1:
+                if(checkForContinueNextSequence())
+                {
+                    nextSentence = getString(R.string.vi_finised);
+                    flagWaitingForTemiToFinishSpeaking = true;
+                }
+                else
+                {
+                    nextSentence = getString(R.string.vi_not_understood);
+
+                }
+                temi.speak(TtsRequest.create(nextSentence));
+                // flag set only in if-case
+                break;
+            case 2:
+                currentSequence = Sequence.UNDEFINED;
+                currentSequenceStep = 0;
+                break;
+            default:
+                showTranscription("Debug: in default der handleSequenceViviInteraction!");
+                break;
+        }
+    }
 
 
     public void relocateTemi()
