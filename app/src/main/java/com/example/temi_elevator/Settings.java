@@ -98,7 +98,7 @@ public class Settings extends AppCompatActivity {
             speedSeekBar.setProgress(speedProgress);
             pitchSeekBar.setProgress(pitchProgress);
 
-            speedValue.setText(String.valueOf(((TtsVoice) ttsVoice).getSpeed()));
+            speedValue.setText(String.valueOf(ttsVoice.getSpeed()));
             pitchValue.setText(String.valueOf(ttsVoice.getPitch()));
         }
     }

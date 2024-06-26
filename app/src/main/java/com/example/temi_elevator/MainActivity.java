@@ -1,6 +1,6 @@
 package com.example.temi_elevator;
 
-import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
@@ -11,7 +11,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -20,9 +19,11 @@ import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
+import android.graphics.drawable.Drawable;
+
+import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.robotemi.sdk.Robot;
@@ -62,8 +63,6 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import kotlin.sequences.Sequence;
-
 public class MainActivity extends AppCompatActivity implements
         OnRobotReadyListener,
         Robot.AsrListener,
@@ -75,14 +74,9 @@ public class MainActivity extends AppCompatActivity implements
     // Member variables
     private final String TAG = "MainActivity";
     private UserInfo contact;
-    private int destinationFloor = -1; // is used to reset when temi on destination Floor arrives
     private String newDest = ""; // is used to save a destination from MQTT
-    @SuppressLint("StaticFieldLeak")
-    private static MainActivity instance;
     private final Robot temi = Robot.getInstance();
     private final List<UserInfo> validContacts = new ArrayList<>();
-    private boolean waitingForFloor = false;
-    private boolean waitingForReset = false;
     private boolean waitingForFinish = false;
     private final Handler waitHandler = new Handler();
     private TextView transcription;
@@ -128,7 +122,6 @@ public class MainActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        instance = this;
         setupVideoCall();
 
         myExecutorService = Executors.newSingleThreadExecutor();
@@ -170,11 +163,9 @@ public class MainActivity extends AppCompatActivity implements
             if (temi.isSelectedKioskApp()){
                 temi.setKioskModeOn(false);
             }
-            currentSequence = Sequence.UNDEFINED;
-            currentSequenceStep = 0;
-            showTranscription("Debug: currentSequence = UNDEFINED and currentSeqStep = 0");
+
             temi.setGoToSpeed(SpeedLevel.SLOW);
-            enable_menu();
+            temi.startPage(Page.HOME);
         });
 
         /* Sequence Window Launcher*/
@@ -200,6 +191,7 @@ public class MainActivity extends AppCompatActivity implements
         /* Settings Window Launcher*/
         findViewById(R.id.settingsButton).setOnClickListener(view -> {
             Intent intent = new Intent(MainActivity.this, Settings.class);
+
             settingsResultLauncher.launch(intent);
         });
 
@@ -262,6 +254,36 @@ public class MainActivity extends AppCompatActivity implements
     {
         findViewById(R.id.overlay_image).setVisibility(View.VISIBLE);
         findViewById(R.id.img_close_button).setVisibility(View.VISIBLE);
+    }
+
+    private void displayImageForSeconds(int milliseconds) {
+        // Create a dialog with an ImageView to show the image
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        ImageView imageView = new ImageView(this);
+
+        // Load the image into the ImageView
+        Drawable drawable = getResources().getDrawable(R.drawable.alexa_commands_preview);
+        imageView.setImageDrawable(drawable);
+
+        // Set the ImageView as the view for the dialog
+        builder.setView(imageView);
+
+        // Create the AlertDialog
+        final AlertDialog dialog = builder.create();
+
+        // Show the dialog
+        dialog.show();
+
+        // Schedule a handler to dismiss the dialog after a delay
+        Handler handler = new Handler();
+        handler.postDelayed(() -> {
+            if (dialog.isShowing()) {
+                dialog.dismiss();
+            }
+        }, milliseconds); // milliseconds is the duration to display the image
+
+        // Optionally, you can add a listener to dismiss the dialog on touch outside
+        dialog.setCanceledOnTouchOutside(true);
     }
 
     private void setupThemeButton() {
@@ -451,7 +473,7 @@ public class MainActivity extends AppCompatActivity implements
         temi.stopMovement();
         temi.cancelAllTtsRequests();
         currentSequenceStep = 0;
-        currentSequence = null;
+        currentSequence = Sequence.UNDEFINED;
     }
 
     //Handles result from voice commands and SequenceActivity.java click result
@@ -505,7 +527,7 @@ public class MainActivity extends AppCompatActivity implements
                 handleSequenceViviInteraction();
                 break;
             default:
-                showTranscription("Error default in switch(currentsequence)");
+                showTranscription("Error: No sequence chosen.");
                 break;
         }
 
@@ -1250,6 +1272,7 @@ public class MainActivity extends AppCompatActivity implements
             case 2:
                 nextSentence = getString(R.string.ai_ready_livingroom);
                 temi.speak(TtsRequest.create(nextSentence));
+                displayImageForSeconds(10000);
                 currentSequenceStep++;
                 break;
             case 3:
@@ -1273,7 +1296,7 @@ public class MainActivity extends AppCompatActivity implements
 
     private void handleSequenceViviInteraction()
     {
-        String nextSentence = "";
+        String nextSentence;
         switch(currentSequenceStep)
         {
             case 0:
@@ -1614,29 +1637,10 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-    @SuppressLint("SetTextI18n")
-    public void receivedFloor(int number) {
-        runOnUiThread(() -> {
-            TextView textView = findViewById(R.id.elevatorTextView);
-            textView.setText("Der Raum befindet sich auf dem Stockwerk: " + number);
-            this.waitingForFloor = false;
-            this.waitingForReset = true;
-
-            // If nothing happens after 1 min go home anyways
-            waitHandler.postDelayed(() -> {
-                if (this.waitingForFinish) {
-                    Log.w(TAG, "no button was pressed");
-                    reset();
-                }
-            }, 60000);
-        });
-    }
-
     // tells the initial temi to reset and resets itself when the user arrives at the destination
     public void arrived() {
         if (!this.waitingForFinish) {
             temi.goTo(newDest);
-            //String msg = "{\"status\":\"arrived\",\"floor\":\"" + this.myfloorNumber + "\"}";
             this.waitingForFinish = true;
 
             this.showArrivedMessage();
@@ -1685,36 +1689,9 @@ public class MainActivity extends AppCompatActivity implements
         runOnUiThread(this::fillDropdownMenu);
     }*/
 
-    public static MainActivity getInstance() {
-        return instance;
-    }
-
-    public Robot getTemi() {
-        return temi;
-    }
-
-    public int getMyfloorNumber() {
-        return 0;
-    }
-
-    public int getDestinationFloor() {
-        return this.destinationFloor;
-    }
-
-    public boolean isWaitingForFloor() {
-        return waitingForFloor;
-    }
-
-    public boolean isWaitingForReset() {
-        return waitingForReset;
-    }
-
     public void reset() {
         temi.goTo("home base");
-        this.destinationFloor = -1;
-        this.waitingForFloor = false;
         this.waitingForFinish = false;
-        this.waitingForReset = false;
         this.newDest = "";
         runOnUiThread(() -> {
             TextView confirmTextView = findViewById(R.id.confirmTextView);
@@ -1733,10 +1710,6 @@ public class MainActivity extends AppCompatActivity implements
             textView.setVisibility(View.VISIBLE);
         });
     }
-
-    public void setDestinationFloor(int destinationFloor) {
-        this.destinationFloor = destinationFloor;
-    }
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -1748,23 +1721,6 @@ public class MainActivity extends AppCompatActivity implements
         super.onRestoreInstanceState(savedInstanceState);
         String transcript = savedInstanceState.getString("transcript");
         transcription.setText(transcript);
-    }
-
-    private void enable_menu() {
-        temi.startPage(Page.HOME);
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Enter a Number");
-        final EditText input = new EditText(this);
-        builder.setView(input);
-        builder.setPositiveButton("Go to Home", (dialog, which) -> {
-            try {
-                temi.startPage(Page.HOME);
-            } catch (NumberFormatException e) {
-                Log.i(TAG, "not a valid number");
-            }
-        });
-        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
     }
 
     @Override
@@ -1782,8 +1738,6 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
-        instance = null;
 
         if (myExecutorService != null) {
             myExecutorService.shutdown();
