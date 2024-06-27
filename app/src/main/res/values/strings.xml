@@ -95,13 +95,14 @@
 
 
     <!-- Survey Sequence Strings -->
-    <string name="survey_livingroom_string">Bitte nehmen Sie doch Platz. Mein Team wird gleich mit
-        Ihnen noch kurz die Einzelheiten des heutigen Tages durchgehen,
-        danach gehts mit einer kurzen Führung weiter</string>
     <string name="survey_start_phrase">Hey Temi lass uns anfangen</string>
     <string name="survey_to_kitchen"> Okay! Folgen Sie mir bitte. Es ist wichtig viel zu trinken. Daher haben wir Ihnen Getränke bereitgestellt. Hier wären wir. Bitte bedienen Sie sich. Wenn ich Ihnen etwas zu den hier verbauten (Dingen) erzählen soll, sagen Sie bitte‚ Hey Temi, was kannst du mir zur Küche‘ sagen, andernfalls können wir auch mit‚Hey Temi, lass uns weitergehen‘ mit der Besichtigung fortfahren. </string>
     <string name="survey_goodbye_string">Ich habe mich gefreut, Sie kennenzulernen und ich möchte mich bei Ihne bedanken, dass Sie an unserer Studie teilgenommen haben. Vielen Dank und alles Gute. </string>
-    <string name="survey_questions_intro">Bevor wir Schluss machen, möchte ich Sie bitten mir ein paar Fragen zu beantworten. Bitte beantworten Sie die Fragen auf einer Skala von 1 bis 6. 1= trifft völlig zu; 6= trifft gar nicht zu</string>
+    <string name="survey_announcement">Unser Treffen neigt sich langsam dem Ende zu. Nehmen Sie doch bitte nocheinmal auf dem Sofa Platz.</string>
+    <string name="survey_questions_intro">Bevor wir Schluss machen, möchte ich Sie bitten mir noch ein paar Fragen zu beantworten. Bitte beantworten Sie die Fragen auf einer Skala von 1 bis 6. 1 entspricht trifft völlig zu; 6 entspricht trifft gar nicht zu.
+        Also genau so, wie sie es noch aus ihrer Schulzeit kennen. Bei ihren Antworten brauchen sie nicht extra Hey Temi sagen, ich höre automatisch zu, sobald ich die Frage gestellt habe.
+        </string>
+    <string name="survey_letsgo">Fangen wir an.  </string>
     <string name="survey_question_1">Meine Sprache war einfach und verständlich.</string>
     <string name="survey_question_2">Meine Sprechgeschwindigkeit war angemessen.</string>
     <string name="survey_question_3">Die Sprache des Sprachassistenten Alexa war einfach und verständlich.</string>
@@ -159,12 +160,12 @@
 
     <!-- ViviInteraction Sequence String -->
     <string name="vi_transition">Im nächsten Schritt würde ich Ihnen gerne ein weiteres Sprachassistenzsystem vorstellen, welches hier in der A A L Musterwohung eingerichtet ist.
-        Wenn Sie aber zunächst eine kurze Pause machen möchten, um vielleicht noch etwas zu trinken ist das auch kein Problem. Wenn Sie beriet sind weiterzumachen sagen Sie
+        Wenn Sie aber zunächst eine kurze Pause machen möchten, um vielleicht noch etwas zu trinken ist das auch kein Problem. Wenn Sie bereit sind weiterzumachen sagen Sie
         einfach  Hey Temi lass uns weitermachen. </string>
     <string name="vi_vivi_introduction_short">Kurzfassung vivi vorstellung.</string>
     <string name="vi_vivi_introduction">Alles klar. Dann machen wir mal weiter. Hier links auf der Kommode sehen Sie das Assistenzsystem VivaiCare. Dabei handelt es sich um
         ein stationäres Assistenzsystem, mit dem Sie genauso wie mit mir, durch Ansprechen interagieren können. Sie hört auf den Namen Vivi. Jetzt können Sie selbst versuchen,
-        sich mit Vivi zu unterhalten. zum Beispiel können sie Vivi sagen,  ich möchte mit dem Märchenonkel sprechen um gemeinsam mit vivi ein Geschichte zu spinnen. Alternativ
+        sich mit Vivi zu unterhalten. zum Beispiel können sie Vivi sagen,  ich möchte mit dem Märchenonkel sprechen um gemeinsam mit vivi eine Geschichte zu spinnen. Alternativ
         können sie vivi auch auffordern, mit Ihnen ein Quiz zu spielen. Probieren Sie es doch einfach einmal aus und vergessen Sie nicht den richtigen Ansprechnamen für Vivi.
         Ich werde solange an der Wand warten. Wenn Sie fertig sind mit Vivi oder keine Lust mehr haben, werde ich wieder übernehmen. Sagen Sie dazu einfach Hey temi lass uns weitermachen.</string>
     <string name="vi_not_understood">Entschuldigung das habe ich wohl nicht korrekt verstanden. Wenn Sie mit Vivi fertig sind, sagen Sie Hey Temi lass uns weitermachen.</string>

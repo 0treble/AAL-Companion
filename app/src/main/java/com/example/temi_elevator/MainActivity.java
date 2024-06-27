@@ -1,5 +1,6 @@
 package com.example.temi_elevator;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -256,35 +257,41 @@ public class MainActivity extends AppCompatActivity implements
         findViewById(R.id.img_close_button).setVisibility(View.VISIBLE);
     }
 
-    private void displayImageForSeconds(int milliseconds) {
-        // Create a dialog with an ImageView to show the image
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        ImageView imageView = new ImageView(this);
+    private AlertDialog dialog; // Declare the AlertDialog as a field to keep its state
 
-        // Load the image into the ImageView
-        Drawable drawable = getResources().getDrawable(R.drawable.alexa_commands_preview);
-        imageView.setImageDrawable(drawable);
+    private void displayCommandPreview(boolean show) {
+        // Only create the dialog if it hasn't been initialized
+        if (dialog == null) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            ImageView imageView = new ImageView(this);
 
-        // Set the ImageView as the view for the dialog
-        builder.setView(imageView);
-
-        // Create the AlertDialog
-        final AlertDialog dialog = builder.create();
-
-        // Show the dialog
-        dialog.show();
-
-        // Schedule a handler to dismiss the dialog after a delay
-        Handler handler = new Handler();
-        handler.postDelayed(() -> {
-            if (dialog.isShowing()) {
-                dialog.dismiss();
+            // Depending on the sequence, load the corresponding image
+            if (currentSequence == Sequence.ALEXA_INTERACTION) {
+                @SuppressLint("UseCompatLoadingForDrawables")
+                Drawable drawable = getResources().getDrawable(R.drawable.alexa_commands_preview);
+                imageView.setImageDrawable(drawable);
+            } else if (currentSequence == Sequence.VIVI_INTERACTION) {
+                @SuppressLint("UseCompatLoadingForDrawables")
+                Drawable drawable = getResources().getDrawable(R.drawable.vivi_commands_preview);
+                imageView.setImageDrawable(drawable);
             }
-        }, milliseconds); // milliseconds is the duration to display the image
 
-        // Optionally, you can add a listener to dismiss the dialog on touch outside
+            builder.setView(imageView); // Set the ImageView as the view for the dialog
+            dialog = builder.create(); // Create the AlertDialog from the builder
+        }
+
+        // Control the display of the dialog based on the 'show' parameter
+        if (show && !dialog.isShowing()) {
+            dialog.show();
+        } else if (!show && dialog.isShowing()) {
+            dialog.dismiss();
+        }
+
+        // Optionally, set the dialog to dismiss when touched outside
         dialog.setCanceledOnTouchOutside(true);
     }
+
+
 
     private void setupThemeButton() {
 
@@ -608,10 +615,11 @@ public class MainActivity extends AppCompatActivity implements
 
     public void handleSequenceQuestionnaire()
     {
+        String nextSentence = "";
         switch (currentSequenceStep)
         {
             case 0:
-                String questions_intro = getString(R.string.survey_questions_intro);
+                String questions_intro = getString(R.string.survey_questions_intro) + getString(R.string.survey_letsgo);
                 showTranscription(questions_intro);
                 flagWaitingForTemiToFinishSpeaking = true;
                 temi.speak(TtsRequest.create(questions_intro, false));
@@ -624,7 +632,6 @@ public class MainActivity extends AppCompatActivity implements
             flagWaitingForUserResponse = true;
             temi.wakeup(Collections.singletonList(SttLanguage.SYSTEM));
             findViewById(R.id.isRecordingImg).setVisibility(View.VISIBLE);
-
             currentSequenceStep++;
             break;
             case 3:
@@ -1096,6 +1103,7 @@ public class MainActivity extends AppCompatActivity implements
                 flagRepeatSentenceRequest = false;
                 currentSequence = Sequence.VIVI_INTERACTION;
                 currentSequenceStep = 0;
+                break;
 
             default:
                 showTranscription("DEGBUG: default in handleSequenceBrainGame !");
@@ -1272,7 +1280,7 @@ public class MainActivity extends AppCompatActivity implements
             case 2:
                 nextSentence = getString(R.string.ai_ready_livingroom);
                 temi.speak(TtsRequest.create(nextSentence));
-                displayImageForSeconds(10000);
+                displayCommandPreview(true);
                 currentSequenceStep++;
                 break;
             case 3:
@@ -1285,6 +1293,7 @@ public class MainActivity extends AppCompatActivity implements
                 {
                     nextSentence = getString(R.string.ai_not_understood);
                 }
+                displayCommandPreview(false);
                 //flagWaitingForTemiToFinishSpeaking = true; // HIER NICHT!!!!
                 temi.speak(TtsRequest.create(nextSentence, false));
                 break;
@@ -1300,9 +1309,8 @@ public class MainActivity extends AppCompatActivity implements
         switch(currentSequenceStep)
         {
             case 0:
-                temi.goTo("wohnzimmer");
                 nextSentence = getString(R.string.vi_vivi_introduction);
-                //flagWaitingForTemiToFinishSpeaking = true;
+                displayCommandPreview(true);
                 temi.speak(TtsRequest.create(nextSentence));
                 currentSequenceStep++;
                 // now user is talking to Vivi...
@@ -1310,8 +1318,9 @@ public class MainActivity extends AppCompatActivity implements
             case 1:
                 if(checkForContinueNextSequence())
                 {
-                    nextSentence = getString(R.string.vi_finised);
+                    nextSentence = getString(R.string.vi_finised) + getString(R.string.survey_announcement);
                     flagWaitingForTemiToFinishSpeaking = true;
+                    displayCommandPreview(false);
                 }
                 else
                 {
@@ -1319,11 +1328,12 @@ public class MainActivity extends AppCompatActivity implements
 
                 }
                 temi.speak(TtsRequest.create(nextSentence));
-                // flag set only in if-case
                 break;
             case 2:
-                currentSequence = Sequence.UNDEFINED;
+                currentSequence = Sequence.QUESTIONNAIRE;
                 currentSequenceStep = 0;
+                flagWaitingForTemiToArrive = true;
+                temi.goTo("wohnzimmersitzgruppe");
                 break;
             default:
                 showTranscription("Debug: in default der handleSequenceViviInteraction!");
