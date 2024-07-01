@@ -618,29 +618,33 @@ public class MainActivity extends AppCompatActivity implements
         String nextSentence = "";
         switch (currentSequenceStep)
         {
-            case 0:
+            // no case 0 because last step is goTo() with waitingFlag in previous sequence
+            case 1:
                 String questions_intro = getString(R.string.survey_questions_intro) + getString(R.string.survey_letsgo);
                 showTranscription(questions_intro);
                 flagWaitingForTemiToFinishSpeaking = true;
                 temi.speak(TtsRequest.create(questions_intro, false));
                 break;
-            case 1:
+            case 2:
                 askSurveyQuestion(R.string.survey_question_1);
                 break;
-            case 2: case 4: case 6: case 8: case 10: case 12: case 14:
-            case 16: case 18: case 20: case 22: case 24: case 26: case 28:
+            case 4: case 6: case 8: case 10: case 12: case 14: case 16:
+            case 18: case 20: case 22: case 24: case 26: case 28: case 30:
             flagWaitingForUserResponse = true;
             temi.wakeup(Collections.singletonList(SttLanguage.SYSTEM));
             findViewById(R.id.isRecordingImg).setVisibility(View.VISIBLE);
             currentSequenceStep++;
             break;
             case 3:
-                askSurveyQuestion(R.string.survey_question_3);
+                askSurveyQuestion(R.string.survey_question_2);
                 break;
             case 5:
-                askSurveyQuestion(R.string.survey_question_4);
+                askSurveyQuestion(R.string.survey_question_3);
                 break;
             case 7:
+                askSurveyQuestion(R.string.survey_question_4);
+                break;
+            case 9:
                 askSurveyQuestion(R.string.survey_question_5);
                 break;
             case 11:
@@ -670,6 +674,7 @@ public class MainActivity extends AppCompatActivity implements
             case 27:
                 String suggestions = getString(R.string.survey_suggestions);
                 showTranscription(suggestions);
+
                 flagWaitingForTemiToFinishSpeaking = true;
                 temi.speak(TtsRequest.create(suggestions, false));
                 break;
@@ -678,8 +683,10 @@ public class MainActivity extends AppCompatActivity implements
                 showTranscription(goodbye_string);
                 flagWaitingForTemiToFinishSpeaking = true;
                 temi.speak(TtsRequest.create(goodbye_string, false));
+
+            case 31:
                 currentSequenceStep = 0;
-                currentSequence = null;
+                currentSequence = Sequence.UNDEFINED;
                 break;
             default:
                 showTranscription("Error: Default in Sequenz GREETING!");
@@ -845,7 +852,7 @@ public class MainActivity extends AppCompatActivity implements
             case 0:
                 showTranscription("DEGBUG: Start Sequence: handleSequenceBrainGame");
                 flagRepeatSentenceRequest = false;
-                String introducingBrainGame = getString(R.string.bg_introduction_short);
+                String introducingBrainGame = getString(R.string.bg_introduction);
                 flagWaitingForTemiToFinishSpeaking = true;
                 temi.speak(TtsRequest.create(introducingBrainGame, false));
                 // step/case incremeted by the statusChange of tts
@@ -1237,7 +1244,7 @@ public class MainActivity extends AppCompatActivity implements
                 temi.speak(TtsRequest.create(nextString));
                 break;
             case 6:
-                nextString = getString(R.string.aq_thanks) + getString(R.string.ai_introduction_short);
+                nextString = getString(R.string.aq_thanks) + getString(R.string.ai_introduction);
                 flagWaitingForTemiToFinishSpeaking = true;
                 temi.speak(TtsRequest.create(nextString));
                 break;
@@ -1266,7 +1273,7 @@ public class MainActivity extends AppCompatActivity implements
                 }
                 else
                 {
-                    nextSentence = getString(R.string.ai_not_ready) + getString(R.string.ai_introduction_short);
+                    nextSentence = getString(R.string.ai_not_ready) + getString(R.string.ai_introduction);
                 }
 
                 //flagWaitingForTemiToFinishSpeaking = true; // HIER NICHT!!!!
