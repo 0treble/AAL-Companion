@@ -155,7 +155,7 @@ public class MainActivity extends AppCompatActivity implements
         });
 
         findViewById(R.id.endTranscription).setOnClickListener(view -> {
-            showTranscription("Transkription beended.");
+            showTranscription("Transkription beendet.");
             findViewById(R.id.isRecordingImg).setVisibility(View.INVISIBLE);
         });
 
@@ -247,6 +247,7 @@ public class MainActivity extends AppCompatActivity implements
                 currentSequenceStep = 0;
             }
         });
+
         /* Call Button */
         findViewById(R.id.confirmCallButton).setOnClickListener(view -> startVideoMeeting(contact));
     }
@@ -290,8 +291,6 @@ public class MainActivity extends AppCompatActivity implements
         // Optionally, set the dialog to dismiss when touched outside
         dialog.setCanceledOnTouchOutside(true);
     }
-
-
 
     private void setupThemeButton() {
 
@@ -1129,8 +1128,6 @@ public class MainActivity extends AppCompatActivity implements
         return    myAsrResultString.contains("weiß ich nicht") | myAsrResultString.contains("kenne ich nicht") | myAsrResultString.contains("unbekannt") | myAsrResultString.contains("keine ahnung");
     }
 
-
-
     private void handleSequenceKitchen()
     {
         String nextSentence;
@@ -1174,8 +1171,6 @@ public class MainActivity extends AppCompatActivity implements
                     nextSentence = getString(R.string.kt_no_tour);
                 }
 
-
-
                 nextSentence += getString(R.string.aq_introduction);
 
                 flagWaitingForTemiToFinishSpeaking = true; // HIER NICHT!!!!
@@ -1192,7 +1187,6 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-
     private boolean checkForContinueNextSequence()
     {
         return myAsrResultString.contains("lass uns weitermachen")
@@ -1201,7 +1195,6 @@ public class MainActivity extends AppCompatActivity implements
                 | myAsrResultString.contains("weiter")
                 | myAsrResultString.contains("was jetzt");
     }
-
 
     private void handleSequenceAssistanceQuestionaire()
     {
@@ -1258,7 +1251,6 @@ public class MainActivity extends AppCompatActivity implements
                 break;
         }
     }
-
 
     private void handleSequenceAlexaInteraction()
     {
@@ -1347,7 +1339,6 @@ public class MainActivity extends AppCompatActivity implements
                 break;
         }
     }
-
 
     public void relocateTemi()
     {
@@ -1478,13 +1469,13 @@ public class MainActivity extends AppCompatActivity implements
                 }
             }
 
-
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
                 Log.e(TAG, "Nothing is selected");
             }
         });
     }
+
     private void retryInitialization() {
         Log.i(TAG, "Retrying initialization...");
         temi.addOnRobotReadyListener(isReady -> {
@@ -1548,13 +1539,6 @@ public class MainActivity extends AppCompatActivity implements
                     showTranscription("Skipped null user or user with null name");
                 }
             }
-        /*  Contact: Mario : 638fb4837f2a4210c3313a5c89be0747 : 0
-            Contact: sander991 : 5ecc126841b0af8f6cc72feadc090fa3 : 1
-            Contact: Hristo : 58c5f1e537525756a295857c7bce8e91 : 1
-            Contact: Chris : 17b6a96e6079f842f6e1684a15a7c0cc : 0
-            Contact: eric : 4730f86644ae309b1d097002ff075da3 : 0
-            Contact: Orlando Gtz : 2378ee1e0716e6cf4e5f2f0ed10b2a44 : 1 */
-
             // Log contacts for debugging
             showTranscription("Total contacts added: " + contactNames.size());
 
@@ -1684,27 +1668,6 @@ public class MainActivity extends AppCompatActivity implements
             confirmYesButton.setVisibility(View.VISIBLE);
         });
     }
-/*  plan is to take this function and repurpose it for relocateTemi
-
-    public void addLocations(String[] locations) {
-        validLocations.addAll(Arrays.asList(locations));
-
-        // Remove duplicates
-        Set<String> set = new HashSet<>(validLocations);
-        validLocations = new ArrayList<>(set);
-
-        String floorx = "";
-
-        for (String element : validLocations) {
-            if (element.startsWith("floor")) {
-                floorx = element;
-            }
-        }
-
-        validLocations.remove(floorx);
-
-        runOnUiThread(this::fillDropdownMenu);
-    }*/
 
     public void reset() {
         temi.goTo("home base");
@@ -1727,6 +1690,7 @@ public class MainActivity extends AppCompatActivity implements
             textView.setVisibility(View.VISIBLE);
         });
     }
+
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
