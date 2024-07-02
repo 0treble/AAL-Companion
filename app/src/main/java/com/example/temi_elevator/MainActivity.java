@@ -270,7 +270,7 @@ public class MainActivity extends AppCompatActivity implements
                 @SuppressLint("UseCompatLoadingForDrawables")
                 Drawable drawable = getResources().getDrawable(R.drawable.alexa_commands_preview);
                 imageView.setImageDrawable(drawable);
-            } else if (currentSequence == Sequence.VIVI_INTERACTION) {
+            } else if (currentSequence == Sequence.VIVI_INTERACTION ) {
                 @SuppressLint("UseCompatLoadingForDrawables")
                 Drawable drawable = getResources().getDrawable(R.drawable.vivi_commands_preview);
                 imageView.setImageDrawable(drawable);
@@ -619,7 +619,7 @@ public class MainActivity extends AppCompatActivity implements
         {
             case 0:
                 nextSentence = getString(R.string.vi_vivi_introduction);
-                displayCommandPreview(true);
+                //displayCommandPreview(true);
                 temi.speak(TtsRequest.create(nextSentence));
                 currentSequenceStep++;
                 // now user is talking to Vivi...
@@ -629,16 +629,18 @@ public class MainActivity extends AppCompatActivity implements
                 {
                     nextSentence = getString(R.string.vi_finised) + getString(R.string.survey_announcement);
                     flagWaitingForTemiToFinishSpeaking = true;
-                    displayCommandPreview(false);
+                    //
                 }
                 else
                 {
                     nextSentence = getString(R.string.vi_not_understood);
 
                 }
+                // flag is set in if-statement
                 temi.speak(TtsRequest.create(nextSentence));
                 break;
             case 2:
+                //displayCommandPreview(false);
                 currentSequence = Sequence.QUESTIONNAIRE;
                 currentSequenceStep = 0;
                 flagWaitingForTemiToArrive = true;
@@ -659,6 +661,7 @@ public class MainActivity extends AppCompatActivity implements
             case 0: // when sequence is manually called...
                 currentSequenceStep = 1;
             case 1:
+                showTranscription("DEBUG: in QUESTIONAIRE-STEP = 1\n");
                 String questions_intro = getString(R.string.survey_questions_intro) + getString(R.string.survey_letsgo);
                 showTranscription(questions_intro);
                 flagWaitingForTemiToFinishSpeaking = true;
