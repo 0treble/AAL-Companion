@@ -613,279 +613,6 @@ public class MainActivity extends AppCompatActivity implements
                 break;
         }
     }
-    private void handleSequenceViviInteraction()
-    {
-        String nextSentence;
-        switch(currentSequenceStep)
-        {
-            case 0:
-                nextSentence = getString(R.string.vi_vivi_introduction);
-                //displayCommandPreview(true);
-                temi.speak(TtsRequest.create(nextSentence));
-                currentSequenceStep++;
-                // now user is talking to Vivi...
-                break;
-            case 1:
-                if(checkForContinueNextSequence())
-                {
-                    nextSentence = getString(R.string.vi_finised) + getString(R.string.survey_announcement);
-                    flagWaitingForTemiToFinishSpeaking = true;
-                    //
-                }
-                else
-                {
-                    nextSentence = getString(R.string.vi_not_understood);
-
-                }
-                // flag is set in if-statement
-                temi.speak(TtsRequest.create(nextSentence));
-                break;
-            case 2:
-                //displayCommandPreview(false);
-                currentSequence = Sequence.QUESTIONNAIRE;
-                currentSequenceStep = 0;
-                flagWaitingForTemiToArrive = true;
-                temi.goTo("wohnzimmersitzgruppe");
-                break;
-            default:
-                showTranscription("Debug: in default der handleSequenceViviInteraction!");
-                break;
-        }
-    }
-
-    public void handleSequenceQuestionnaire()
-    {
-        String nextSentence = "";
-        switch (currentSequenceStep)
-        {
-            // no case 0 because last step is goTo() with waitingFlag in previous sequence
-            //case 0: // when sequence is manually called...
-                //currentSequenceStep = 1;
-                //showTranscription("DEBUG: in QUESTIONAIRE-STEP = 0\n");
-            case 1:
-                showTranscription("DEBUG: in QUESTIONAIRE-STEP = 1\n");
-                String questions_intro = getString(R.string.survey_questions_intro) + getString(R.string.survey_letsgo);
-                showTranscription(questions_intro);
-                flagWaitingForTemiToFinishSpeaking = true;
-                temi.speak(TtsRequest.create(questions_intro, false));
-                break;
-            case 2:
-                askSurveyQuestion(R.string.survey_question_1);
-                break;
-            case 3: case 5: case 7: case 9: case 11: case 13: case 15:
-            case 17: case 19: case 21: case 23: case 25: case 27: case 29:
-            flagWaitingForUserResponse = true;
-            temi.wakeup(Collections.singletonList(SttLanguage.SYSTEM));
-            findViewById(R.id.isRecordingImg).setVisibility(View.VISIBLE);
-            currentSequenceStep++;
-            break;
-            case 4:
-                askSurveyQuestion(R.string.survey_question_2);
-                break;
-            case 6:
-                askSurveyQuestion(R.string.survey_question_3);
-                break;
-            case 8:
-                askSurveyQuestion(R.string.survey_question_4);
-                break;
-            case 10:
-                askSurveyQuestion(R.string.survey_question_5);
-                break;
-            case 12:
-                askSurveyQuestion(R.string.survey_question_6);
-                break;
-            case 14:
-                askSurveyQuestion(R.string.survey_question_7);
-                break;
-            case 16:
-                askSurveyQuestion(R.string.survey_question_8);
-                break;
-            case 18:
-                askSurveyQuestion(R.string.survey_question_9);
-                break;
-            case 20:
-                askSurveyQuestion(R.string.survey_question_10);
-                break;
-            case 22:
-                askSurveyQuestion(R.string.survey_question_11);
-                break;
-            case 24:
-                askSurveyQuestion(R.string.survey_question_12);
-                break;
-            case 26:
-                askSurveyQuestion(R.string.survey_question_13);
-                break;
-            case 28:
-                String suggestions = getString(R.string.survey_suggestions);
-                showTranscription(suggestions);
-
-                flagWaitingForTemiToFinishSpeaking = true;
-                temi.speak(TtsRequest.create(suggestions, false));
-                break;
-            case 30: // End of sequence
-                String goodbye_string = getString(R.string.survey_goodbye_string);
-                showTranscription(goodbye_string);
-                flagWaitingForTemiToFinishSpeaking = true;
-                temi.speak(TtsRequest.create(goodbye_string, false));
-
-            case 31:
-                currentSequenceStep = 0;
-                currentSequence = Sequence.UNDEFINED;
-                break;
-            default:
-                showTranscription("Error: Default in Sequenz GREETING!");
-                break;
-        }
-    }
-
-    private void askSurveyQuestion(int questionResId) {
-        String question = getString(questionResId);
-        showTranscription(question);
-        flagWaitingForTemiToFinishSpeaking = true;
-        temi.speak(TtsRequest.create(question, false));
-    }
-
-    private void handleSequenceAlexa() {
-        switch (currentSequenceStep) {
-            case 0:
-                // Initial command
-                String alexa_command_init = "Okay. Ich gehe zu Alexa um ihr zu sagen, dass sie den Rolläden schließen soll.";
-                //showTranscription(alexa_command_init);
-                flagWaitingForTemiToFinishSpeaking = true;
-                temi.speak(TtsRequest.create(alexa_command_init, false));
-                break;
-            case 1:
-                // Go to Alexa location
-                flagWaitingForTemiToArrive = true;
-                temi.goTo("alexa");
-                break;
-            case 2:
-                // Speak "Alexa"
-                //showTranscription("Alexa");
-                flagWaitingForTemiToFinishSpeaking = true;
-                temi.speak(TtsRequest.create("Alexa", false));
-                break;
-            case 3:
-                // Final command after a delay
-                waitHandler.postDelayed(() -> {
-                    //showTranscription("Bitte schließe die Rolläden");
-                    flagWaitingForTemiToFinishSpeaking = true;
-                    temi.speak(TtsRequest.create("Bitte schließe die Rolläden", false));
-                    // oder temi.speak(TtsRequest.create("Wohnzimmer an", false));
-                }, 1000);
-                currentSequenceStep = 0;
-                currentSequence = null;
-                break;
-            default:
-                showTranscription("Error: Default in Sequenz Alexa!");
-                break;
-        }
-    }
-
-    private void handleAALSequence() {  // Sequence to presesnt the AAL appartment at the Digitaltag 2024
-        switch (currentSequenceStep) {
-            case 0:
-                flagWaitingForTemiToArrive = true;
-                temi.goTo("tür");
-                break;
-            case 1:
-                // At the entrance
-                String entranceWelcome = getString(R.string.aal_welcome);
-                //showTranscription(entranceWelcome);
-                flagWaitingForTemiToFinishSpeaking = true;
-                temi.speak(TtsRequest.create(entranceWelcome, false));
-                break;
-            case 2:
-                String introduction = getString(R.string.aal_intro);
-                //showTranscription(introduction);
-                flagWaitingForTemiToFinishSpeaking = true;
-                temi.speak(TtsRequest.create(introduction, false));
-                break;
-            case 3:
-                // Move to the kitchen
-                flagWaitingForTemiToArrive = true;
-                temi.goTo("küche");
-                break;
-            case 4:
-                // In the kitchen
-                String kitchenIntro = getString(R.string.aal_kitchen_intro);
-                //showTranscription(kitchenIntro);
-                flagWaitingForTemiToFinishSpeaking = true;
-                temi.speak(TtsRequest.create(kitchenIntro, false));
-                break;
-            case 5:
-                String kitchenDetails1 = getString(R.string.aal_kitchen_details1);
-                //showTranscription(kitchenDetails1);
-                flagWaitingForTemiToFinishSpeaking = true;
-                temi.speak(TtsRequest.create(kitchenDetails1, false));
-                break;
-            case 6:
-                String kitchenDetails2 = getString(R.string.aal_kitchen_details2);
-                //showTranscription(kitchenDetails2);
-                flagWaitingForTemiToFinishSpeaking = true;
-                temi.speak(TtsRequest.create(kitchenDetails2, false));
-                break;
-            case 7:
-                // Move to the sink
-                flagWaitingForTemiToArrive = true;
-                temi.goTo("waschbecken");
-                break;
-            case 8:
-                String sinkDetails = getString(R.string.aal_sink_details);
-                //showTranscription(sinkDetails);
-                flagWaitingForTemiToFinishSpeaking = true;
-                temi.speak(TtsRequest.create(sinkDetails, false));
-                break;
-            case 9:
-                String worktopDetails = getString(R.string.aal_worktop_details);
-                //showTranscription(worktopDetails);
-                flagWaitingForTemiToFinishSpeaking = true;
-                temi.speak(TtsRequest.create(worktopDetails, false));
-                break;
-            case 10:
-                String kitchenSummary = getString(R.string.aal_kitchen_summary);
-                //showTranscription(kitchenSummary);
-                flagWaitingForTemiToFinishSpeaking = true;
-                temi.speak(TtsRequest.create(kitchenSummary, false));
-                break;
-            case 11:
-                // Move to the living room
-                flagWaitingForTemiToArrive = true;
-                temi.goTo("wohnzimmer");
-                break;
-            case 12:
-                // In the living room
-                String livingRoomIntro = getString(R.string.aal_livingroom_intro);
-                //showTranscription(livingRoomIntro);
-                flagWaitingForTemiToFinishSpeaking = true;
-                temi.speak(TtsRequest.create(livingRoomIntro, false));
-                break;
-            case 13:
-                String livingRoomDetails1 = getString(R.string.aal_livingroom_details1);
-                //showTranscription(livingRoomDetails1);
-                flagWaitingForTemiToFinishSpeaking = true;
-                temi.speak(TtsRequest.create(livingRoomDetails1, false));
-                break;
-            case 14:
-                String livingRoomDetails2 = getString(R.string.aal_livingroom_details2);
-                //showTranscription(livingRoomDetails2);
-                flagWaitingForTemiToFinishSpeaking = true;
-                temi.speak(TtsRequest.create(livingRoomDetails2, false));
-                break;
-            case 15:
-                String farewell = getString(R.string.aal_farewell);
-                //showTranscription(farewell);
-                flagWaitingForTemiToFinishSpeaking = true;
-                temi.speak(TtsRequest.create(farewell, false));
-                // Sequence completed
-                currentSequenceStep = 0;
-                currentSequence = null;
-                break;
-            default:
-                showTranscription("Error: Default in Sequenz AAL!");
-                break;
-        }
-    }
 
     private void handleSequenceBrainGame() {
         showTranscription("DEGBUG: in handleBrainGame: Schritt = " + currentSequenceStep);
@@ -1162,6 +889,286 @@ public class MainActivity extends AppCompatActivity implements
                 break;
         }
     }
+    private void handleSequenceViviInteraction()
+    {
+        String nextSentence;
+        switch(currentSequenceStep)
+        {
+            case 0:
+                nextSentence = getString(R.string.vi_vivi_introduction);
+
+                flagWaitingForTemiToFinishSpeaking = true;
+                temi.speak(TtsRequest.create(nextSentence));
+                // now user is talking to Vivi...
+                displayCommandPreview(true);
+                break;
+            case 1:
+                temi.goTo("wohnzimmer");
+                currentSequenceStep++;
+                break;
+            case 2:
+                if(checkForContinueNextSequence())
+                {
+                    nextSentence = getString(R.string.vi_finised) + getString(R.string.survey_announcement);
+                    flagWaitingForTemiToFinishSpeaking = true;
+                    //
+                }
+                else
+                {
+                    nextSentence = getString(R.string.vi_not_understood);
+
+                }
+                // flag is set in if-statement
+                temi.speak(TtsRequest.create(nextSentence));
+                break;
+            case 3:
+                displayCommandPreview(false);
+                currentSequence = Sequence.QUESTIONNAIRE;
+                currentSequenceStep = 0;
+                flagWaitingForTemiToArrive = true;
+                temi.goTo("wohnzimmersitzgruppe");
+                break;
+            default:
+                showTranscription("Debug: in default der handleSequenceViviInteraction!");
+                break;
+        }
+    }
+
+    public void handleSequenceQuestionnaire()
+    {
+        String nextSentence = "";
+        switch (currentSequenceStep)
+        {
+            // no case 0 because last step is goTo() with waitingFlag in previous sequence
+            //case 0: // when sequence is manually called...
+                //currentSequenceStep = 1;
+                //showTranscription("DEBUG: in QUESTIONAIRE-STEP = 0\n");
+            case 1:
+                showTranscription("DEBUG: in QUESTIONAIRE-STEP = 1\n");
+                String questions_intro = getString(R.string.survey_questions_intro) + getString(R.string.survey_letsgo);
+                showTranscription(questions_intro);
+                flagWaitingForTemiToFinishSpeaking = true;
+                temi.speak(TtsRequest.create(questions_intro, false));
+                break;
+            case 2:
+                askSurveyQuestion(R.string.survey_question_1);
+                break;
+            case 3: case 5: case 7: case 9: case 11: case 13: case 15:
+            case 17: case 19: case 21: case 23: case 25: case 27: case 29:
+            flagWaitingForUserResponse = true;
+            temi.wakeup(Collections.singletonList(SttLanguage.SYSTEM));
+            findViewById(R.id.isRecordingImg).setVisibility(View.VISIBLE);
+            currentSequenceStep++;
+            break;
+            case 4:
+                askSurveyQuestion(R.string.survey_question_2);
+                break;
+            case 6:
+                askSurveyQuestion(R.string.survey_question_3);
+                break;
+            case 8:
+                askSurveyQuestion(R.string.survey_question_4);
+                break;
+            case 10:
+                askSurveyQuestion(R.string.survey_question_5);
+                break;
+            case 12:
+                askSurveyQuestion(R.string.survey_question_6);
+                break;
+            case 14:
+                askSurveyQuestion(R.string.survey_question_7);
+                break;
+            case 16:
+                askSurveyQuestion(R.string.survey_question_8);
+                break;
+            case 18:
+                askSurveyQuestion(R.string.survey_question_9);
+                break;
+            case 20:
+                askSurveyQuestion(R.string.survey_question_10);
+                break;
+            case 22:
+                askSurveyQuestion(R.string.survey_question_11);
+                break;
+            case 24:
+                askSurveyQuestion(R.string.survey_question_12);
+                break;
+            case 26:
+                askSurveyQuestion(R.string.survey_question_13);
+                break;
+            case 28:
+                String suggestions = getString(R.string.survey_suggestions);
+                showTranscription(suggestions);
+
+                flagWaitingForTemiToFinishSpeaking = true;
+                temi.speak(TtsRequest.create(suggestions, false));
+                break;
+            case 30: // End of sequence
+                String goodbye_string = getString(R.string.survey_goodbye_string);
+                showTranscription(goodbye_string);
+                flagWaitingForTemiToFinishSpeaking = true;
+                temi.speak(TtsRequest.create(goodbye_string, false));
+
+            case 31:
+                currentSequenceStep = 0;
+                currentSequence = Sequence.UNDEFINED;
+                break;
+            default:
+                showTranscription("Error: Default in Sequenz GREETING!");
+                break;
+        }
+    }
+
+    private void askSurveyQuestion(int questionResId) {
+        String question = getString(questionResId);
+        showTranscription(question);
+        flagWaitingForTemiToFinishSpeaking = true;
+        temi.speak(TtsRequest.create(question, false));
+    }
+
+    private void handleSequenceAlexa() {
+        switch (currentSequenceStep) {
+            case 0:
+                // Initial command
+                String alexa_command_init = "Okay. Ich gehe zu Alexa um ihr zu sagen, dass sie den Rolläden schließen soll.";
+                //showTranscription(alexa_command_init);
+                flagWaitingForTemiToFinishSpeaking = true;
+                temi.speak(TtsRequest.create(alexa_command_init, false));
+                break;
+            case 1:
+                // Go to Alexa location
+                flagWaitingForTemiToArrive = true;
+                temi.goTo("alexa");
+                break;
+            case 2:
+                // Speak "Alexa"
+                //showTranscription("Alexa");
+                flagWaitingForTemiToFinishSpeaking = true;
+                temi.speak(TtsRequest.create("Alexa", false));
+                break;
+            case 3:
+                // Final command after a delay
+                waitHandler.postDelayed(() -> {
+                    //showTranscription("Bitte schließe die Rolläden");
+                    flagWaitingForTemiToFinishSpeaking = true;
+                    temi.speak(TtsRequest.create("Bitte schließe die Rolläden", false));
+                    // oder temi.speak(TtsRequest.create("Wohnzimmer an", false));
+                }, 1000);
+                currentSequenceStep = 0;
+                currentSequence = null;
+                break;
+            default:
+                showTranscription("Error: Default in Sequenz Alexa!");
+                break;
+        }
+    }
+
+    private void handleAALSequence() {  // Sequence to presesnt the AAL appartment at the Digitaltag 2024
+        switch (currentSequenceStep) {
+            case 0:
+                flagWaitingForTemiToArrive = true;
+                temi.goTo("tür");
+                break;
+            case 1:
+                // At the entrance
+                String entranceWelcome = getString(R.string.aal_welcome);
+                //showTranscription(entranceWelcome);
+                flagWaitingForTemiToFinishSpeaking = true;
+                temi.speak(TtsRequest.create(entranceWelcome, false));
+                break;
+            case 2:
+                String introduction = getString(R.string.aal_intro);
+                //showTranscription(introduction);
+                flagWaitingForTemiToFinishSpeaking = true;
+                temi.speak(TtsRequest.create(introduction, false));
+                break;
+            case 3:
+                // Move to the kitchen
+                flagWaitingForTemiToArrive = true;
+                temi.goTo("küche");
+                break;
+            case 4:
+                // In the kitchen
+                String kitchenIntro = getString(R.string.aal_kitchen_intro);
+                //showTranscription(kitchenIntro);
+                flagWaitingForTemiToFinishSpeaking = true;
+                temi.speak(TtsRequest.create(kitchenIntro, false));
+                break;
+            case 5:
+                String kitchenDetails1 = getString(R.string.aal_kitchen_details1);
+                //showTranscription(kitchenDetails1);
+                flagWaitingForTemiToFinishSpeaking = true;
+                temi.speak(TtsRequest.create(kitchenDetails1, false));
+                break;
+            case 6:
+                String kitchenDetails2 = getString(R.string.aal_kitchen_details2);
+                //showTranscription(kitchenDetails2);
+                flagWaitingForTemiToFinishSpeaking = true;
+                temi.speak(TtsRequest.create(kitchenDetails2, false));
+                break;
+            case 7:
+                // Move to the sink
+                flagWaitingForTemiToArrive = true;
+                temi.goTo("waschbecken");
+                break;
+            case 8:
+                String sinkDetails = getString(R.string.aal_sink_details);
+                //showTranscription(sinkDetails);
+                flagWaitingForTemiToFinishSpeaking = true;
+                temi.speak(TtsRequest.create(sinkDetails, false));
+                break;
+            case 9:
+                String worktopDetails = getString(R.string.aal_worktop_details);
+                //showTranscription(worktopDetails);
+                flagWaitingForTemiToFinishSpeaking = true;
+                temi.speak(TtsRequest.create(worktopDetails, false));
+                break;
+            case 10:
+                String kitchenSummary = getString(R.string.aal_kitchen_summary);
+                //showTranscription(kitchenSummary);
+                flagWaitingForTemiToFinishSpeaking = true;
+                temi.speak(TtsRequest.create(kitchenSummary, false));
+                break;
+            case 11:
+                // Move to the living room
+                flagWaitingForTemiToArrive = true;
+                temi.goTo("wohnzimmer");
+                break;
+            case 12:
+                // In the living room
+                String livingRoomIntro = getString(R.string.aal_livingroom_intro);
+                //showTranscription(livingRoomIntro);
+                flagWaitingForTemiToFinishSpeaking = true;
+                temi.speak(TtsRequest.create(livingRoomIntro, false));
+                break;
+            case 13:
+                String livingRoomDetails1 = getString(R.string.aal_livingroom_details1);
+                //showTranscription(livingRoomDetails1);
+                flagWaitingForTemiToFinishSpeaking = true;
+                temi.speak(TtsRequest.create(livingRoomDetails1, false));
+                break;
+            case 14:
+                String livingRoomDetails2 = getString(R.string.aal_livingroom_details2);
+                //showTranscription(livingRoomDetails2);
+                flagWaitingForTemiToFinishSpeaking = true;
+                temi.speak(TtsRequest.create(livingRoomDetails2, false));
+                break;
+            case 15:
+                String farewell = getString(R.string.aal_farewell);
+                //showTranscription(farewell);
+                flagWaitingForTemiToFinishSpeaking = true;
+                temi.speak(TtsRequest.create(farewell, false));
+                // Sequence completed
+                currentSequenceStep = 0;
+                currentSequence = null;
+                break;
+            default:
+                showTranscription("Error: Default in Sequenz AAL!");
+                break;
+        }
+    }
+
+
 
     // for handleSequenceBrainGame: func to check if the user didnt understand the question/sentence and wants it to be repeated
     private boolean checkRepeatRequest()
@@ -1331,8 +1338,8 @@ public class MainActivity extends AppCompatActivity implements
             case 2:
                 nextSentence = getString(R.string.ai_ready_livingroom);
                 temi.speak(TtsRequest.create(nextSentence));
-                displayCommandPreview(true);
                 currentSequenceStep++;
+                displayCommandPreview(true);
                 break;
             case 3:
                 if (checkForContinueNextSequence() | myAsrResultString.contains("bin fertig")) {
@@ -1344,11 +1351,12 @@ public class MainActivity extends AppCompatActivity implements
                 {
                     nextSentence = getString(R.string.ai_not_understood);
                 }
-                displayCommandPreview(false);
+
                 //flagWaitingForTemiToFinishSpeaking = true; // HIER NICHT!!!!
                 temi.speak(TtsRequest.create(nextSentence, false));
                 break;
             case 4:
+                displayCommandPreview(false);
                 currentSequenceStep = 0;
                 currentSequence = Sequence.SEQUENCE_BRAIN_GAME;
         }
