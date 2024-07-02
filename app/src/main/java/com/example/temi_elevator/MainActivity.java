@@ -270,7 +270,7 @@ public class MainActivity extends AppCompatActivity implements
                 @SuppressLint("UseCompatLoadingForDrawables")
                 Drawable drawable = getResources().getDrawable(R.drawable.alexa_commands_preview);
                 imageView.setImageDrawable(drawable);
-            } else if (currentSequence == Sequence.VIVI_INTERACTION) {
+            } else if (currentSequence == Sequence.VIVI_INTERACTION ) {
                 @SuppressLint("UseCompatLoadingForDrawables")
                 Drawable drawable = getResources().getDrawable(R.drawable.vivi_commands_preview);
                 imageView.setImageDrawable(drawable);
@@ -421,7 +421,7 @@ public class MainActivity extends AppCompatActivity implements
         });
         commandsMap.put(new String[]{"fragebogen starten", "fragebogensequenz starten", "fragebogen beginnen", "sequenz fragebogen" }, command -> {
             currentSequence = Sequence.QUESTIONNAIRE;
-            currentSequenceStep = 0;
+            currentSequenceStep = 1;
             chooseCurrentSequence();
         });
         commandsMap.put(new String[]{"führung durch die küche starten", "sequenz küche" }, command -> {
@@ -511,6 +511,7 @@ public class MainActivity extends AppCompatActivity implements
             case QUESTIONNAIRE:
                 scrollToBottom();
                 showFace();
+                if(currentSequenceStep == 0){ currentSequenceStep =1;}
                 handleSequenceQuestionnaire();
                 break;
             case KITCHEN:
@@ -619,7 +620,7 @@ public class MainActivity extends AppCompatActivity implements
         {
             case 0:
                 nextSentence = getString(R.string.vi_vivi_introduction);
-                displayCommandPreview(true);
+                //displayCommandPreview(true);
                 temi.speak(TtsRequest.create(nextSentence));
                 currentSequenceStep++;
                 // now user is talking to Vivi...
@@ -629,16 +630,18 @@ public class MainActivity extends AppCompatActivity implements
                 {
                     nextSentence = getString(R.string.vi_finised) + getString(R.string.survey_announcement);
                     flagWaitingForTemiToFinishSpeaking = true;
-                    displayCommandPreview(false);
+                    //
                 }
                 else
                 {
                     nextSentence = getString(R.string.vi_not_understood);
 
                 }
+                // flag is set in if-statement
                 temi.speak(TtsRequest.create(nextSentence));
                 break;
             case 2:
+                //displayCommandPreview(false);
                 currentSequence = Sequence.QUESTIONNAIRE;
                 currentSequenceStep = 0;
                 flagWaitingForTemiToArrive = true;
@@ -656,9 +659,11 @@ public class MainActivity extends AppCompatActivity implements
         switch (currentSequenceStep)
         {
             // no case 0 because last step is goTo() with waitingFlag in previous sequence
-            case 0: // when sequence is manually called...
-                currentSequenceStep = 1;
+            //case 0: // when sequence is manually called...
+                //currentSequenceStep = 1;
+                //showTranscription("DEBUG: in QUESTIONAIRE-STEP = 0\n");
             case 1:
+                showTranscription("DEBUG: in QUESTIONAIRE-STEP = 1\n");
                 String questions_intro = getString(R.string.survey_questions_intro) + getString(R.string.survey_letsgo);
                 showTranscription(questions_intro);
                 flagWaitingForTemiToFinishSpeaking = true;
