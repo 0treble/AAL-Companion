@@ -22,6 +22,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
+
 import android.graphics.drawable.Drawable;
 
 import android.widget.ImageView;
@@ -1426,7 +1427,6 @@ public class MainActivity extends AppCompatActivity implements
 
     private void setupVideoCall() {
         Log.i(TAG, "Entered transportMode");
-        setContentView(R.layout.activity_main);
 
         // Add listener to check when the robot is ready
         temi.addOnRobotReadyListener(isReady -> {
