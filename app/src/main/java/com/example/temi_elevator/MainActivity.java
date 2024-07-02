@@ -612,6 +612,43 @@ public class MainActivity extends AppCompatActivity implements
                 break;
         }
     }
+    private void handleSequenceViviInteraction()
+    {
+        String nextSentence;
+        switch(currentSequenceStep)
+        {
+            case 0:
+                nextSentence = getString(R.string.vi_vivi_introduction);
+                displayCommandPreview(true);
+                temi.speak(TtsRequest.create(nextSentence));
+                currentSequenceStep++;
+                // now user is talking to Vivi...
+                break;
+            case 1:
+                if(checkForContinueNextSequence())
+                {
+                    nextSentence = getString(R.string.vi_finised) + getString(R.string.survey_announcement);
+                    flagWaitingForTemiToFinishSpeaking = true;
+                    displayCommandPreview(false);
+                }
+                else
+                {
+                    nextSentence = getString(R.string.vi_not_understood);
+
+                }
+                temi.speak(TtsRequest.create(nextSentence));
+                break;
+            case 2:
+                currentSequence = Sequence.QUESTIONNAIRE;
+                currentSequenceStep = 0;
+                flagWaitingForTemiToArrive = true;
+                temi.goTo("wohnzimmersitzgruppe");
+                break;
+            default:
+                showTranscription("Debug: in default der handleSequenceViviInteraction!");
+                break;
+        }
+    }
 
     public void handleSequenceQuestionnaire()
     {
@@ -619,6 +656,8 @@ public class MainActivity extends AppCompatActivity implements
         switch (currentSequenceStep)
         {
             // no case 0 because last step is goTo() with waitingFlag in previous sequence
+            case 0: // when sequence is manually called...
+                currentSequenceStep = 1;
             case 1:
                 String questions_intro = getString(R.string.survey_questions_intro) + getString(R.string.survey_letsgo);
                 showTranscription(questions_intro);
@@ -628,57 +667,57 @@ public class MainActivity extends AppCompatActivity implements
             case 2:
                 askSurveyQuestion(R.string.survey_question_1);
                 break;
-            case 4: case 6: case 8: case 10: case 12: case 14: case 16:
-            case 18: case 20: case 22: case 24: case 26: case 28: case 30:
+            case 3: case 5: case 7: case 9: case 11: case 13: case 15:
+            case 17: case 19: case 21: case 23: case 25: case 27: case 29:
             flagWaitingForUserResponse = true;
             temi.wakeup(Collections.singletonList(SttLanguage.SYSTEM));
             findViewById(R.id.isRecordingImg).setVisibility(View.VISIBLE);
             currentSequenceStep++;
             break;
-            case 3:
+            case 4:
                 askSurveyQuestion(R.string.survey_question_2);
                 break;
-            case 5:
+            case 6:
                 askSurveyQuestion(R.string.survey_question_3);
                 break;
-            case 7:
+            case 8:
                 askSurveyQuestion(R.string.survey_question_4);
                 break;
-            case 9:
+            case 10:
                 askSurveyQuestion(R.string.survey_question_5);
                 break;
-            case 11:
+            case 12:
                 askSurveyQuestion(R.string.survey_question_6);
                 break;
-            case 13:
+            case 14:
                 askSurveyQuestion(R.string.survey_question_7);
                 break;
-            case 15:
+            case 16:
                 askSurveyQuestion(R.string.survey_question_8);
                 break;
-            case 17:
+            case 18:
                 askSurveyQuestion(R.string.survey_question_9);
                 break;
-            case 19:
+            case 20:
                 askSurveyQuestion(R.string.survey_question_10);
                 break;
-            case 21:
+            case 22:
                 askSurveyQuestion(R.string.survey_question_11);
                 break;
-            case 23:
+            case 24:
                 askSurveyQuestion(R.string.survey_question_12);
                 break;
-            case 25:
+            case 26:
                 askSurveyQuestion(R.string.survey_question_13);
                 break;
-            case 27:
+            case 28:
                 String suggestions = getString(R.string.survey_suggestions);
                 showTranscription(suggestions);
 
                 flagWaitingForTemiToFinishSpeaking = true;
                 temi.speak(TtsRequest.create(suggestions, false));
                 break;
-            case 29: // End of sequence GREETING
+            case 30: // End of sequence
                 String goodbye_string = getString(R.string.survey_goodbye_string);
                 showTranscription(goodbye_string);
                 flagWaitingForTemiToFinishSpeaking = true;
@@ -1310,43 +1349,7 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-    private void handleSequenceViviInteraction()
-    {
-        String nextSentence;
-        switch(currentSequenceStep)
-        {
-            case 0:
-                nextSentence = getString(R.string.vi_vivi_introduction);
-                displayCommandPreview(true);
-                temi.speak(TtsRequest.create(nextSentence));
-                currentSequenceStep++;
-                // now user is talking to Vivi...
-                break;
-            case 1:
-                if(checkForContinueNextSequence())
-                {
-                    nextSentence = getString(R.string.vi_finised) + getString(R.string.survey_announcement);
-                    flagWaitingForTemiToFinishSpeaking = true;
-                    displayCommandPreview(false);
-                }
-                else
-                {
-                    nextSentence = getString(R.string.vi_not_understood);
 
-                }
-                temi.speak(TtsRequest.create(nextSentence));
-                break;
-            case 2:
-                currentSequence = Sequence.QUESTIONNAIRE;
-                currentSequenceStep = 0;
-                flagWaitingForTemiToArrive = true;
-                temi.goTo("wohnzimmersitzgruppe");
-                break;
-            default:
-                showTranscription("Debug: in default der handleSequenceViviInteraction!");
-                break;
-        }
-    }
 
 
     public void relocateTemi()

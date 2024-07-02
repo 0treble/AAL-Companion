@@ -97,7 +97,7 @@
     <!-- Survey Sequence Strings -->
     <string name="survey_start_phrase">Hey Temi lass uns anfangen</string>
     <string name="survey_to_kitchen"> Okay! Folgen Sie mir bitte. Es ist wichtig viel zu trinken. Daher haben wir Ihnen Getränke bereitgestellt. Hier wären wir. Bitte bedienen Sie sich. Wenn ich Ihnen etwas zu den hier verbauten (Dingen) erzählen soll, sagen Sie bitte‚ Hey Temi, was kannst du mir zur Küche‘ sagen, andernfalls können wir auch mit‚Hey Temi, lass uns weitergehen‘ mit der Besichtigung fortfahren. </string>
-    <string name="survey_goodbye_string">Ich habe mich gefreut, Sie kennenzulernen und ich möchte mich bei Ihne bedanken, dass Sie an unserer Studie teilgenommen haben. Vielen Dank und alles Gute. </string>
+    <string name="survey_goodbye_string">Vielen Dank für ihren Antworten. Ich habe mich gefreut, Sie kennenzulernen und ich möchte mich bei Ihne bedanken, dass Sie an unserer Studie teilgenommen haben. Vielen Dank und alles Gute. </string>
     <string name="survey_announcement">Unser Treffen neigt sich langsam dem Ende zu. Nehmen Sie doch bitte nocheinmal auf dem Sofa Platz.</string>
     <string name="survey_questions_intro">Bevor wir Schluss machen, möchte ich Sie bitten mir noch ein paar Fragen zu beantworten. Bitte beantworten Sie die Fragen auf einer Skala von 1 bis 6. 1 entspricht trifft völlig zu; 6 entspricht trifft gar nicht zu.
         Also genau so, wie sie es noch aus ihrer Schulzeit kennen. Bei ihren Antworten brauchen sie nicht extra Hey Temi sagen, ich höre automatisch zu, sobald ich die Frage gestellt habe.
