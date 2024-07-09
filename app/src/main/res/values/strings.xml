@@ -89,9 +89,9 @@
     <string name="ai_not_ready">Kein Problem. Ich erkläre Alexa erneut. </string>
     <string name="ai_ready_livingroom">Da wären wir. Die Sprachassistenz, deren Name ich jetzt nicht nennen kann, befindet sich rechts auf der Komode.
         Zu ihrer Erinnerung zeige ich ihnen die Sprachbefehle auf meinem Bildschirm an. Wenn Sie mit der Bedienung der Sprachassistenz fertig sind, oder keine Lust mehr haben, sagen Sie einfach  Hey temi lass uns weitermachen.  </string>
-    <string name="ai_finished">Alles klar. Ich hoffe die Interaktion mit alexa hat funktioniert. </string>
-    <string name="ai_not_understood">Entschuldigung das habe ich wohl nicht korrekt verstanden. Wenn Sie fertig sind mit Alexa, sagen Sie
-         Hey Temi   ich bin fertig mit Alexa oder  Hey Temi  lass uns weitermachen. </string>
+    <string name="ai_finished">Alles klar. Ich hoffe die Interaktion mit dem Sprachassistenzsystem hat funktioniert. </string>
+    <string name="ai_not_understood">Entschuldigung das habe ich wohl nicht korrekt verstanden. Wenn Sie fertig sind mit dem Sprachassistenzsystem, sagen Sie
+         Hey Temi ich bin fertig oder  Hey Temi  lass uns weitermachen. </string>
 
 
     <!-- Survey Sequence Strings -->
@@ -189,7 +189,9 @@
     <string name="sequence4">Gedächtnisspiel</string>
     <string name="sequence5">Küchenrundgang</string>
     <string name="sequence6">Alexa-Interaktion</string>
-    <string name="sequence7">Befragung</string>
+    <string name="sequence7">Abschlussfragebogen</string>
+    <string name="sequence8">Unterstützungsbedarf</string>
+    <string name="sequence9">Vivi Interaktion</string>
 
     <string name="back">Zurück</string>
     <string name="next">Weiter</string>

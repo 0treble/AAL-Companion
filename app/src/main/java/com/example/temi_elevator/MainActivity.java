@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity implements
         Robot.TtsListener,
         OnConversationStatusChangedListener,
         OnGoToLocationStatusChangedListener,
-        OnTelepresenceEventChangedListener {
+        OnTelepresenceEventChangedListener, Robot.WakeupWordListener {
 
     // Member variables
     private final String TAG = "MainActivity";
@@ -86,6 +86,12 @@ public class MainActivity extends AppCompatActivity implements
     private ActivityResultLauncher<Intent> settingsResultLauncher;
     private ExecutorService myExecutorService;
     private String myAsrResultString = "";
+
+    @Override
+    public void onPointerCaptureChanged(boolean hasCapture) {
+        super.onPointerCaptureChanged(hasCapture);
+    }
+
     enum Sequence {UNDEFINED, GREETING, SEQUENCE_ALEXA, AAL_SEQUENCE, SEQUENCE_BRAIN_GAME, QUESTIONNAIRE,
         KITCHEN, ASSISTANCE_QUESTIONAIRE, ALEXA_INTERACTION, VIVI_INTERACTION}
     private Sequence currentSequence;
@@ -110,6 +116,7 @@ public class MainActivity extends AppCompatActivity implements
         temi.addOnGoToLocationStatusChangedListener(this);
         temi.addOnTelepresenceStatusChangedListener(telepresenceStatusChangedListener);
         temi.addOnTelepresenceEventChangedListener(this);
+        temi.addWakeupWordListener(this);
     }
 
     @Override
@@ -130,12 +137,24 @@ public class MainActivity extends AppCompatActivity implements
         init(savedInstanceState);
 
         createLogFile();
+
+    }
+
+    public void onWakeupWord(String wakeupWord, int direction)
+    {
+        //showFace(R.drawable.smileblink_crop);
+        if(wakeupWord.equals("Hey Auto"))
+        {
+            temi.speak(TtsRequest.create("Neuer Aufrufname detektiert"));
+        }
     }
 
     private void init(Bundle savedInstanceState) {
         startTranscription();
         setupThemeButton();
         initCommandsMap();
+        showFace(R.drawable.sleeping_crop);
+
 
         scrollView = findViewById(R.id.scrollView);
 
@@ -157,6 +176,7 @@ public class MainActivity extends AppCompatActivity implements
         findViewById(R.id.endTranscription).setOnClickListener(view -> {
             showTranscription("Transkription beended.");
             findViewById(R.id.isRecordingImg).setVisibility(View.INVISIBLE);
+            showFace(R.drawable.sleeping_crop);
         });
 
         findViewById(R.id.quitButton).setOnClickListener(view -> {
@@ -221,9 +241,9 @@ public class MainActivity extends AppCompatActivity implements
         /* Robot Face Display */
         findViewById(R.id.imgOverlayButton).setOnClickListener(view ->  {
             Glide.with(this).asGif().load(R.drawable.smileblink_crop).into((android.widget.ImageView) findViewById(R.id.overlay_image));
-
-            showFace();
+            showFace(R.drawable.smileblink_crop);
         });
+
 
         findViewById(R.id.img_close_button).setOnClickListener(view ->  {
             findViewById(R.id.overlay_image).setVisibility(View.GONE);
@@ -251,8 +271,8 @@ public class MainActivity extends AppCompatActivity implements
         findViewById(R.id.confirmCallButton).setOnClickListener(view -> startVideoMeeting(contact));
     }
 
-    private void showFace()
-    {
+    private void showFace(int gifResource) {
+        Glide.with(this).asGif().load(gifResource).into((android.widget.ImageView) findViewById(R.id.overlay_image));
         findViewById(R.id.overlay_image).setVisibility(View.VISIBLE);
         findViewById(R.id.img_close_button).setVisibility(View.VISIBLE);
     }
@@ -260,19 +280,20 @@ public class MainActivity extends AppCompatActivity implements
     private AlertDialog dialog; // Declare the AlertDialog as a field to keep its state
 
     private void displayCommandPreview(boolean show) {
+
         // Only create the dialog if it hasn't been initialized
-        if (dialog == null) {
+        if (dialog == null || !dialog.isShowing()) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             ImageView imageView = new ImageView(this);
 
             // Depending on the sequence, load the corresponding image
-            if (currentSequence == Sequence.ALEXA_INTERACTION) {
-                @SuppressLint("UseCompatLoadingForDrawables")
-                Drawable drawable = getResources().getDrawable(R.drawable.alexa_commands_preview);
-                imageView.setImageDrawable(drawable);
-            } else if (currentSequence == Sequence.VIVI_INTERACTION ) {
+            if (currentSequence == Sequence.VIVI_INTERACTION) {
                 @SuppressLint("UseCompatLoadingForDrawables")
                 Drawable drawable = getResources().getDrawable(R.drawable.vivi_commands_preview);
+                imageView.setImageDrawable(drawable);
+            } else if (currentSequence == Sequence.ALEXA_INTERACTION) {
+                @SuppressLint("UseCompatLoadingForDrawables")
+                Drawable drawable = getResources().getDrawable(R.drawable.alexa_commands_preview);
                 imageView.setImageDrawable(drawable);
             }
 
@@ -281,9 +302,9 @@ public class MainActivity extends AppCompatActivity implements
         }
 
         // Control the display of the dialog based on the 'show' parameter
-        if (show && !dialog.isShowing()) {
+        if (show) {
             dialog.show();
-        } else if (!show && dialog.isShowing()) {
+        } else {
             dialog.dismiss();
         }
 
@@ -342,32 +363,36 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onConversationStatusChanged(int status, @NotNull String text) {
         myAsrResultString += text;
-        switch (status)
-        {
+        switch (status) {
             case IDLE:
                 Log.i(TAG, "Status: IDLE | Text: " + myAsrResultString);
-                showTranscription("Status: IDLE | Text: " + myAsrResultString);
+                //showTranscription("Status: IDLE | Text: " + myAsrResultString);
+                //showFace(R.drawable.sleeping_crop);
                 findViewById(R.id.isRecordingImg).setVisibility(View.INVISIBLE);
                 break;
             case LISTENING:
                 Log.i(TAG, "Status: LISTENING | Text: " + myAsrResultString);
-                showTranscription("Status: LISTENING | Text: " + myAsrResultString);
+                //showTranscription("Status: LISTENING | Text: " + myAsrResultString);
+                showFace(R.drawable.smileblink_crop);
                 findViewById(R.id.isRecordingImg).setVisibility(View.VISIBLE);
                 break;
             case THINKING:
                 Log.i(TAG, "Status: THINKING | Text: " + myAsrResultString);
-                showTranscription("Status: THINKING | Text: " + myAsrResultString);
+                //showTranscription("Status: THINKING | Text: " + myAsrResultString);
+                showFace(R.drawable.smileblink_crop);
                 break;
             case SPEAKING:
                 Log.i(TAG, "Status: SPEAKING | Text: " + myAsrResultString);
-                showTranscription("Status: SPEAKING | Text: " + myAsrResultString);
+                //showTranscription("Status: SPEAKING | Text: " + myAsrResultString);
+                showFace(R.drawable.happyblink_crop);
                 break;
             default:
                 Log.i(TAG, "Status: UNKNOWN | Text: " + myAsrResultString);
-                showTranscription("Status: UNKNOWN | Text: " + myAsrResultString);
-                findViewById(R.id.isRecordingImg).setVisibility(View.INVISIBLE);
+                //showTranscription("Status: UNKNOWN | Text: " + myAsrResultString);
+                showFace(R.drawable.sleeping_crop);
                 break;
         }
+
 
         if(flagWaitingForUserResponse & status == IDLE)
         {
@@ -439,7 +464,7 @@ public class MainActivity extends AppCompatActivity implements
             currentSequenceStep = 0;
             chooseCurrentSequence();
         });
-        commandsMap.put(new String[]{"sequenz vivi", "sequenz vivaicare", "sequenz stationäres assistenzsystem" }, command -> {
+        commandsMap.put(new String[]{"sequenz vivi", "sequenz video", "sequenz vivaicare", "sequenz stationäres assistenzsystem" }, command -> {
             currentSequence = Sequence.VIVI_INTERACTION;
             currentSequenceStep = 0;
             chooseCurrentSequence();
@@ -477,6 +502,8 @@ public class MainActivity extends AppCompatActivity implements
 
     public void stopCurrentSequence()
     {
+        displayCommandPreview(false);
+        showFace(R.drawable.sleeping_crop);
         temi.stopMovement();
         temi.cancelAllTtsRequests();
         currentSequenceStep = 0;
@@ -490,48 +517,48 @@ public class MainActivity extends AppCompatActivity implements
         {
             case GREETING:
                 scrollToBottom();
-                showFace();
+                showFace(R.drawable.happyblink_crop);
                 handleSequenceGreeting();
                 break;
             case SEQUENCE_ALEXA:
                 scrollToBottom();
-                showFace();
+                showFace(R.drawable.happyblink_crop);
                 handleSequenceAlexa();
                 break;
             case AAL_SEQUENCE:
                 scrollToBottom();
-                showFace();
+                showFace(R.drawable.happyblink_crop);
                 handleAALSequence();
                 break;
             case SEQUENCE_BRAIN_GAME:
                 //scrollToBottom();
-                showFace();
+                showFace(R.drawable.happyblink_crop);
                 handleSequenceBrainGame();
                 break;
             case QUESTIONNAIRE:
                 scrollToBottom();
-                showFace();
+                showFace(R.drawable.happyblink_crop);
                 if(currentSequenceStep == 0){ currentSequenceStep =1;}
                 handleSequenceQuestionnaire();
                 break;
             case KITCHEN:
                 scrollToBottom();
-                showFace();
+                showFace(R.drawable.happyblink_crop);
                 handleSequenceKitchen();
                 break;
             case ASSISTANCE_QUESTIONAIRE:
                 scrollToBottom();
-                showFace();
+                showFace(R.drawable.happyblink_crop);
                 handleSequenceAssistanceQuestionaire();
                 break;
             case ALEXA_INTERACTION:
                 scrollToBottom();
-                showFace();
+                showFace(R.drawable.happyblink_crop);
                 handleSequenceAlexaInteraction();
                 break;
             case VIVI_INTERACTION:
                 scrollToBottom();
-                showFace();
+                showFace(R.drawable.happyblink_crop);
                 handleSequenceViviInteraction();
                 break;
             default:
@@ -830,7 +857,7 @@ public class MainActivity extends AppCompatActivity implements
                     {
                         nextSentence += getString(R.string.bg_answer_correct);
                     }
-                    nextSentence += getString(R.string.bg_answer_correct);
+                    //nextSentence += getString(R.string.bg_answer_correct);
                     // step/case incremeted by the statusChange of tts
                 }
                 else
@@ -901,6 +928,7 @@ public class MainActivity extends AppCompatActivity implements
                 temi.speak(TtsRequest.create(nextSentence));
                 // now user is talking to Vivi...
                 displayCommandPreview(true);
+                //showFace(R.drawable.vivi_commands_preview);
                 break;
             case 1:
                 temi.goTo("wohnzimmer");
@@ -923,13 +951,14 @@ public class MainActivity extends AppCompatActivity implements
                 break;
             case 3:
                 displayCommandPreview(false);
+                //showFace(R.drawable.happyblink_crop);
                 currentSequence = Sequence.QUESTIONNAIRE;
                 currentSequenceStep = 0;
                 flagWaitingForTemiToArrive = true;
                 temi.goTo("wohnzimmersitzgruppe");
                 break;
             default:
-                showTranscription("Debug: in default der handleSequenceViviInteraction!");
+                //showTranscription("Debug: in default der handleSequenceViviInteraction!");
                 break;
         }
     }
@@ -944,7 +973,7 @@ public class MainActivity extends AppCompatActivity implements
                 //currentSequenceStep = 1;
                 //showTranscription("DEBUG: in QUESTIONAIRE-STEP = 0\n");
             case 1:
-                showTranscription("DEBUG: in QUESTIONAIRE-STEP = 1\n");
+                //("DEBUG: in QUESTIONAIRE-STEP = 1\n");
                 String questions_intro = getString(R.string.survey_questions_intro) + getString(R.string.survey_letsgo);
                 showTranscription(questions_intro);
                 flagWaitingForTemiToFinishSpeaking = true;
@@ -1181,7 +1210,6 @@ public class MainActivity extends AppCompatActivity implements
     }
 
 
-
     private void handleSequenceKitchen()
     {
         String nextSentence;
@@ -1243,16 +1271,14 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-
     private boolean checkForContinueNextSequence()
     {
-        return myAsrResultString.contains("lass uns weitermachen")
-                | myAsrResultString.contains("ich bin bereit")
-                | myAsrResultString.contains("es kann weitergehen")
+        return myAsrResultString.contains("weitermachen")
+                | myAsrResultString.contains("bin bereit")
                 | myAsrResultString.contains("weiter")
+                | myAsrResultString.contains("was nun")
                 | myAsrResultString.contains("was jetzt");
     }
-
 
     private void handleSequenceAssistanceQuestionaire()
     {
@@ -1313,7 +1339,7 @@ public class MainActivity extends AppCompatActivity implements
 
     private void handleSequenceAlexaInteraction()
     {
-        showTranscription("DEBUG: In der handleAlexaSequence");
+        //showTranscription("DEBUG: In der handleAlexaSequence");
         String nextSentence;
         switch(currentSequenceStep) {
             case 0:
@@ -1340,6 +1366,7 @@ public class MainActivity extends AppCompatActivity implements
                 temi.speak(TtsRequest.create(nextSentence));
                 currentSequenceStep++;
                 displayCommandPreview(true);
+                //showFace(R.drawable.alexa_commands_preview);
                 break;
             case 3:
                 if (checkForContinueNextSequence() | myAsrResultString.contains("bin fertig")) {
@@ -1357,12 +1384,11 @@ public class MainActivity extends AppCompatActivity implements
                 break;
             case 4:
                 displayCommandPreview(false);
+                //showFace(R.drawable.happyblink_crop);
                 currentSequenceStep = 0;
                 currentSequence = Sequence.SEQUENCE_BRAIN_GAME;
         }
     }
-
-
 
 
     public void relocateTemi()
@@ -1520,7 +1546,9 @@ public class MainActivity extends AppCompatActivity implements
         temi.setHardButtonsDisabled(true);
         temi.setGoToSpeed(SpeedLevel.SLOW);
         currentSequence = Sequence.UNDEFINED;
-        showTranscription("Debug: currentSequence = UNDEFINED");
+        //showTranscription("Debug: currentSequence = UNDEFINED");
+
+
     }
 
     public static class ContactMapWrapper {
