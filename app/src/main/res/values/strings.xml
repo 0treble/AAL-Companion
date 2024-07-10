@@ -1,4 +1,19 @@
 <resources>
+
+    <string name="survey_title_for_transcript">"\n\t-------------------------------------------------\n
+        -------------------------------------------------\n
+        -------------------------------------------------\n
+        Forschungsprojekt Voice zur Untersuchung von Assistenzsystemen im Alltag\n
+        START Untersuchungstranskript erzeugt vom Assistenzsystem Temi\n
+        -------------------------------------------------\n
+        -------------------------------------------------\n\n
+    </string>
+    <string name="survey_outro_for_transcript">\n-------------------------------------------------\n
+        -------------------------------------------------\n
+        ENDE des Untersuchungstranskript\n
+        -------------------------------------------------\n
+        -------------------------------------------------\n\n</string>
+
     <string name="app_name">TemiVoice</string>
     <string name="top_view_text">Wählen Sie einen Kontakt, den Sie anrufen möchten:</string>
     <string name="ja">Zurück zur Basisstation</string>
@@ -47,7 +62,7 @@
         Wenn Sie daran Interesse haben sagen Sie Hey Temi was kannst du mir zur Küche sagen.
         Andernfalls könne wir auch mit der Untersuchung fortfahren. Sagen Sie dazu  Hey Temi lass
         uns weitermachen.</string>
-    <string name="kt_no_tour">Kein Problem. Dann machen wir weiter.</string>
+    <string name="kt_no_tour">Kein Problem. Dann machen wir weiter. </string>
     <string name="kt_tour_finished">Nehmen Sie ihr Getränk und lassen sie uns zurück ins
         Wohnzimmer zurückgehen. Wenn Sie bereit sind sagen Sie  Hey Temi lass uns weitermachen.</string>
 
@@ -61,7 +76,7 @@
 
     <string name="aq_ans_unsufficiant">Entschuldigung das habe ich nicht korrekt verstanden.
         Ich werde das Vorgehen noch einmal erklären.</string>
-    <string name="aq_ans_ready">Alles klar. Los gehts.  </string>
+    <string name="aq_ans_ready">Alles klar. Los gehts. </string>
     <string name="aq_remind_no_hey_temi">Wie gesagt, sie brauchen mich nicht mit Hey Temi anzusprechen.
         Sprechen Sie einfahc drauf los</string>
     <string name="aq_question_1">Die erste Frage lautet  Wenn
@@ -70,10 +85,10 @@
     erinnern, falls Sie welche einnehmen. Würde Ihnen das gefallen?       </string>
     <string name="aq_question_3">Vielen Dank. Außerdem könnte ich Sie  im Laufe eines Tages auch erinnern, genug zu trinken.
      Wäre das für sie hilfreich?  </string>
-    <string name="aq_thanks">Vielen Dank. Ich habe mir deine Antworten gemerkt. </string>
+    <string name="aq_thanks">Vielen Dank. Ich habe mir ihre Antworten gemerkt. </string>
 
     <!-- Alexa interaction Sequence Strings -->
-    <string name="ai_introduction">Als nächstes mächte ich Ihnen ein weiteres Sprachassistenzsystem
+    <string name="ai_introduction">Als nächstes möchte ich Ihnen ein weiteres Sprachassistenzsystem
         namens    Alexa    vorstellen. Diese befindet sich rechts auf der Komode
         im Wohnzimmer. Bevor wir jedoch dorthin
         zurückgehen, möchte ich Ihnen die Bedienung der Alexa  noch hier erklären. Grund dafür ist,
@@ -139,7 +154,7 @@
                                     Ich gebe den ersten Teil eines Spruches vor und Sie vollenden ihn. Wenn Sie einen Satz nicht verstanden haben, bitten Sie mich einfach, ihn zu widerholen. Wenn Sie bereit sind sagen Sie ja, wenn ich das Spiel nochmal erklären soll, sagen sie nein. Sind Sie bereit?</string>
     <string name="bg_introduction_short">Kurzfassung: Wenn Sie bereit sind sagen Sie ja Sind Sie bereit?</string>
     <string name="bg_iRepeat">Kein Problem. Ich erkläre das Spiel noch einmal.</string>
-    <string name="bg_letsgo">Alles klar. Los gehts!</string>
+    <string name="bg_letsgo">Alles klar. Los gehts! </string>
     <string name="bg_sentence1">Der erste Satz lautet: Besser den Spatz in der Hand, als …</string>
     <string name="bg_sentence2">Der nächste Satz lautet: Eine Schwalbe …</string>
     <string name="bg_sentence3">Der nächste Satz lautet: Alter schützt …</string>
@@ -156,7 +171,7 @@
     <string name="bg_finish_answer_negative">Dann müssen meine Entwickler wohl noch etwas nachbessern!</string>
     <string name="bg_answer_correct">Das war richtig! Super!</string>
     <string name="bg_dont_know_answer">Kein Problem. </string>
-    <string name="bg_sorry_wrong">Entschuldige, das habe ich wohl nicht korrekt verstanden. </string>
+    <string name="bg_sorry_wrong">Entschuldigen Sie, das habe ich wohl nicht korrekt verstanden. </string>
 
     <!-- ViviInteraction Sequence String -->
     <string name="vi_transition">Im nächsten Schritt würde ich Ihnen gerne ein weiteres Sprachassistenzsystem vorstellen, welches hier in der A A L Musterwohung eingerichtet ist.
@@ -178,7 +193,7 @@
     <string name="quit">Beenden</string>
     <string name="button">Button</string>
     <string name="listen">Hören</string>
-    <string name="TranscriptionText">Transkription wird hier angezeigt.</string>
+    <string name="TranscriptionText">Transkript</string>
     <string name="endTranscriptionButton">endTranscriptionButton</string>
     <string name="end_transcription">Transkription beenden</string>
     <string name="sequenceButtonText">Sequenz</string>
