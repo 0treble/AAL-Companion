@@ -428,6 +428,7 @@ public class MainActivity extends AppCompatActivity implements
         commandsMap.put(new String[]{"gesprächsmodus", "dialogmodus", "gesprächs modus"}, command -> conversationMode = !conversationMode);
         commandsMap.put(new String[]{"erinnere mich", "erinnerung setzen", "setze eine erinnerung"}, command -> setReminder());
         commandsMap.put(new String[]{"wiederholen", "erneut", "wiederhole", "noch mal", "nicht verstanden"}, command -> findViewById(R.id.repeatButton).performClick());
+        commandsMap.put(new String[]{"ausblenden", "befehle ausblenden", "bild ausblenden", "zurück" }, command -> displayCommandPreview(false));
         /* Sequences */
         commandsMap.put(new String[]{"gäste begrüßen", "begrüßung starten", "begrüßung", "willkommenssequenz starten", "sequenz 1 starten",
                 "sequenz 1 beginnen"}, command -> {
@@ -1335,30 +1336,38 @@ public class MainActivity extends AppCompatActivity implements
             case 1:
             case 3:
             case 5:
+            case 7:
                 temi.wakeup(Collections.singletonList(SttLanguage.SYSTEM));
                 findViewById(R.id.isRecordingImg).setVisibility(View.VISIBLE);
                 flagWaitingForUserResponse = true;
                 currentSequenceStep++;
                 break;
+
             case 2:
-                nextString = getString(R.string.aq_question_2);
+                nextString = getString(R.string.aq_question_1_anything_else);
                 showTranscription("Temi: " + nextString);
                 flagWaitingForTemiToFinishSpeaking = true;
                 temi.speak(TtsRequest.create(nextString));
                 break;
             case 4:
-                nextString = getString(R.string.aq_question_3);
+                nextString = getString(R.string.aq_question_2);
                 showTranscription("Temi: " + nextString);
                 flagWaitingForTemiToFinishSpeaking = true;
                 temi.speak(TtsRequest.create(nextString));
                 break;
             case 6:
+                nextString = getString(R.string.aq_question_3);
+                showTranscription("Temi: " + nextString);
+                flagWaitingForTemiToFinishSpeaking = true;
+                temi.speak(TtsRequest.create(nextString));
+                break;
+            case 8:
                 nextString = getString(R.string.aq_thanks) + getString(R.string.ai_introduction);
                 showTranscription("Temi: " + nextString);
                 flagWaitingForTemiToFinishSpeaking = true;
                 temi.speak(TtsRequest.create(nextString));
                 break;
-            case 7:
+            case 9:
                 showTranscription("\nSystem: Ende Sequenz Unterstützungsbedarf\n-------------------------------\n");
                 currentSequenceStep = 0;
                 currentSequence = Sequence.ALEXA_INTERACTION;

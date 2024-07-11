@@ -81,6 +81,7 @@
         Sprechen Sie einfahc drauf los</string>
     <string name="aq_question_1">Die erste Frage lautet  Wenn
         ich in Ihrem Haushalt verfügbar wäre, worin könnte ich Sie unterstützen</string>
+    <string name="aq_question_1_anything_else">Möchten Sie noch etwas hinzufügen? </string>
     <string name="aq_question_2">Vielen Dank für ihre Antwort. Ich könnte Sie beispielsweise auch an die Medikamenteneinnahme
     erinnern, falls Sie welche einnehmen. Würde Ihnen das gefallen?       </string>
     <string name="aq_question_3">Vielen Dank. Außerdem könnte ich Sie  im Laufe eines Tages auch erinnern, genug zu trinken.
