@@ -38,6 +38,7 @@
             android:text="@string/sequenceButtonText"
             android:textColor="?attr/colorOnPrimary"
             android:textSize="20sp"
+            android:foreground="?attr/selectableItemBackgroundBorderless"
             app:layout_constraintBottom_toBottomOf="@+id/confirmCallButton"
             app:layout_constraintStart_toEndOf="@+id/confirmCallButton"
             app:layout_constraintTop_toTopOf="@+id/confirmCallButton"
@@ -51,6 +52,7 @@
             android:text="@string/settingsButtonText"
             android:textColor="?attr/colorOnPrimary"
             android:textSize="20sp"
+            android:foreground="?attr/selectableItemBackgroundBorderless"
             app:layout_constraintBottom_toBottomOf="@+id/confirmCallButton"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/sequenceWindowButton"
@@ -66,6 +68,7 @@
             android:backgroundTint="?attr/colorOnTertiary"
             android:entries="@array/spinner_items"
             android:scrollbarSize="30dp"
+            android:foreground="?attr/selectableItemBackgroundBorderless"
             app:layout_constraintBottom_toTopOf="@+id/endTranscription"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -81,6 +84,7 @@
             android:text="@string/call"
             android:textColor="?attr/colorOnPrimary"
             android:textSize="20sp"
+            android:foreground="?attr/selectableItemBackgroundBorderless"
             app:layout_constraintBottom_toBottomOf="@+id/dropdownMenu"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
@@ -137,6 +141,7 @@
                 android:textColor="?attr/colorOnPrimary"
                 android:textSize="20sp"
                 android:visibility="invisible"
+                android:foreground="?attr/selectableItemBackgroundBorderless"
                 app:layout_constraintBottom_toBottomOf="@+id/confirmTextView"
                 app:layout_constraintEnd_toEndOf="@+id/scrollView"
                 app:layout_constraintStart_toStartOf="@+id/scrollView"
@@ -151,6 +156,7 @@
                 android:text="@string/vielen_dank_temi"
                 android:textColor="?attr/colorOnPrimary"
                 android:visibility="invisible"
+                android:foreground="?attr/selectableItemBackgroundBorderless"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/elevatorTextView" />
@@ -163,6 +169,7 @@
                 android:text="@string/i_want_to_scan_a_qr_code"
                 android:textColor="?attr/colorOnPrimary"
                 android:visibility="invisible"
+                android:foreground="?attr/selectableItemBackgroundBorderless"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -178,6 +185,7 @@
                 android:text="@string/quit"
                 android:textColor="?attr/colorOnPrimary"
                 android:textSize="20sp"
+                android:foreground="?attr/selectableItemBackgroundBorderless"
                 app:layout_constraintBottom_toBottomOf="@+id/QRCodeButton"
                 app:layout_constraintEnd_toEndOf="@+id/scrollView" />
 
@@ -189,6 +197,7 @@
                 android:text="@string/listen"
                 android:textColor="?attr/colorOnPrimary"
                 android:textSize="20sp"
+                android:foreground="?attr/selectableItemBackgroundBorderless"
                 app:layout_constraintBottom_toBottomOf="@+id/QRCodeButton"
                 app:layout_constraintEnd_toStartOf="@+id/quitButton"
                 app:layout_constraintStart_toEndOf="@+id/QRCodeButton" />
@@ -200,6 +209,7 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginEnd="16dp"
                 android:background="?attr/colorOnTertiary"
+                android:foreground="?attr/selectableItemBackgroundBorderless"
                 app:layout_constraintBottom_toTopOf="@+id/listen"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
@@ -239,6 +249,7 @@
                 android:elegantTextHeight="true"
                 android:text="@string/dark_theme"
                 android:textColor="?attr/colorOnPrimary"
+                android:foreground="?attr/selectableItemBackgroundBorderless"
                 app:layout_constraintBottom_toBottomOf="@+id/QRCodeButton"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.016"
@@ -252,6 +263,7 @@
                 android:elegantTextHeight="true"
                 android:text="@string/img_overlay"
                 android:textColor="?attr/colorOnPrimary"
+                android:foreground="?attr/selectableItemBackgroundBorderless"
                 app:layout_constraintBottom_toBottomOf="@+id/QRCodeButton"
                 app:layout_constraintEnd_toStartOf="@+id/repeatButton"
                 app:layout_constraintStart_toEndOf="@+id/themeButton" />
@@ -265,6 +277,7 @@
                 android:elegantTextHeight="true"
                 android:text="@string/repeatLastSequenceStep"
                 android:textColor="?attr/colorOnPrimary"
+                android:foreground="?attr/selectableItemBackgroundBorderless"
                 app:layout_constraintBottom_toBottomOf="@+id/QRCodeButton"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.191"
@@ -281,6 +294,7 @@
             android:text="@string/end_transcription"
             android:textColor="?attr/colorOnPrimary"
             android:textSize="20sp"
+            android:foreground="?attr/selectableItemBackgroundBorderless"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -306,15 +320,15 @@
 
         <ImageView
             android:id="@+id/overlay_image"
-            android:scaleType="fitXY"
             android:layout_width="fill_parent"
             android:layout_height="match_parent"
+            android:contentDescription="@string/img_description"
+            android:scaleType="fitXY"
             android:src="@drawable/smileblink_crop"
             android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:contentDescription="@string/img_description" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <Button
             android:id="@+id/img_close_button"
