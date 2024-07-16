@@ -1227,7 +1227,7 @@ public class MainActivity extends AppCompatActivity implements
     // for handleSequenceBrainGame: func to check if the user didnt understand the question/sentence and wants it to be repeated
     private boolean checkRepeatRequest()
     {
-        return myAsrResultString.contains("wiederhole") | myAsrResultString.contains("noch mal") | myAsrResultString.contains("nicht verstanden");
+        return myAsrResultString.contains("wiederhole") | myAsrResultString.contains("noch mal") | myAsrResultString.contains("nicht verstanden") | myAsrResultString.contains("wiederholen");
     }
     private boolean checkForDontKnowAnswer()
     {
@@ -1316,6 +1316,7 @@ public class MainActivity extends AppCompatActivity implements
         switch (currentSequenceStep)
         {
             case 0:
+
                 showTranscription("\n-------------------------------\nSystem: Start Sequenz Unterstützungsbedarf\n");
                 // called when user says "Hey Temi ich bin bereit"
                 if(checkForContinueNextSequence())
@@ -1327,10 +1328,10 @@ public class MainActivity extends AppCompatActivity implements
                 }
                 else
                 {
-                    nextString = getString(R.string.aq_ans_unsufficiant) + getString(R.string.aq_introduction);
+                    nextString = getString(R.string.aq_ans_unsufficiant) + getString(R.string.aq_introduction_short);
                     //currentSequenceStep = 0;
                 }
-                showTranscription("Temi" + nextString);
+                showTranscription("Temi: " + nextString);
                 temi.speak(TtsRequest.create(nextString));
                 break;
             case 1:
@@ -1344,25 +1345,65 @@ public class MainActivity extends AppCompatActivity implements
                 break;
 
             case 2:
-                nextString = getString(R.string.aq_question_1_anything_else);
+                showTranscription("DEBUG: STEP = " + currentSequenceStep);
+                if(checkRepeatRequest())
+                {
+                    nextString = getString(R.string.aq_question_1);
+                    currentSequenceStep -= 2;   // because we want to go to step 2 again after user input
+                }
+                else
+                {
+                    nextString = getString(R.string.aq_question_1_anything_else);
+                }
                 showTranscription("Temi: " + nextString);
                 flagWaitingForTemiToFinishSpeaking = true;
                 temi.speak(TtsRequest.create(nextString));
                 break;
             case 4:
-                nextString = getString(R.string.aq_question_2);
+                showTranscription("DEBUG: STEP = " + currentSequenceStep);
+                if(checkRepeatRequest())
+                {
+                    showTranscription("DEBUG: ENTERED  REPEAT REQUEST - step = " + currentSequenceStep);
+                    nextString = getString(R.string.aq_question_1_anything_else);
+                    currentSequenceStep -= 2;
+                }
+                else
+                {
+                    nextString = getString(R.string.aq_question_2);
+
+                }
                 showTranscription("Temi: " + nextString);
                 flagWaitingForTemiToFinishSpeaking = true;
                 temi.speak(TtsRequest.create(nextString));
                 break;
             case 6:
-                nextString = getString(R.string.aq_question_3);
+                showTranscription("DEBUG: STEP = " + currentSequenceStep);
+                if(checkRepeatRequest())
+                {
+                    showTranscription("DEBUG: ENTERED  REPEAT REQUEST - step = " + currentSequenceStep);
+                    nextString = getString(R.string.aq_question_2);
+                    currentSequenceStep -= 2;
+                }
+                else
+                {
+                    nextString = getString(R.string.aq_question_3);
+                }
                 showTranscription("Temi: " + nextString);
                 flagWaitingForTemiToFinishSpeaking = true;
                 temi.speak(TtsRequest.create(nextString));
                 break;
             case 8:
-                nextString = getString(R.string.aq_thanks) + getString(R.string.ai_introduction);
+                showTranscription("DEBUG: STEP = " + currentSequenceStep);
+                if(checkRepeatRequest())
+                {
+                    showTranscription("DEBUG: ENTERED  REPEAT REQUEST - step = " + currentSequenceStep);
+                    nextString = getString(R.string.aq_question_3);
+                    currentSequenceStep -= 2;
+                }
+                else
+                {
+                    nextString = getString(R.string.aq_thanks) + getString(R.string.ai_introduction);
+                }
                 showTranscription("Temi: " + nextString);
                 flagWaitingForTemiToFinishSpeaking = true;
                 temi.speak(TtsRequest.create(nextString));

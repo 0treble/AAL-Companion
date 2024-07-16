@@ -42,7 +42,7 @@
         Zusammen mit meinen Freunden Alexa und Vivi werde ich Ihnen heute versuchen aufzuzeigen,
         wie wir Ihnen tatkräftig zur Seite stehen können. Meine Freundin Vivi z.B. nutzt ihre
         Sturzsensoren, um immer ein Auge darauf zu haben, dass es Ihnen noch gut geht.
-        Im Verlauf dieser Untersuchung haben wir
+        Im Verlauf dieses Programmes haben wir
         einige Szenarien vorbereitet, in denen sie meine Fähigkeiten kennenlernen können.
         Damit wir uns gut verstehen, ist es wichtig, dass sie mich immer aussprechen lassen.
         In einem ersten Schritt möchte ich Ihnen eine kleine Führung durch unsere Musterwohnung geben
@@ -60,7 +60,7 @@
         wir Ihnen Getränke bereitgestellt. Bitte bedienen Sie sich und nehmen Sie gerne Platz.
         Wenn sie möchten, erkläre ich Ihnen einige Besonderheiten dieser Küche.
         Wenn Sie daran Interesse haben sagen Sie Hey Temi was kannst du mir zur Küche sagen.
-        Andernfalls könne wir auch mit der Untersuchung fortfahren. Sagen Sie dazu  Hey Temi lass
+        Andernfalls können wir auch mit dem Programm fortfahren. Sagen Sie dazu  Hey Temi lass
         uns weitermachen.</string>
     <string name="kt_no_tour">Kein Problem. Dann machen wir weiter. </string>
     <string name="kt_tour_finished">Nehmen Sie ihr Getränk und lassen sie uns zurück ins
@@ -73,7 +73,7 @@
         mit  Hey Temi  ansprechen. Wenn ich Ihnen die Frage gestellt habe, höre ich
         automatisch zu. Wenn Sie das verstanden haben und bereit sind, sagen Sie Hey Temi ja ich bin
         bereit. Ansonsten kann ich den Frageablauf auch erneut erklären.  </string>
-
+    <string name="aq_introduction_short">Unterstützungsbedarf Kurzfassung. Sagen Sie Temi bin bereit</string>
     <string name="aq_ans_unsufficiant">Entschuldigung das habe ich nicht korrekt verstanden.
         Ich werde das Vorgehen noch einmal erklären.</string>
     <string name="aq_ans_ready">Alles klar. Los gehts. </string>
@@ -186,7 +186,7 @@
         Ich werde solange an der Wand warten. Zu ihrer Unterstützung zeige ich ihnen die Sprachbefehle auch auf meinem Bildschirm an.
         Wenn Sie fertig sind mit Vivi oder keine Lust mehr haben, werde ich wieder übernehmen. Sagen Sie dazu einfach Hey temi lass uns weitermachen.</string>
     <string name="vi_not_understood">Entschuldigung das habe ich wohl nicht korrekt verstanden. Wenn Sie mit Vivi fertig sind, sagen Sie Hey Temi lass uns weitermachen.</string>
-    <string name="vi_finised">Alles klar. ich hoffe die Interaktion mit Vivi hat gut funktioniert. Dann machen wir mal weiter mit der Untersuchung.</string>
+    <string name="vi_finised">Alles klar. ich hoffe die Interaktion mit Vivi hat gut funktioniert. Dann machen wir mal weiter mit dem Programm.</string>
 
     <!-- Button Label Strings -->
     <string name="take_photo">Transport Modus</string>
