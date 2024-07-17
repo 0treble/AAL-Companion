@@ -954,8 +954,9 @@ public class MainActivity extends AppCompatActivity implements
                 //showFace(R.drawable.vivi_commands_preview);
                 break;
             case 1:
+                flagWaitingForTemiToArrive = true;
                 temi.goTo("wohnzimmer");
-                currentSequenceStep++;
+                //currentSequenceStep++;
                 break;
             case 2:
                 if(checkForContinueNextSequence())
@@ -1338,6 +1339,7 @@ public class MainActivity extends AppCompatActivity implements
             case 3:
             case 5:
             case 7:
+                showTranscription("DEBUG: LISTENING IN STEP = " + currentSequenceStep);
                 temi.wakeup(Collections.singletonList(SttLanguage.SYSTEM));
                 findViewById(R.id.isRecordingImg).setVisibility(View.VISIBLE);
                 flagWaitingForUserResponse = true;
@@ -1348,8 +1350,10 @@ public class MainActivity extends AppCompatActivity implements
                 showTranscription("DEBUG: STEP = " + currentSequenceStep);
                 if(checkRepeatRequest())
                 {
+                    showTranscription("DEBUG: ENTERED  REPEAT REQUEST - step = " + currentSequenceStep);
                     nextString = getString(R.string.aq_question_1);
                     currentSequenceStep -= 2;   // because we want to go to step 2 again after user input
+                    //myAsrResultString ="";
                 }
                 else
                 {
@@ -1366,16 +1370,20 @@ public class MainActivity extends AppCompatActivity implements
                     showTranscription("DEBUG: ENTERED  REPEAT REQUEST - step = " + currentSequenceStep);
                     nextString = getString(R.string.aq_question_1_anything_else);
                     currentSequenceStep -= 2;
+                    showTranscription("DEBUG: new step = " + currentSequenceStep);
+                    //myAsrResultString ="";
                 }
                 else
                 {
                     nextString = getString(R.string.aq_question_2);
-
                 }
                 showTranscription("Temi: " + nextString);
                 flagWaitingForTemiToFinishSpeaking = true;
                 temi.speak(TtsRequest.create(nextString));
+
+
                 break;
+
             case 6:
                 showTranscription("DEBUG: STEP = " + currentSequenceStep);
                 if(checkRepeatRequest())
@@ -1383,6 +1391,8 @@ public class MainActivity extends AppCompatActivity implements
                     showTranscription("DEBUG: ENTERED  REPEAT REQUEST - step = " + currentSequenceStep);
                     nextString = getString(R.string.aq_question_2);
                     currentSequenceStep -= 2;
+                    showTranscription("DEBUG: new step = " + currentSequenceStep);
+                    //myAsrResultString ="";
                 }
                 else
                 {
@@ -1391,6 +1401,7 @@ public class MainActivity extends AppCompatActivity implements
                 showTranscription("Temi: " + nextString);
                 flagWaitingForTemiToFinishSpeaking = true;
                 temi.speak(TtsRequest.create(nextString));
+
                 break;
             case 8:
                 showTranscription("DEBUG: STEP = " + currentSequenceStep);
@@ -1399,6 +1410,9 @@ public class MainActivity extends AppCompatActivity implements
                     showTranscription("DEBUG: ENTERED  REPEAT REQUEST - step = " + currentSequenceStep);
                     nextString = getString(R.string.aq_question_3);
                     currentSequenceStep -= 2;
+                    //myAsrResultString ="";
+
+
                 }
                 else
                 {
