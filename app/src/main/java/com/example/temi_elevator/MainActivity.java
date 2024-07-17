@@ -187,7 +187,7 @@ public class MainActivity extends AppCompatActivity implements
 
         findViewById(R.id.quitButton).setOnClickListener(view -> {
             showTranscription(getString(R.string.survey_outro_for_transcript));
-            logToFile(transcription.getText().toString());
+            //logToFile(transcription.getText().toString());
             if (temi.isSelectedKioskApp()){
                 temi.setKioskModeOn(false);
             }
@@ -629,7 +629,7 @@ public class MainActivity extends AppCompatActivity implements
                 // step increment done by the onTtsStatusChanged() when temi finished speaking previous string
                 break;
             case 4:
-                if(myAsrResultString.contains("stell dich vor") | myAsrResultString.contains("stelle dich vor") | myAsrResultString.contains("beginne die untersuchung") | myAsrResultString.contains("starte die untersuchung"))
+                if(myAsrResultString.contains("stell dich vor") | myAsrResultString.contains("stelle dich vor") | myAsrResultString.contains("beginne die führung") | myAsrResultString.contains("starte die führung"))
                 {
                     flagWaitingForTemiToArrive = true;
                     temi.goTo("wohnzimmersitzgruppe");
@@ -944,19 +944,20 @@ public class MainActivity extends AppCompatActivity implements
         switch(currentSequenceStep)
         {
             case 0:
+                flagWaitingForTemiToArrive = true;
+                temi.goTo("wohnzimmer");
+
+                break;
+            case 1:
                 showTranscription("\n-------------------------------\nSystem: Start Sequenz Vivi Interaktion\n");
                 nextSentence = getString(R.string.vi_vivi_introduction);
                 showTranscription("Temi: " + nextSentence);
-                flagWaitingForTemiToFinishSpeaking = true;
+                //flagWaitingForTemiToFinishSpeaking = true;
                 temi.speak(TtsRequest.create(nextSentence));
+                currentSequenceStep++;
                 // now user is talking to Vivi...
                 displayCommandPreview(true);
                 //showFace(R.drawable.vivi_commands_preview);
-                break;
-            case 1:
-                flagWaitingForTemiToArrive = true;
-                temi.goTo("wohnzimmer");
-                //currentSequenceStep++;
                 break;
             case 2:
                 if(checkForContinueNextSequence())
@@ -1311,24 +1312,17 @@ public class MainActivity extends AppCompatActivity implements
                 | myAsrResultString.contains("was jetzt");
     }
 
-    private void handleSequenceAssistanceQuestionaire()
-    {
+    private void handleSequenceAssistanceQuestionaire() {
         String nextString;
-        switch (currentSequenceStep)
-        {
+        switch (currentSequenceStep) {
             case 0:
-
                 showTranscription("\n-------------------------------\nSystem: Start Sequenz Unterstützungsbedarf\n");
-                // called when user says "Hey Temi ich bin bereit"
-                if(checkForContinueNextSequence())
-                {
+                if (checkForContinueNextSequence()) {
                     nextString = getString(R.string.aq_ans_ready)
                             + getString(R.string.aq_remind_no_hey_temi)
                             + getString(R.string.aq_question_1);
-                    flagWaitingForTemiToFinishSpeaking = true;  // when finised speaking inc step
-                }
-                else
-                {
+                    flagWaitingForTemiToFinishSpeaking = true;  // when finished speaking inc step
+                } else {
                     nextString = getString(R.string.aq_ans_unsufficiant) + getString(R.string.aq_introduction_short);
                     //currentSequenceStep = 0;
                 }
@@ -1339,88 +1333,62 @@ public class MainActivity extends AppCompatActivity implements
             case 3:
             case 5:
             case 7:
-                showTranscription("DEBUG: LISTENING IN STEP = " + currentSequenceStep);
                 temi.wakeup(Collections.singletonList(SttLanguage.SYSTEM));
                 findViewById(R.id.isRecordingImg).setVisibility(View.VISIBLE);
                 flagWaitingForUserResponse = true;
                 currentSequenceStep++;
                 break;
-
             case 2:
-                showTranscription("DEBUG: STEP = " + currentSequenceStep);
-                if(checkRepeatRequest())
-                {
-                    showTranscription("DEBUG: ENTERED  REPEAT REQUEST - step = " + currentSequenceStep);
-                    nextString = getString(R.string.aq_question_1);
-                    currentSequenceStep -= 2;   // because we want to go to step 2 again after user input
-                    //myAsrResultString ="";
-                }
-                else
-                {
-                    nextString = getString(R.string.aq_question_1_anything_else);
-                }
-                showTranscription("Temi: " + nextString);
-                flagWaitingForTemiToFinishSpeaking = true;
-                temi.speak(TtsRequest.create(nextString));
-                break;
             case 4:
-                showTranscription("DEBUG: STEP = " + currentSequenceStep);
-                if(checkRepeatRequest())
-                {
-                    showTranscription("DEBUG: ENTERED  REPEAT REQUEST - step = " + currentSequenceStep);
-                    nextString = getString(R.string.aq_question_1_anything_else);
-                    currentSequenceStep -= 2;
-                    showTranscription("DEBUG: new step = " + currentSequenceStep);
-                    //myAsrResultString ="";
-                }
-                else
-                {
-                    nextString = getString(R.string.aq_question_2);
-                }
-                showTranscription("Temi: " + nextString);
-                flagWaitingForTemiToFinishSpeaking = true;
-                temi.speak(TtsRequest.create(nextString));
-
-
-                break;
-
             case 6:
-                showTranscription("DEBUG: STEP = " + currentSequenceStep);
-                if(checkRepeatRequest())
-                {
-                    showTranscription("DEBUG: ENTERED  REPEAT REQUEST - step = " + currentSequenceStep);
-                    nextString = getString(R.string.aq_question_2);
-                    currentSequenceStep -= 2;
-                    showTranscription("DEBUG: new step = " + currentSequenceStep);
-                    //myAsrResultString ="";
-                }
-                else
-                {
-                    nextString = getString(R.string.aq_question_3);
-                }
-                showTranscription("Temi: " + nextString);
-                flagWaitingForTemiToFinishSpeaking = true;
-                temi.speak(TtsRequest.create(nextString));
-
-                break;
             case 8:
                 showTranscription("DEBUG: STEP = " + currentSequenceStep);
-                if(checkRepeatRequest())
-                {
-                    showTranscription("DEBUG: ENTERED  REPEAT REQUEST - step = " + currentSequenceStep);
-                    nextString = getString(R.string.aq_question_3);
+                if (checkRepeatRequest()) {
+                    showTranscription("DEBUG: ENTERED REPEAT REQUEST - step = " + currentSequenceStep);
+                    switch (currentSequenceStep) {
+                        case 2:
+                            nextString = getString(R.string.aq_question_1);
+                            break;
+                        case 4:
+                            nextString = getString(R.string.aq_question_1_anything_else);
+                            break;
+                        case 6:
+                            nextString = getString(R.string.aq_question_2);
+                            break;
+                        case 8:
+                            nextString = getString(R.string.aq_question_3);
+                            break;
+                        default:
+                            nextString = "";
+                            break;
+                    }
                     currentSequenceStep -= 2;
-                    //myAsrResultString ="";
-
-
-                }
-                else
-                {
-                    nextString = getString(R.string.aq_thanks) + getString(R.string.ai_introduction);
+                } else {
+                    switch (currentSequenceStep) {
+                        case 2:
+                            nextString = getString(R.string.aq_question_1_anything_else);
+                            break;
+                        case 4:
+                            nextString = getString(R.string.aq_question_2);
+                            break;
+                        case 6:
+                            nextString = getString(R.string.aq_question_3);
+                            break;
+                        case 8:
+                            nextString = getString(R.string.aq_thanks) + getString(R.string.ai_introduction);
+                            break;
+                        default:
+                            nextString = "";
+                            break;
+                    }
                 }
                 showTranscription("Temi: " + nextString);
                 flagWaitingForTemiToFinishSpeaking = true;
-                temi.speak(TtsRequest.create(nextString));
+
+                // Delay before repeating the phrase
+                new Handler().postDelayed(() -> {
+                    temi.speak(TtsRequest.create(nextString));
+                }, 2000); // Adjust the delay as needed
                 break;
             case 9:
                 showTranscription("\nSystem: Ende Sequenz Unterstützungsbedarf\n-------------------------------\n");
@@ -1433,6 +1401,7 @@ public class MainActivity extends AppCompatActivity implements
                 break;
         }
     }
+
 
 
     private void handleSequenceAlexaInteraction()
