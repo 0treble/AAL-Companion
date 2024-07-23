@@ -187,13 +187,14 @@ public class MainActivity extends AppCompatActivity implements
 
         findViewById(R.id.quitButton).setOnClickListener(view -> {
             showTranscription(getString(R.string.survey_outro_for_transcript));
-            //logToFile(transcription.getText().toString());
+            logToFile(transcription.getText().toString());
             if (temi.isSelectedKioskApp()){
                 temi.setKioskModeOn(false);
             }
 
             temi.setGoToSpeed(SpeedLevel.SLOW);
             temi.startPage(Page.HOME);
+            transcription.setText(getString(R.string.text_field_cleared_msg));
         });
 
         /* Sequence Window Launcher*/
@@ -689,7 +690,7 @@ public class MainActivity extends AppCompatActivity implements
 
             case 2:
 
-                if(((myAsrResultString.contains("ja") | myAsrResultString.contains("bereit")) & !myAsrResultString.contains("nicht")) | flagRepeatSentenceRequest | checkForContinueNextSequence())
+                if(((myAsrResultString.contains("ja") | myAsrResultString.contains("bereit")) & !myAsrResultString.contains("nicht")) | myAsrResultString.contains("habe ich verstanden") | flagRepeatSentenceRequest | checkForContinueNextSequence())
                 {
                     flagRepeatSentenceRequest = false;
                     String sentence1 = getString(R.string.bg_letsgo) + getString(R.string.bg_sentence1);
@@ -1309,7 +1310,8 @@ public class MainActivity extends AppCompatActivity implements
                 | myAsrResultString.contains("bin bereit")
                 | myAsrResultString.contains("weiter")
                 | myAsrResultString.contains("was nun")
-                | myAsrResultString.contains("was jetzt");
+                | myAsrResultString.contains("was jetzt")
+                | myAsrResultString.contains("los");
     }
 
     private void handleSequenceAssistanceQuestionaire() {
@@ -1317,13 +1319,13 @@ public class MainActivity extends AppCompatActivity implements
         switch (currentSequenceStep) {
             case 0:
                 showTranscription("\n-------------------------------\nSystem: Start Sequenz Unterstützungsbedarf\n");
-                if (checkForContinueNextSequence()) {
+                if (checkForContinueNextSequence() | myAsrResultString.contains("habe ich verstanden") | myAsrResultString.contains("ich habe das verstanden")) {
                     nextString = getString(R.string.aq_ans_ready)
                             + getString(R.string.aq_remind_no_hey_temi)
                             + getString(R.string.aq_question_1);
                     flagWaitingForTemiToFinishSpeaking = true;  // when finished speaking inc step
                 } else {
-                    nextString = getString(R.string.aq_ans_unsufficiant) + getString(R.string.aq_introduction_short);
+                    nextString = getString(R.string.aq_ans_unsufficiant) + getString(R.string.aq_introduction);
                     //currentSequenceStep = 0;
                 }
                 showTranscription("Temi: " + nextString);
@@ -1342,7 +1344,7 @@ public class MainActivity extends AppCompatActivity implements
             case 4:
             case 6:
             case 8:
-                showTranscription("DEBUG: STEP = " + currentSequenceStep);
+                //showTranscription("DEBUG: STEP = " + currentSequenceStep);
                 if (checkRepeatRequest()) {
                     showTranscription("DEBUG: ENTERED REPEAT REQUEST - step = " + currentSequenceStep);
                     switch (currentSequenceStep) {

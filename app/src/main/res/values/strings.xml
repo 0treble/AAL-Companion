@@ -22,6 +22,9 @@
         <item>Default</item>
     </string-array>
 
+
+    <string name="text_field_cleared_msg">/////////////////// text field cleared ///////////////////////</string>
+
     <string name="greeting_welcome_door"> Herzlich Willkommen in der Musterwohnung der htw saar! Mein Name
         ist Temi. Vielen Dank für Ihre Teilnahme am Forschungsprojekt VOICE
         zur Erforschung der Nutzbarkeit und Akzeptanz von K I basierten
@@ -115,7 +118,7 @@
     <string name="survey_to_kitchen"> Okay! Folgen Sie mir bitte. Es ist wichtig viel zu trinken. Daher haben wir Ihnen Getränke bereitgestellt. Hier wären wir. Bitte bedienen Sie sich. Wenn ich Ihnen etwas zu den hier verbauten (Dingen) erzählen soll, sagen Sie bitte‚ Hey Temi, was kannst du mir zur Küche‘ sagen, andernfalls können wir auch mit‚Hey Temi, lass uns weitergehen‘ mit der Besichtigung fortfahren. </string>
     <string name="survey_goodbye_string">Vielen Dank für ihre Antworten. Ich habe mich gefreut, Sie kennenzulernen und ich möchte mich bei Ihne bedanken, dass Sie an unserer Studie teilgenommen haben. Vielen Dank und alles Gute. </string>
     <string name="survey_announcement">Unser Treffen neigt sich langsam dem Ende zu. Nehmen Sie doch bitte nocheinmal auf dem Sofa Platz.</string>
-    <string name="survey_questions_intro">Bevor wir Schluss machen, möchte ich Sie bitten mir noch ein paar Fragen zu beantworten. Bitte beantworten Sie die Fragen auf einer Skala von 1 bis 6.  1 entspricht dabei  trifft gar nicht zu und 6 entspricht  trifft voll zu.
+    <string name="survey_questions_intro">Bevor wir Schluss machen, möchte ich Sie bitten mir noch ein paar Fragen zu beantworten. Bitte beantworten Sie die Fragen auf einer Skala von 1 bis 6   1 entspricht dabei  trifft gar nicht zu und 6 entspricht  trifft voll zu.
          Bei ihren Antworten brauchen sie nicht extra Hey Temi sagen, ich höre automatisch zu, sobald ich die Frage gestellt habe.
         </string>
     <string name="survey_letsgo">Fangen wir an.  </string>
@@ -152,7 +155,7 @@
     <string name="bg_info">Als  nächstes würde ich mit Ihnen ein kleines Gedächtnisspiel spielen.  Machen Sie es sich doch bitte auf dem Sofa gemütlich und
         sagen Hey Temi   lass uns etwas spielen. </string>
     <string name="bg_introduction">Gerne würde ich mit Ihnen ein bischen spielen, damit wir feststellen können, ob oder wie gut wir uns verstehen oder uns unterhalten können. Das Spiel heißt alte Sprichwörter erkennen und vervollständigen.
-                                    Ich gebe den ersten Teil eines Spruches vor und Sie vollenden ihn. Wenn Sie einen Satz nicht verstanden haben, bitten Sie mich einfach, ihn zu widerholen. Wenn Sie bereit sind sagen Sie ja, wenn ich das Spiel nochmal erklären soll, sagen sie nein. Sind Sie bereit?</string>
+                                    Ich gebe den ersten Teil eines Spruches vor und Sie vollenden ihn. Wenn Sie bereit sind sagen Sie ja, wenn ich das Spiel nochmal erklären soll, sagen sie nein. Sind Sie bereit?</string>
     <string name="bg_introduction_short">Kurzfassung: Wenn Sie bereit sind sagen Sie ja Sind Sie bereit?</string>
     <string name="bg_iRepeat">Kein Problem. Ich erkläre das Spiel noch einmal.</string>
     <string name="bg_letsgo">Alles klar. Los gehts! </string>
@@ -228,4 +231,5 @@
     <string name="_0">0</string>
     <string name="_1_0">1.0</string>
     <string name="gender">Geschlecht</string>
+    <string name="text_field_cleared">/////////////////// text field cleared ///////////////////////</string>
 </resources>
