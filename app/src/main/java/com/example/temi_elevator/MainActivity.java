@@ -64,9 +64,6 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-
-
-
 public class MainActivity extends AppCompatActivity implements
         OnRobotReadyListener,
         Robot.AsrListener,
@@ -89,7 +86,6 @@ public class MainActivity extends AppCompatActivity implements
     private ActivityResultLauncher<Intent> settingsResultLauncher;
     private ExecutorService myExecutorService;
     private String myAsrResultString = "";
-
     private boolean DEBUG = false;
 
     @Override
@@ -320,7 +316,35 @@ public class MainActivity extends AppCompatActivity implements
         dialog.setCanceledOnTouchOutside(true);
     }
 
+    private void showHappyBlink() {
+        ImageView imageView = findViewById(R.id.overlay_image);
+        Glide.with(this).load(R.drawable.happyblink_crop).into(imageView);
+    }
 
+    private void showSmileBlink() {
+        ImageView imageView = findViewById(R.id.overlay_image);
+        Glide.with(this).load(R.drawable.smileblink_crop).into(imageView);
+    }
+
+    private void speak(String text) {
+        TtsRequest ttsRequest = TtsRequest.create(text, true);
+        temi.speak(ttsRequest);
+    }
+
+    @Override
+    public void onTtsStatusChanged(@NonNull TtsRequest ttsRequest) {
+        TtsRequest.Status status = ttsRequest.getStatus();
+        if (status == TtsRequest.Status.STARTED) {
+            showHappyBlink();
+        } else if (status == TtsRequest.Status.COMPLETED) {
+            showSmileBlink();
+            if (flagWaitingForTemiToFinishSpeaking) {
+                flagWaitingForTemiToFinishSpeaking = false;
+                currentSequenceStep += 1;
+                chooseCurrentSequence();
+            }
+        }
+    }
 
     private void setupThemeButton() {
 
@@ -484,7 +508,8 @@ public class MainActivity extends AppCompatActivity implements
     private void handleUndefinedCommand() {
         String undefinedCommandMessage = "Entschuldige, ich habe das nicht verstanden.";
         showTranscription(undefinedCommandMessage);
-        temi.speak(TtsRequest.create(undefinedCommandMessage, false));
+        speak(undefinedCommandMessage);
+
     }
 
     public void analyzeVoiceCommand() {
@@ -527,48 +552,48 @@ public class MainActivity extends AppCompatActivity implements
         {
             case GREETING:
                 scrollToBottom();
-                showFace(R.drawable.happyblink_crop);
+                showFace(R.drawable.smileblink_crop);
                 handleSequenceGreeting();
                 break;
             case SEQUENCE_ALEXA:
                 scrollToBottom();
-                showFace(R.drawable.happyblink_crop);
+                showFace(R.drawable.smileblink_crop);
                 handleSequenceAlexa();
                 break;
             case AAL_SEQUENCE:
                 scrollToBottom();
-                showFace(R.drawable.happyblink_crop);
+                showFace(R.drawable.smileblink_crop);
                 handleAALSequence();
                 break;
             case SEQUENCE_BRAIN_GAME:
                 //scrollToBottom();
-                showFace(R.drawable.happyblink_crop);
+                showFace(R.drawable.smileblink_crop);
                 handleSequenceBrainGame();
                 break;
             case QUESTIONNAIRE:
                 scrollToBottom();
-                showFace(R.drawable.happyblink_crop);
+                showFace(R.drawable.smileblink_crop);
                 if(currentSequenceStep == 0){ currentSequenceStep =1;}
                 handleSequenceQuestionnaire();
                 break;
             case KITCHEN:
                 scrollToBottom();
-                showFace(R.drawable.happyblink_crop);
+                showFace(R.drawable.smileblink_crop);
                 handleSequenceKitchen();
                 break;
             case ASSISTANCE_QUESTIONAIRE:
                 scrollToBottom();
-                showFace(R.drawable.happyblink_crop);
+                showFace(R.drawable.smileblink_crop);
                 handleSequenceAssistanceQuestionaire();
                 break;
             case ALEXA_INTERACTION:
                 scrollToBottom();
-                showFace(R.drawable.happyblink_crop);
+                showFace(R.drawable.smileblink_crop);
                 handleSequenceAlexaInteraction();
                 break;
             case VIVI_INTERACTION:
                 scrollToBottom();
-                showFace(R.drawable.happyblink_crop);
+                showFace(R.drawable.smileblink_crop);
                 handleSequenceViviInteraction();
                 break;
             default:
@@ -577,7 +602,7 @@ public class MainActivity extends AppCompatActivity implements
         }
 
     }
-
+/*
     @Override
     public void onTtsStatusChanged(@NonNull TtsRequest ttsRequest) {
         TtsRequest.Status status = ttsRequest.getStatus();
@@ -586,7 +611,7 @@ public class MainActivity extends AppCompatActivity implements
             currentSequenceStep += 1;
             chooseCurrentSequence();
         }
-    }
+    }*/
 
     @Override
     public void onGoToLocationStatusChanged(@NonNull String location, @NonNull String status, int descriptionId, @NonNull String description) {
@@ -612,7 +637,7 @@ public class MainActivity extends AppCompatActivity implements
                 nextSentence = getString(R.string.greeting_welcome_door);
                 showTranscription("Temi: " + nextSentence);
                 flagWaitingForTemiToFinishSpeaking = true;  /// SUPER IMPORTANT BEFORE EVERY speaking-COMMAND!!!!
-                temi.speak(TtsRequest.create(nextSentence, false));
+                speak(nextSentence);
                 // step increment done by the onTtsStatusChanged() when temi finished speaking previous string
                 /// so that the next task is started AFTER arriving at destination
 
@@ -626,7 +651,7 @@ public class MainActivity extends AppCompatActivity implements
                 nextSentence = getString(R.string.greeting_livingroom_have_a_seat);
                 showTranscription("Temi: " + nextSentence);
                 flagWaitingForTemiToFinishSpeaking = true;
-                temi.speak(TtsRequest.create(nextSentence, false));
+                speak(nextSentence);
                 // step increment done by the onTtsStatusChanged() when temi finished speaking previous string
                 break;
             case 4:
@@ -642,7 +667,7 @@ public class MainActivity extends AppCompatActivity implements
                 nextSentence = getString(R.string.greeting_introduction);
                 showTranscription("Temi: " + nextSentence);
                 flagWaitingForTemiToFinishSpeaking = true;
-                temi.speak(TtsRequest.create(nextSentence, false));
+                speak(nextSentence);
                 break;
             case 6:
                 showTranscription("\nSystem: Ende Sequenz Begrüßung\n-------------------------------\n");
@@ -659,8 +684,6 @@ public class MainActivity extends AppCompatActivity implements
     private void handleSequenceBrainGame() {
         if(DEBUG) showTranscription("DEGBUG: in handleBrainGame: Schritt = " + currentSequenceStep);
 
-
-
         String nextSentence = "";
 
         switch (currentSequenceStep) {
@@ -671,7 +694,7 @@ public class MainActivity extends AppCompatActivity implements
                 String introducingBrainGame = getString(R.string.bg_introduction);
                 showTranscription("Temi: " + nextSentence);
                 flagWaitingForTemiToFinishSpeaking = true;
-                temi.speak(TtsRequest.create(introducingBrainGame, false));
+                speak(introducingBrainGame);
                 // step/case incremeted by the statusChange of tts
                 break;
 
@@ -696,7 +719,7 @@ public class MainActivity extends AppCompatActivity implements
                     String sentence1 = getString(R.string.bg_letsgo) + getString(R.string.bg_sentence1);
                     showTranscription("Temi: " + sentence1);
                     flagWaitingForTemiToFinishSpeaking = true;
-                    temi.speak(TtsRequest.create(sentence1, false));
+                    speak(sentence1);
                     // step/case incremeted by the statusChange of tts
                 }
                 else
@@ -705,7 +728,7 @@ public class MainActivity extends AppCompatActivity implements
                     currentSequenceStep = 0;
                     showTranscription("Temi: " + repeatIntdroduction);
                     flagWaitingForTemiToFinishSpeaking = true;
-                    temi.speak(TtsRequest.create(repeatIntdroduction, false));
+                    speak(repeatIntdroduction);
                     // step/case incremeted by the statusChange of tts > therefore continues at case 1
                 }
                 flagRepeatSentenceRequest = false;  // just to be save
@@ -745,7 +768,7 @@ public class MainActivity extends AppCompatActivity implements
                 flagRepeatSentenceRequest = false;
                 showTranscription("Temi: " + nextSentence);
                 flagWaitingForTemiToFinishSpeaking = true;
-                temi.speak(TtsRequest.create(nextSentence, false));
+                speak(nextSentence);
                 // when answer is transcripted - onAsrResult calls handle-func again to continue with step/case 6
                 break;
             case 6:
@@ -781,7 +804,7 @@ public class MainActivity extends AppCompatActivity implements
                 }
                 showTranscription("Temi: " + nextSentence);
                 flagWaitingForTemiToFinishSpeaking = true;
-                temi.speak(TtsRequest.create(nextSentence, false));
+                speak(nextSentence);
                 flagRepeatSentenceRequest = false;
                 break;
             // when answer is transcripted - onAsrResult calls handle-func again to continue with step/case 4
@@ -819,7 +842,7 @@ public class MainActivity extends AppCompatActivity implements
                 }
                 showTranscription("Temi: " + nextSentence);
                 flagWaitingForTemiToFinishSpeaking = true;
-                temi.speak(TtsRequest.create(nextSentence, false));
+                speak(nextSentence);
                 flagRepeatSentenceRequest = false;
                 break;
             // when answer is transcripted - onAsrResult calls handle-func again to continue with step/case 4
@@ -857,7 +880,7 @@ public class MainActivity extends AppCompatActivity implements
                 }
                 showTranscription("Temi: " + nextSentence);
                 flagWaitingForTemiToFinishSpeaking = true;
-                temi.speak(TtsRequest.create(nextSentence, false));
+                speak(nextSentence);
                 flagRepeatSentenceRequest = false;
                 break;
             // when answer is transcripted - onAsrResult calls handle-func again to continue with step/case 4
@@ -895,7 +918,7 @@ public class MainActivity extends AppCompatActivity implements
                 }
                 showTranscription("Temi: " + nextSentence);
                 flagWaitingForTemiToFinishSpeaking = true;
-                temi.speak(TtsRequest.create(nextSentence, false));
+                speak(nextSentence);
                 flagRepeatSentenceRequest = false;
                 break;
 
@@ -903,7 +926,7 @@ public class MainActivity extends AppCompatActivity implements
                 String finish = getString(R.string.bg_finish_question);
                 showTranscription("Temi: " + finish);
                 flagWaitingForTemiToFinishSpeaking = true;
-                temi.speak(TtsRequest.create(finish, false));
+                speak(finish);
                 break;
             // when answer is transcripted - onAsrResult calls handle-func again to continue with step/case 4
 
@@ -921,7 +944,7 @@ public class MainActivity extends AppCompatActivity implements
                 nextSentence += getString(R.string.vi_transition);
                 showTranscription("Temi: " + nextSentence);
                 flagWaitingForTemiToFinishSpeaking = true;
-                temi.speak(TtsRequest.create(nextSentence, false));
+                speak(nextSentence);
                 break;
 
             case 16:
@@ -954,7 +977,7 @@ public class MainActivity extends AppCompatActivity implements
                 nextSentence = getString(R.string.vi_vivi_introduction);
                 showTranscription("Temi: " + nextSentence);
                 //flagWaitingForTemiToFinishSpeaking = true;
-                temi.speak(TtsRequest.create(nextSentence));
+                speak(nextSentence);
                 currentSequenceStep++;
                 // now user is talking to Vivi...
                 displayCommandPreview(true);
@@ -972,7 +995,7 @@ public class MainActivity extends AppCompatActivity implements
                 }
                 showTranscription("Temi: " + nextSentence);
                 // flag is set in if-statement
-                temi.speak(TtsRequest.create(nextSentence));
+                speak(nextSentence);
                 break;
             case 3:
                 displayCommandPreview(false);
@@ -1004,7 +1027,7 @@ public class MainActivity extends AppCompatActivity implements
                 String questions_intro = getString(R.string.survey_questions_intro) + getString(R.string.survey_letsgo);
                 showTranscription("Temi: " + questions_intro);
                 flagWaitingForTemiToFinishSpeaking = true;
-                temi.speak(TtsRequest.create(questions_intro, false));
+                speak(questions_intro);
                 break;
             case 2:
                 askSurveyQuestion(R.string.survey_question_1);
@@ -1057,18 +1080,19 @@ public class MainActivity extends AppCompatActivity implements
                 showTranscription("Temi: " + suggestions);
 
                 flagWaitingForTemiToFinishSpeaking = true;
-                temi.speak(TtsRequest.create(suggestions, false));
+                speak(suggestions);
                 break;
             case 30: // End of sequence
                 String goodbye_string = getString(R.string.survey_goodbye_string);
                 showTranscription("Temi: " + goodbye_string);
                 flagWaitingForTemiToFinishSpeaking = true;
-                temi.speak(TtsRequest.create(goodbye_string, false));
+                speak(goodbye_string);
 
             case 31:
                 showTranscription("\nSystem: Ende Sequenz Fragebogen\n-------------------------------\n");
                 currentSequenceStep = 0;
                 currentSequence = Sequence.UNDEFINED;
+                showFace(R.drawable.sleeping_crop);
                 break;
             default:
                 showTranscription("Error: Default in Sequenz GREETING!");
@@ -1080,7 +1104,7 @@ public class MainActivity extends AppCompatActivity implements
         String question = getString(questionResId);
         showTranscription("Temi: " + question);
         flagWaitingForTemiToFinishSpeaking = true;
-        temi.speak(TtsRequest.create(question, false));
+        speak(question);
     }
 
     private void handleSequenceAlexa() {
@@ -1090,7 +1114,7 @@ public class MainActivity extends AppCompatActivity implements
                 String alexa_command_init = "Okay. Ich gehe zu Alexa um ihr zu sagen, dass sie den Rolläden schließen soll.";
                 //showTranscription(alexa_command_init);
                 flagWaitingForTemiToFinishSpeaking = true;
-                temi.speak(TtsRequest.create(alexa_command_init, false));
+                speak(alexa_command_init);
                 break;
             case 1:
                 // Go to Alexa location
@@ -1101,15 +1125,15 @@ public class MainActivity extends AppCompatActivity implements
                 // Speak "Alexa"
                 //showTranscription("Alexa");
                 flagWaitingForTemiToFinishSpeaking = true;
-                temi.speak(TtsRequest.create("Alexa", false));
+                speak("Alexa");
                 break;
             case 3:
                 // Final command after a delay
                 waitHandler.postDelayed(() -> {
                     //showTranscription("Bitte schließe die Rolläden");
                     flagWaitingForTemiToFinishSpeaking = true;
-                    temi.speak(TtsRequest.create("Bitte schließe die Rolläden", false));
-                    // oder temi.speak(TtsRequest.create("Wohnzimmer an", false));
+                    speak("Bitte schließe die Rolläden");
+                    //speak("Wohnzimmer an");
                 }, 1000);
                 currentSequenceStep = 0;
                 currentSequence = null;
@@ -1131,13 +1155,13 @@ public class MainActivity extends AppCompatActivity implements
                 String entranceWelcome = getString(R.string.aal_welcome);
                 //showTranscription(entranceWelcome);
                 flagWaitingForTemiToFinishSpeaking = true;
-                temi.speak(TtsRequest.create(entranceWelcome, false));
+                speak(entranceWelcome);
                 break;
             case 2:
                 String introduction = getString(R.string.aal_intro);
                 //showTranscription(introduction);
                 flagWaitingForTemiToFinishSpeaking = true;
-                temi.speak(TtsRequest.create(introduction, false));
+                speak(introduction);
                 break;
             case 3:
                 // Move to the kitchen
@@ -1149,19 +1173,19 @@ public class MainActivity extends AppCompatActivity implements
                 String kitchenIntro = getString(R.string.aal_kitchen_intro);
                 //showTranscription(kitchenIntro);
                 flagWaitingForTemiToFinishSpeaking = true;
-                temi.speak(TtsRequest.create(kitchenIntro, false));
+                speak(kitchenIntro);
                 break;
             case 5:
                 String kitchenDetails1 = getString(R.string.aal_kitchen_details1);
                 //showTranscription(kitchenDetails1);
                 flagWaitingForTemiToFinishSpeaking = true;
-                temi.speak(TtsRequest.create(kitchenDetails1, false));
+                speak(kitchenDetails1);
                 break;
             case 6:
                 String kitchenDetails2 = getString(R.string.aal_kitchen_details2);
                 //showTranscription(kitchenDetails2);
                 flagWaitingForTemiToFinishSpeaking = true;
-                temi.speak(TtsRequest.create(kitchenDetails2, false));
+                speak(kitchenDetails2);
                 break;
             case 7:
                 // Move to the sink
@@ -1172,19 +1196,19 @@ public class MainActivity extends AppCompatActivity implements
                 String sinkDetails = getString(R.string.aal_sink_details);
                 //showTranscription(sinkDetails);
                 flagWaitingForTemiToFinishSpeaking = true;
-                temi.speak(TtsRequest.create(sinkDetails, false));
+                speak(sinkDetails);
                 break;
             case 9:
                 String worktopDetails = getString(R.string.aal_worktop_details);
                 //showTranscription(worktopDetails);
                 flagWaitingForTemiToFinishSpeaking = true;
-                temi.speak(TtsRequest.create(worktopDetails, false));
+                speak(worktopDetails);
                 break;
             case 10:
                 String kitchenSummary = getString(R.string.aal_kitchen_summary);
                 //showTranscription(kitchenSummary);
                 flagWaitingForTemiToFinishSpeaking = true;
-                temi.speak(TtsRequest.create(kitchenSummary, false));
+                speak(kitchenSummary);
                 break;
             case 11:
                 // Move to the living room
@@ -1196,25 +1220,25 @@ public class MainActivity extends AppCompatActivity implements
                 String livingRoomIntro = getString(R.string.aal_livingroom_intro);
                 //showTranscription(livingRoomIntro);
                 flagWaitingForTemiToFinishSpeaking = true;
-                temi.speak(TtsRequest.create(livingRoomIntro, false));
+                speak(livingRoomIntro);
                 break;
             case 13:
                 String livingRoomDetails1 = getString(R.string.aal_livingroom_details1);
                 //showTranscription(livingRoomDetails1);
                 flagWaitingForTemiToFinishSpeaking = true;
-                temi.speak(TtsRequest.create(livingRoomDetails1, false));
+                speak(livingRoomDetails1);
                 break;
             case 14:
                 String livingRoomDetails2 = getString(R.string.aal_livingroom_details2);
                 //showTranscription(livingRoomDetails2);
                 flagWaitingForTemiToFinishSpeaking = true;
-                temi.speak(TtsRequest.create(livingRoomDetails2, false));
+                speak(livingRoomDetails2);
                 break;
             case 15:
                 String farewell = getString(R.string.aal_farewell);
                 //showTranscription(farewell);
                 flagWaitingForTemiToFinishSpeaking = true;
-                temi.speak(TtsRequest.create(farewell, false));
+                speak(farewell);
                 // Sequence completed
                 currentSequenceStep = 0;
                 currentSequence = null;
@@ -1224,7 +1248,6 @@ public class MainActivity extends AppCompatActivity implements
                 break;
         }
     }
-
 
 
     // for handleSequenceBrainGame: func to check if the user didnt understand the question/sentence and wants it to be repeated
@@ -1258,7 +1281,7 @@ public class MainActivity extends AppCompatActivity implements
                 }
                 showTranscription("Temi: " + nextSentence);
                 //flagWaitingForTemiToFinishSpeaking = true; // HIER NICHT!!!!
-                temi.speak(TtsRequest.create(nextSentence, false));
+                speak(nextSentence);
                 break;
             case 1:
                 flagWaitingForTemiToArrive = true;
@@ -1269,7 +1292,7 @@ public class MainActivity extends AppCompatActivity implements
                 nextSentence = getString(R.string.kt_takeDrink);
                 showTranscription("Temi: " + nextSentence);
                 //flagWaitingForTemiToFinishSpeaking = true;
-                temi.speak(TtsRequest.create(nextSentence, false));
+                speak(nextSentence);
                 currentSequenceStep++;
                 break;
             case 3:
@@ -1290,7 +1313,7 @@ public class MainActivity extends AppCompatActivity implements
                 nextSentence += getString(R.string.aq_introduction);
                 showTranscription("Temi: " + nextSentence);
                 flagWaitingForTemiToFinishSpeaking = true; // HIER NICHT!!!!
-                temi.speak(TtsRequest.create(nextSentence, false));
+                speak(nextSentence);
                 break;
             case 4:
                 showTranscription("\nSystem: Ende Sequenz Küchenrundgang\n-------------------------------\n");
@@ -1329,7 +1352,7 @@ public class MainActivity extends AppCompatActivity implements
                     //currentSequenceStep = 0;
                 }
                 showTranscription("Temi: " + nextString);
-                temi.speak(TtsRequest.create(nextString));
+                speak(nextString);
                 break;
             case 1:
             case 3:
@@ -1389,7 +1412,7 @@ public class MainActivity extends AppCompatActivity implements
 
                 // Delay before repeating the phrase
                 new Handler().postDelayed(() -> {
-                    temi.speak(TtsRequest.create(nextString));
+                    speak(nextString);
                 }, 2000); // Adjust the delay as needed
                 break;
             case 9:
@@ -1403,8 +1426,6 @@ public class MainActivity extends AppCompatActivity implements
                 break;
         }
     }
-
-
 
     private void handleSequenceAlexaInteraction()
     {
@@ -1424,7 +1445,7 @@ public class MainActivity extends AppCompatActivity implements
                 }
                 showTranscription("Temi: " + nextSentence);
                 //flagWaitingForTemiToFinishSpeaking = true; // HIER NICHT!!!!
-                temi.speak(TtsRequest.create(nextSentence, false));
+                speak(nextSentence);
                 break;
             case 1:
                 flagWaitingForTemiToArrive = true;
@@ -1434,7 +1455,7 @@ public class MainActivity extends AppCompatActivity implements
             case 2:
                 nextSentence = getString(R.string.ai_ready_livingroom);
                 showTranscription("Temi: " + nextSentence);
-                temi.speak(TtsRequest.create(nextSentence));
+                speak(nextSentence);
                 currentSequenceStep++;
                 displayCommandPreview(true);
                 //showFace(R.drawable.alexa_commands_preview);
@@ -1451,7 +1472,7 @@ public class MainActivity extends AppCompatActivity implements
                 }
                 showTranscription("Temi: " + nextSentence);
                 //flagWaitingForTemiToFinishSpeaking = true; // HIER NICHT!!!!
-                temi.speak(TtsRequest.create(nextSentence, false));
+                speak(nextSentence);
                 break;
             case 4:
                 showTranscription("\nSystem: Ende Sequenz Alexa Interaktion\n-------------------------------\n");
@@ -1501,7 +1522,7 @@ public class MainActivity extends AppCompatActivity implements
         {   // default
             String unknownPlace = "Entschuldige diesen Ort kenne ich leider nicht.";
             showTranscription(unknownPlace);
-            temi.speak(TtsRequest.create(unknownPlace, false));
+            speak(unknownPlace);
         }
     }
 
@@ -1513,7 +1534,7 @@ public class MainActivity extends AppCompatActivity implements
 
         String reminderString = "Erinnerung: " + myAsrResultString;
         showTranscription(reminderString);
-        temi.speak(TtsRequest.create(reminderString, false));
+        speak(reminderString);
     }
 
     /* Text Field to TXT File*/
