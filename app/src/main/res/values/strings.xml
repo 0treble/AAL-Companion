@@ -23,7 +23,7 @@
     </string-array>
 
 
-    <string name="text_field_cleared_msg">/////////////////// text field cleared ///////////////////////</string>
+    <string name="text_field_cleared_msg">/////////////////// text field cleared ///////////////////////\n</string>
 
     <string name="greeting_welcome_door"> Herzlich Willkommen in der Musterwohnung der htw saar! Mein Name
         ist Temi. Vielen Dank für Ihre Teilnahme am Forschungsprojekt VOICE

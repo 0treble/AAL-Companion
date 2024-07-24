@@ -191,6 +191,7 @@ public class MainActivity extends AppCompatActivity implements
             temi.setGoToSpeed(SpeedLevel.SLOW);
             temi.startPage(Page.HOME);
             transcription.setText(getString(R.string.text_field_cleared_msg));
+            showTranscription("System: Transkript wurde in Datei:   " + logFile.getName() + "  gespeichert.\n");
         });
 
         /* Sequence Window Launcher*/
@@ -537,6 +538,7 @@ public class MainActivity extends AppCompatActivity implements
 
     public void stopCurrentSequence()
     {
+        logToFile(transcription.getText().toString());
         displayCommandPreview(false);
         showFace(R.drawable.sleeping_crop);
         temi.stopMovement();
@@ -598,20 +600,11 @@ public class MainActivity extends AppCompatActivity implements
                 break;
             default:
                 showTranscription("Error: No sequence chosen.");
+                showFace(R.drawable.sleeping_crop);
                 break;
         }
 
     }
-/*
-    @Override
-    public void onTtsStatusChanged(@NonNull TtsRequest ttsRequest) {
-        TtsRequest.Status status = ttsRequest.getStatus();
-        if (status == TtsRequest.Status.COMPLETED && flagWaitingForTemiToFinishSpeaking) {
-            flagWaitingForTemiToFinishSpeaking = false;
-            currentSequenceStep += 1;
-            chooseCurrentSequence();
-        }
-    }*/
 
     @Override
     public void onGoToLocationStatusChanged(@NonNull String location, @NonNull String status, int descriptionId, @NonNull String description) {
@@ -629,6 +622,7 @@ public class MainActivity extends AppCompatActivity implements
         {
             case 0:
                 showTranscription("\n-------------------------------\nSystem: Start Sequenz Begrüßung\n");
+                //if(logFile.exists())
                 flagWaitingForTemiToArrive = true;      /// SUPER IMPORTANT BEFORE EVERY GO-TO-COMMAND!!!!
                 temi.goTo("tür");               /// so that the next task is started AFTER arriving at destination
                 // step increment done by the onGoToStatusListener()
@@ -1090,9 +1084,7 @@ public class MainActivity extends AppCompatActivity implements
 
             case 31:
                 showTranscription("\nSystem: Ende Sequenz Fragebogen\n-------------------------------\n");
-                currentSequenceStep = 0;
-                currentSequence = Sequence.UNDEFINED;
-                showFace(R.drawable.sleeping_crop);
+                stopCurrentSequence();
                 break;
             default:
                 showTranscription("Error: Default in Sequenz GREETING!");
@@ -1558,6 +1550,7 @@ public class MainActivity extends AppCompatActivity implements
         if (logFile != null) {
             try (FileWriter writer = new FileWriter(logFile, true)) {
                 writer.append(logMessage).append("\n");
+                Toast.makeText(getApplicationContext(), "Log file saved", Toast.LENGTH_SHORT).show();
             } catch (IOException e) {
                 Toast.makeText(getApplicationContext(), "Error logging message", Toast.LENGTH_SHORT).show();
             }
