@@ -1122,10 +1122,10 @@ public class MainActivity extends AppCompatActivity implements
             case 3:
                 // Final command after a delay
                 waitHandler.postDelayed(() -> {
-                    //showTranscription("Bitte schließe die Rolläden");
+                    showTranscription("Temi: Wohnzimmer an");
                     flagWaitingForTemiToFinishSpeaking = true;
-                    speak("Bitte schließe die Rolläden");
-                    //speak("Wohnzimmer an");
+                    //speak("Bitte schließe die Rolläden");
+                    speak("Wohnzimmer an");
                 }, 1000);
                 currentSequenceStep = 0;
                 currentSequence = null;
