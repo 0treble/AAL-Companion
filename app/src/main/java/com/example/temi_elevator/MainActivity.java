@@ -1027,7 +1027,7 @@ public class MainActivity extends AppCompatActivity implements
                 askSurveyQuestion(R.string.survey_question_1);
                 break;
             case 3: case 5: case 7: case 9: case 11: case 13: case 15:
-            case 17: case 19: case 21: case 23: case 25: case 27: case 29:
+            case 17: case 19: case 21: case 23: case 25: case 27: case 29: case 31: case 33: case 35:
             flagWaitingForUserResponse = true;
             temi.wakeup(Collections.singletonList(SttLanguage.SYSTEM));
             findViewById(R.id.isRecordingImg).setVisibility(View.VISIBLE);
@@ -1070,19 +1070,28 @@ public class MainActivity extends AppCompatActivity implements
                 askSurveyQuestion(R.string.survey_question_13);
                 break;
             case 28:
+                askSurveyQuestion(R.string.survey_question_14);
+                break;
+            case 30:
+                askSurveyQuestion(R.string.survey_question_15);
+                break;
+            case 32:
+                askSurveyQuestion(R.string.survey_question_16);
+                break;
+            case 34:
                 String suggestions = getString(R.string.survey_suggestions);
                 showTranscription("Temi: " + suggestions);
 
                 flagWaitingForTemiToFinishSpeaking = true;
                 speak(suggestions);
                 break;
-            case 30: // End of sequence
+            case 36: // End of sequence
                 String goodbye_string = getString(R.string.survey_goodbye_string);
                 showTranscription("Temi: " + goodbye_string);
                 flagWaitingForTemiToFinishSpeaking = true;
                 speak(goodbye_string);
 
-            case 31:
+            case 37:
                 showTranscription("\nSystem: Ende Sequenz Fragebogen\n-------------------------------\n");
                 stopCurrentSequence();
                 break;

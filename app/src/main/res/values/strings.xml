@@ -118,23 +118,26 @@
     <string name="survey_to_kitchen"> Okay! Folgen Sie mir bitte. Es ist wichtig viel zu trinken. Daher haben wir Ihnen Getränke bereitgestellt. Hier wären wir. Bitte bedienen Sie sich. Wenn ich Ihnen etwas zu den hier verbauten (Dingen) erzählen soll, sagen Sie bitte‚ Hey Temi, was kannst du mir zur Küche‘ sagen, andernfalls können wir auch mit‚Hey Temi, lass uns weitergehen‘ mit der Besichtigung fortfahren. </string>
     <string name="survey_goodbye_string">Vielen Dank für ihre Antworten. Ich habe mich gefreut, Sie kennenzulernen und ich möchte mich bei Ihne bedanken, dass Sie an unserer Studie teilgenommen haben. Vielen Dank und alles Gute. </string>
     <string name="survey_announcement">Unser Treffen neigt sich langsam dem Ende zu. Nehmen Sie doch bitte nocheinmal auf dem Sofa Platz.</string>
-    <string name="survey_questions_intro">Bevor wir Schluss machen, möchte ich Sie bitten mir noch ein paar Fragen zu beantworten. Bitte beantworten Sie die Fragen auf einer Skala von 1 bis 6   1 entspricht dabei  trifft gar nicht zu und 6 entspricht  trifft voll zu.
+    <string name="survey_questions_intro">Bevor wir Schluss machen, möchte ich Sie bitten mir noch ein paar Fragen zu beantworten. Bitte beantworten Sie die Fragen auf einer Skala von 1 bis 6, 1 entspricht dabei trifft gar nicht zu, 5 entspricht trifft voll zu und 6 entspricht keine Angabe.
          Bei ihren Antworten brauchen sie nicht extra Hey Temi sagen, ich höre automatisch zu, sobald ich die Frage gestellt habe.
         </string>
-    <string name="survey_letsgo">Fangen wir an.  </string>
+    <string name="survey_letsgo">Fangen wir an.</string>
     <string name="survey_question_1">Meine Sprache war einfach und verständlich.</string>
     <string name="survey_question_2">Meine Sprechgeschwindigkeit war angemessen.</string>
-    <string name="survey_question_3">Die Sprache des Sprachassistenten Alexa war einfach und verständlich.</string>
-    <string name="survey_question_4">Die Sprechgeschwindigkeit des Sprachassistenten Alexa war angemessen.</string>
-    <string name="survey_question_5">Sie konnten mir sagen, was ich machen soll.</string>
+    <string name="survey_question_3">Sie konnten mir sagen, was ich machen soll.</string>
+    <string name="survey_question_4">Die Sprache des Sprachassistenten Alexa war einfach und verständlich.</string>
+    <string name="survey_question_5">Die Sprechgeschwindigkeit des Sprachassistenten Alexa war angemessen.</string>
     <string name="survey_question_6">Sie konnten dem Sprachassistenten Alexa sagen, was er machen soll.</string>
-    <string name="survey_question_7">Einen Sprachassistenten in Ihrem Alltag zu nutzen können Sie sich gut vorstellen.</string>
-    <string name="survey_question_8">Sie glauben, dass ein Sprachassistent Ihr Leben erleichtern könnte.</string>
-    <string name="survey_question_9">Statt einen Sprachassistenten zu nutzen, würden Sie den zwischenmenschlichen Austausch vorziehen.</string>
-    <string name="survey_question_10">Die Nutzung eines Sprachassistenten würde Ihnen Angst machen.</string>
-    <string name="survey_question_11">Um einen Sprachassistenten überhaupt nutzen zu können, bräuchten Sie eine Schulung.</string>
-    <string name="survey_question_12">Um einen Sprachassistenten überhaupt nutzen zu können, bräuchten Sie finanzielle Unterstützung.</string>
-    <string name="survey_question_13">Die Nutzung eines Sprachassistenten käme für Sie aus datenschutzrechtlichen Gründen nicht infrage.</string>
+    <string name="survey_question_7">Die Sprache des Sprachassistenten Vivi war einfach und verständlich.</string>
+    <string name="survey_question_8">Die Sprechgeschwindigkeit des Sprachassistenten Vivi war angemessen.</string>
+    <string name="survey_question_9">Sie konnten dem Sprachassistenten Vivi sagen, was er machen soll.</string>
+    <string name="survey_question_10">Einen Sprachassistenten in Ihrem Alltag zu nutzen können Sie sich gut vorstellen.</string>
+    <string name="survey_question_11">Sie glauben, dass ein Sprachassistent Ihr Leben erleichtern könnte.</string>
+    <string name="survey_question_12">Statt einen Sprachassistenten zu nutzen, würden Sie den zwischenmenschlichen Austausch vorziehen.</string>
+    <string name="survey_question_13">Die Nutzung eines Sprachassistenten würde Ihnen Angst machen.</string>
+    <string name="survey_question_14">Um einen Sprachassistenten überhaupt nutzen zu können, bräuchten Sie eine Schulung.</string>
+    <string name="survey_question_15">Um einen Sprachassistenten überhaupt nutzen zu können, bräuchten Sie finanzielle Unterstützung.</string>
+    <string name="survey_question_16">Die Nutzung eines Sprachassistenten käme für Sie aus datenschutzrechtlichen Gründen nicht infrage.</string>
     <string name="survey_suggestions">Welche Verbesserungsvorschläge haben Sie für die Weiterentwicklung eines Sprachassistenten?</string>
 
     <!-- AAL Sequence Strings -->
@@ -170,7 +173,7 @@
     <string name="bg_sentence3_correct">Die richtige Antwort lautet: Alter schützt vor Torheit nicht.</string>
     <string name="bg_sentence4_correct">Die richtige Antwort lautet: Wenn ein Freund weggeht, muss man die Türe schließen, sonst wird es kalt.</string>
     <string name="bg_sentence5_correct">Die richtige Antwort lautet: Dienst ist Dienst und Schnaps ist Schnaps.</string>
-    <string name="bg_finish_question"   >Vielen Dank. Mir hat es viel Spaß gemacht mit Ihnen zu spielen. Hat es dir auch gefallen?</string>
+    <string name="bg_finish_question"   >Vielen Dank. Mir hat es viel Spaß gemacht mit Ihnen zu spielen. Hat es Ihnen auch gefallen?</string>
     <string name="bg_finish_answer_positive">Das freut mich sehr.</string>
     <string name="bg_finish_answer_negative">Dann müssen meine Entwickler wohl noch etwas nachbessern!</string>
     <string name="bg_answer_correct">Das war richtig! Super!</string>
