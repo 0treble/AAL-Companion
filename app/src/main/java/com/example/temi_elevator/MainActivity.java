@@ -1300,8 +1300,8 @@ public class MainActivity extends AppCompatActivity implements
                 if(myAsrResultString.contains("küche"))
                 {
                     nextSentence = getString(R.string.aal_kitchen_intro)
-                            //               + getString(R.string.aal_kitchen_details1)
-                            //               + getString(R.string.aal_kitchen_details2)
+                                           + getString(R.string.aal_kitchen_details1)
+                                           + getString(R.string.aal_kitchen_details2)
                             + getString(R.string.aal_kitchen_summary);
                 }
                 else

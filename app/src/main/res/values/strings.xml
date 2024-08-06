@@ -83,7 +83,7 @@
     <string name="aq_remind_no_hey_temi">Wie gesagt, sie brauchen mich nicht mit Hey Temi anzusprechen.
         Sprechen Sie einfahc drauf los</string>
     <string name="aq_question_1">Die erste Frage lautet  Wenn
-        ich in Ihrem Haushalt verfügbar wäre, worin könnte ich Sie unterstützen</string>
+        ich in Ihrem Haushalt verfügbar wäre, worin könnte ich Sie unterstützen? Vielleicht bei Erinnerungen oder ähnlichem?</string>
     <string name="aq_question_1_anything_else">Möchten Sie noch etwas hinzufügen? </string>
     <string name="aq_question_2">Vielen Dank für ihre Antwort. Ich könnte Sie beispielsweise auch an die Medikamenteneinnahme
     erinnern, falls Sie welche einnehmen. Würde Ihnen das gefallen?       </string>
@@ -118,7 +118,7 @@
     <string name="survey_to_kitchen"> Okay! Folgen Sie mir bitte. Es ist wichtig viel zu trinken. Daher haben wir Ihnen Getränke bereitgestellt. Hier wären wir. Bitte bedienen Sie sich. Wenn ich Ihnen etwas zu den hier verbauten (Dingen) erzählen soll, sagen Sie bitte‚ Hey Temi, was kannst du mir zur Küche‘ sagen, andernfalls können wir auch mit‚Hey Temi, lass uns weitergehen‘ mit der Besichtigung fortfahren. </string>
     <string name="survey_goodbye_string">Vielen Dank für ihre Antworten. Ich habe mich gefreut, Sie kennenzulernen und ich möchte mich bei Ihne bedanken, dass Sie an unserer Studie teilgenommen haben. Vielen Dank und alles Gute. </string>
     <string name="survey_announcement">Unser Treffen neigt sich langsam dem Ende zu. Nehmen Sie doch bitte nocheinmal auf dem Sofa Platz.</string>
-    <string name="survey_questions_intro">Bevor wir Schluss machen, möchte ich Sie bitten mir noch ein paar Fragen zu beantworten. Bitte beantworten Sie die Fragen auf einer Skala von 1 bis 6, 1 entspricht dabei trifft gar nicht zu, 5 entspricht trifft voll zu und 6 entspricht keine Angabe.
+    <string name="survey_questions_intro">Bevor wir Schluss machen, möchte ich Sie bitten mir noch ein paar Fragen zu beantworten. Bitte beantworten Sie die Fragen auf einer Skala von 1 bis 5, 1 entspricht dabei trifft gar nicht zu, 5 entspricht trifft voll zu. Sie können auch keine Angabe sagen. Sagen Sie auch Punkte dazu.
          Bei ihren Antworten brauchen sie nicht extra Hey Temi sagen, ich höre automatisch zu, sobald ich die Frage gestellt habe.
         </string>
     <string name="survey_letsgo">Fangen wir an.</string>
@@ -138,7 +138,7 @@
     <string name="survey_question_14">Um einen Sprachassistenten überhaupt nutzen zu können, bräuchten Sie eine Schulung.</string>
     <string name="survey_question_15">Um einen Sprachassistenten überhaupt nutzen zu können, bräuchten Sie finanzielle Unterstützung.</string>
     <string name="survey_question_16">Die Nutzung eines Sprachassistenten käme für Sie aus datenschutzrechtlichen Gründen nicht infrage.</string>
-    <string name="survey_suggestions">Welche Verbesserungsvorschläge haben Sie für die Weiterentwicklung eines Sprachassistenten?</string>
+    <string name="survey_suggestions">Welche Verbesserungsvorschläge hätten Sie für die Weiterentwicklung eines Sprachassistenten? Sie können an dieser Stelle auch mit vollständigen Sätzen antworten. </string>
 
     <!-- AAL Sequence Strings -->
     <string name="aal_welcome">Herzlich Willkommen in der AAL Musterwohnung.</string>
@@ -158,7 +158,7 @@
     <string name="bg_info">Als  nächstes würde ich mit Ihnen ein kleines Gedächtnisspiel spielen.  Machen Sie es sich doch bitte auf dem Sofa gemütlich und
         sagen Hey Temi   lass uns etwas spielen. </string>
     <string name="bg_introduction">Gerne würde ich mit Ihnen ein bischen spielen, damit wir feststellen können, ob oder wie gut wir uns verstehen oder uns unterhalten können. Das Spiel heißt alte Sprichwörter erkennen und vervollständigen.
-                                    Ich gebe den ersten Teil eines Spruches vor und Sie vollenden ihn. Wenn Sie bereit sind sagen Sie ja, wenn ich das Spiel nochmal erklären soll, sagen sie nein. Sind Sie bereit?</string>
+                                    Ich gebe den ersten Teil eines Spruches vor und Sie vollenden ihn. Sie brauchen mich dabei nicht extra mit Hey Temi ansprechen. Ich höre automatisch zu, wenn ich die Anfang des Satzes gesagt habe. Wenn Sie bereit sind sagen Sie ja, wenn ich das Spiel nochmal erklären soll, sagen sie nein. Sind Sie bereit?</string>
     <string name="bg_introduction_short">Kurzfassung: Wenn Sie bereit sind sagen Sie ja Sind Sie bereit?</string>
     <string name="bg_iRepeat">Kein Problem. Ich erkläre das Spiel noch einmal.</string>
     <string name="bg_letsgo">Alles klar. Los gehts! </string>
