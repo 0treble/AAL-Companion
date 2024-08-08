@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     enum Sequence {UNDEFINED, GREETING, SEQUENCE_ALEXA, AAL_SEQUENCE, SEQUENCE_BRAIN_GAME, QUESTIONNAIRE,
-        KITCHEN, ASSISTANCE_QUESTIONAIRE, ALEXA_INTERACTION, VIVI_INTERACTION}
+        KITCHEN, ASSISTANCE_QUESTIONAIRE, ALEXA_INTERACTION, VIVI_INTERACTION, SEQUENCE_KAFFEE_TREFFEN}
     private Sequence currentSequence;
     int currentSequenceStep = 0;
     private boolean flagWaitingForTemiToArrive = false;
@@ -598,6 +598,11 @@ public class MainActivity extends AppCompatActivity implements
                 showFace(R.drawable.smileblink_crop);
                 handleSequenceViviInteraction();
                 break;
+            case SEQUENCE_KAFFEE_TREFFEN:
+                scrollToBottom();
+                showFace(R.drawable.smileblink_crop);
+                handleSequenceKaffeTreffen();
+                break;
             default:
                 showTranscription("Error: No sequence chosen.");
                 showFace(R.drawable.sleeping_crop);
@@ -694,7 +699,6 @@ public class MainActivity extends AppCompatActivity implements
 
             case 1: case 3: case 5: case 7:
             case 9: case 11: case 14:
-
                 temi.wakeup(Collections.singletonList(SttLanguage.SYSTEM));
                 findViewById(R.id.isRecordingImg).setVisibility(View.VISIBLE);
                 flagWaitingForUserResponse = true;
@@ -1484,6 +1488,23 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
+    private void handleSequenceKaffeTreffen() {
+        switch (currentSequenceStep) {
+            case 0:
+                // Initial command
+                String intro = getString(R.string.coffee_meeting_intro);
+                showTranscription("Temi: " + intro);
+                flagWaitingForTemiToFinishSpeaking = true;
+                speak(intro);
+                break;
+            case 1:
+                currentSequence = Sequence.UNDEFINED;
+                currentSequenceStep = 0;
+            default:
+                showTranscription("Error: Default in Sequenz Kaffe-Treffen!");
+                break;
+        }
+    }
 
     public void relocateTemi()
     {

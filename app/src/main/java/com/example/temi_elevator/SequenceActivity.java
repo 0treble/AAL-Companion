@@ -14,7 +14,7 @@ public class SequenceActivity extends AppCompatActivity {
         button1.setOnClickListener(v -> setResultAndFinish(MainActivity.Sequence.GREETING));
 
         Button button2 = findViewById(R.id.sequence2Button);
-        button2.setOnClickListener(v -> setResultAndFinish(MainActivity.Sequence.SEQUENCE_ALEXA));
+        button2.setOnClickListener(v -> setResultAndFinish(MainActivity.Sequence.SEQUENCE_KAFFEE_TREFFEN));
 
         Button button3 = findViewById(R.id.sequence3Button);
         button3.setOnClickListener(v -> setResultAndFinish(MainActivity.Sequence.AAL_SEQUENCE));

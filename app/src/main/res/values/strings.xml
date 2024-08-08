@@ -193,6 +193,13 @@
         Wenn Sie fertig sind mit Vivi oder keine Lust mehr haben, werde ich wieder übernehmen. Sagen Sie dazu einfach Hey temi lass uns weitermachen.</string>
     <string name="vi_not_understood">Entschuldigung das habe ich wohl nicht korrekt verstanden. Wenn Sie mit Vivi fertig sind, sagen Sie Hey Temi lass uns weitermachen.</string>
     <string name="vi_finised">Alles klar. ich hoffe die Interaktion mit Vivi hat gut funktioniert. Dann machen wir mal weiter mit dem Programm.</string>
+    <string name="coffee_meeting_intro">Hallo! Mein Name ist Temi, ich bin ein Assistenzroboter und wurde entwickelt, um Menschen in ihrem Alltag zu unterstützen.
+        Heute möchte ich Ihnen mehr über unser Forschungsprojekt Voice an der HTW Saar erzählen, in dem wir herauszufinden möchten, wie nützlich und akzeptabel Systeme wie ich in
+        Ihrem täglichen Leben sein können. Gerne würden wir Sie in unsere AAL Wohnung einladen. Dort werde ich Ihnen bereits vorhandene Sprachassistenzsysteme vorstellen.
+        Außerdem werde ich Ihnen die Besonderheiten dieser Wohnung zeigen und wir können gemeinsam ein Spiel mit Sprichwörtern spielen. Wir würden uns sehr freuen, wenn Sie an
+        unserer Studie teilnehmen und uns dabei helfen, die Zukunft der Alltagsassistenz mitzugestalten.
+        Wenn Sie interessiert sind, sprechen Sie Sabine gerne an. Vielen Dank für Ihre Aufmerksamkeit!</string>
+
 
     <!-- Button Label Strings -->
     <string name="take_photo">Transport Modus</string>
@@ -206,7 +213,7 @@
     <string name="sequenceButtonText">Sequenz</string>
     <string name="settingsButtonText">Einstellungen</string>
     <string name="sequence1">Begrüßungssequenz</string>
-    <string name="sequence2">Alexa-Sequenz</string>
+    <string name="sequence2">Kaffee-Vorführung</string>
     <string name="sequence3">AAL-Sequenz</string>
     <string name="sequence4">Gedächtnisspiel</string>
     <string name="sequence5">Küchenrundgang</string>
