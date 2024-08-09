@@ -462,9 +462,8 @@ public class MainActivity extends AppCompatActivity implements
             currentSequenceStep = 0;
             chooseCurrentSequence();
         });
-        commandsMap.put(new String[]{"sequenz 2 starten", "sequenz 2 beginnen", "alexa sequenz ausführen",
-                "alexa sequenz starten", "sag alexa die rolläden zu schließen"}, command -> {
-            currentSequence = Sequence.SEQUENCE_ALEXA;
+        commandsMap.put(new String[]{"stelle dir vor", "stell dir vor", "demo seqenz starten", "starte demo sequenz", "demo sequenz", "sequenz kaffee treffen"}, command -> {
+            currentSequence = Sequence.SEQUENCE_KAFFEE_TREFFEN;
             currentSequenceStep = 0;
             chooseCurrentSequence();
         });
