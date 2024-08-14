@@ -180,6 +180,27 @@
     <string name="bg_dont_know_answer">Kein Problem. </string>
     <string name="bg_sorry_wrong">Entschuldigen Sie, das habe ich wohl nicht korrekt verstanden. </string>
 
+    <!-- Braingame Sequence alt strings
+    <string name="bg_sentence1">Der nächste Satz lautet: Aller Anfang … </string>
+    <string name="bg_sentence2">Der nächste Satz lautet: Aller guten Dinge … </string>
+    <string name="bg_sentence3">Der nächste Satz lautet: Aufgeschoben ist … </string>
+    <string name="bg_sentence4">Der nächste Satz lautet: Der Apfel fällt … </string>
+    <string name="bg_sentence10">Der nächste Satz lautet: Dem Glücklichen schlägt … </string>
+    <string name="bg_sentence11">Der nächste Satz lautet: Der Mensch denkt … </string>
+    <string name="bg_sentence12">Der nächste Satz lautet: Man muss das Eisen schmieden … </string>
+    <string name="bg_sentence13">Der nächste Satz lautet: Nach dem Essen sollst du ruhen … </string>
+    <string name="bg_sentence5">Nun noch ein letzter Satz: Wunder kommen zu denen … </string>
+
+    <string name="bg_sentence1_correct">Die richtige Antwort lautet: ist schwer. </string>
+    <string name="bg_sentence2_correct">Die richtige Antwort lautet: sind drei. </string>
+    <string name="bg_sentence3_correct">Die richtige Antwort lautet: nicht aufgehoben. </string>
+    <string name="bg_sentence4_correct">Die richtige Antwort lautet: nicht weit vom Stamm. </string>
+    <string name="bg_sentence10_correct">Die richtige Antwort lautet: keine Stunde. </string>
+    <string name="bg_sentence11_correct">Die richtige Antwort lautet: und Gott lenkt. </string>
+    <string name="bg_sentence12_correct">Die richtige Antwort lautet: solange es heiß ist. </string>
+    <string name="bg_sentence13_correct">Die richtige Antwort lautet: oder tausend Schritte tun. </string>
+    <string name="bg_sentence5_correct">Die richtige Antwort lautet: die an sie glauben. </string>
+-->
     <!-- ViviInteraction Sequence String -->
     <string name="vi_transition">Im nächsten Schritt würde ich Ihnen gerne ein weiteres Sprachassistenzsystem vorstellen, welches hier in der A A L Musterwohung eingerichtet ist.
         Wenn Sie aber zunächst eine kurze Pause machen möchten, um vielleicht noch etwas zu trinken ist das auch kein Problem. Wenn Sie bereit sind weiterzumachen sagen Sie
