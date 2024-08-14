@@ -64,6 +64,9 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+
+
+
 public class MainActivity extends AppCompatActivity implements
         OnRobotReadyListener,
         Robot.AsrListener,
@@ -742,6 +745,7 @@ public class MainActivity extends AppCompatActivity implements
                     break;
                 }
                 if(((myAsrResultString.contains("taube") || myAsrResultString.contains("spatz")) && myAsrResultString.contains("dach")) | flagRepeatSentenceRequest)
+                //if(myAsrResultString.contains("schwer") | flagRepeatSentenceRequest)
                 {
                     if(!flagRepeatSentenceRequest)  // answer therefore was correct
                     {
@@ -778,6 +782,7 @@ public class MainActivity extends AppCompatActivity implements
                 }
 
                 if((myAsrResultString.contains("macht") && myAsrResultString.contains("sommer")) | flagRepeatSentenceRequest)
+                //if(myAsrResultString.contains("drei") | flagRepeatSentenceRequest)
                 {
                     if(!flagRepeatSentenceRequest)  // answer therefore was correct
                     {
@@ -816,6 +821,7 @@ public class MainActivity extends AppCompatActivity implements
                 }
 
                 if((myAsrResultString.contains("torheit") && myAsrResultString.contains("nicht")) | flagRepeatSentenceRequest)
+                //if(myAsrResultString.contains("aufgehoben") | flagRepeatSentenceRequest)
                 {
                     if(!flagRepeatSentenceRequest)  // answer therefore was correct
                     {
@@ -854,6 +860,7 @@ public class MainActivity extends AppCompatActivity implements
                 }
 
                 if((myAsrResultString.contains("wird") && myAsrResultString.contains("kalt")) | flagRepeatSentenceRequest)
+                //if(myAsrResultString.contains("weit vom stamm") | flagRepeatSentenceRequest)
                 {
                     if(!flagRepeatSentenceRequest)  // answer therefore was correct
                     {
@@ -892,6 +899,7 @@ public class MainActivity extends AppCompatActivity implements
                 }
 
                 if((myAsrResultString.contains("schnaps") | flagRepeatSentenceRequest))
+                //if(myAsrResultString.contains("an sie glauben") | flagRepeatSentenceRequest)
                 {
                     if(!flagRepeatSentenceRequest)  // answer therefore was correct
                     {

@@ -162,6 +162,14 @@
     <string name="bg_introduction_short">Kurzfassung: Wenn Sie bereit sind sagen Sie ja Sind Sie bereit?</string>
     <string name="bg_iRepeat">Kein Problem. Ich erkläre das Spiel noch einmal.</string>
     <string name="bg_letsgo">Alles klar. Los gehts! </string>
+    <string name="bg_finish_question"   >Vielen Dank. Mir hat es viel Spaß gemacht mit Ihnen zu spielen. Hat es Ihnen auch gefallen?</string>
+    <string name="bg_finish_answer_positive">Das freut mich sehr.</string>
+    <string name="bg_finish_answer_negative">Dann müssen meine Entwickler wohl noch etwas nachbessern!</string>
+    <string name="bg_answer_correct">Das war richtig! Super!</string>
+    <string name="bg_dont_know_answer">Kein Problem. </string>
+    <string name="bg_sorry_wrong">Entschuldigen Sie, das habe ich wohl nicht korrekt verstanden. </string>
+
+    <!-- Braingame Sequence alt  strings -->
     <string name="bg_sentence1">Der erste Satz lautet: Besser den Spatz in der Hand, als …</string>
     <string name="bg_sentence2">Der nächste Satz lautet: Eine Schwalbe …</string>
     <string name="bg_sentence3">Der nächste Satz lautet: Alter schützt …</string>
@@ -173,34 +181,34 @@
     <string name="bg_sentence3_correct">Die richtige Antwort lautet: Alter schützt vor Torheit nicht.</string>
     <string name="bg_sentence4_correct">Die richtige Antwort lautet: Wenn ein Freund weggeht, muss man die Türe schließen, sonst wird es kalt.</string>
     <string name="bg_sentence5_correct">Die richtige Antwort lautet: Dienst ist Dienst und Schnaps ist Schnaps.</string>
-    <string name="bg_finish_question"   >Vielen Dank. Mir hat es viel Spaß gemacht mit Ihnen zu spielen. Hat es Ihnen auch gefallen?</string>
-    <string name="bg_finish_answer_positive">Das freut mich sehr.</string>
-    <string name="bg_finish_answer_negative">Dann müssen meine Entwickler wohl noch etwas nachbessern!</string>
-    <string name="bg_answer_correct">Das war richtig! Super!</string>
-    <string name="bg_dont_know_answer">Kein Problem. </string>
-    <string name="bg_sorry_wrong">Entschuldigen Sie, das habe ich wohl nicht korrekt verstanden. </string>
 
-    <!-- Braingame Sequence alt strings
-    <string name="bg_sentence1">Der nächste Satz lautet: Aller Anfang … </string>
-    <string name="bg_sentence2">Der nächste Satz lautet: Aller guten Dinge … </string>
-    <string name="bg_sentence3">Der nächste Satz lautet: Aufgeschoben ist … </string>
-    <string name="bg_sentence4">Der nächste Satz lautet: Der Apfel fällt … </string>
-    <string name="bg_sentence10">Der nächste Satz lautet: Dem Glücklichen schlägt … </string>
-    <string name="bg_sentence11">Der nächste Satz lautet: Der Mensch denkt … </string>
-    <string name="bg_sentence12">Der nächste Satz lautet: Man muss das Eisen schmieden … </string>
-    <string name="bg_sentence13">Der nächste Satz lautet: Nach dem Essen sollst du ruhen … </string>
-    <string name="bg_sentence5">Nun noch ein letzter Satz: Wunder kommen zu denen … </string>
 
-    <string name="bg_sentence1_correct">Die richtige Antwort lautet: ist schwer. </string>
-    <string name="bg_sentence2_correct">Die richtige Antwort lautet: sind drei. </string>
-    <string name="bg_sentence3_correct">Die richtige Antwort lautet: nicht aufgehoben. </string>
-    <string name="bg_sentence4_correct">Die richtige Antwort lautet: nicht weit vom Stamm. </string>
-    <string name="bg_sentence10_correct">Die richtige Antwort lautet: keine Stunde. </string>
-    <string name="bg_sentence11_correct">Die richtige Antwort lautet: und Gott lenkt. </string>
-    <string name="bg_sentence12_correct">Die richtige Antwort lautet: solange es heiß ist. </string>
-    <string name="bg_sentence13_correct">Die richtige Antwort lautet: oder tausend Schritte tun. </string>
-    <string name="bg_sentence5_correct">Die richtige Antwort lautet: die an sie glauben. </string>
+
+
+    <!-- Braingame Sequence questions for version 2 of the game (comment the old questions above out)
+    <string name="bg_sentence1">Der erste Satz lautet: Aller Anfang </string>
+    <string name="bg_sentence2">Der nächste Satz lautet: Aller guten Dinge </string>
+    <string name="bg_sentence3">Der nächste Satz lautet: Aufgeschoben ist  </string>
+    <string name="bg_sentence4">Der nächste Satz lautet: Der Apfel fällt  </string>
+    <string name="bg_sentence5">Nun noch ein letzter Satz: Wunder kommen zu denen  </string>
+
+    <string name="bg_sentence10">Der nächste Satz lautet: Dem Glücklichen schlägt  </string>
+    <string name="bg_sentence11">Der nächste Satz lautet: Der Mensch denkt  </string>
+    <string name="bg_sentence12">Der nächste Satz lautet: Man muss das Eisen schmieden </string>
+    <string name="bg_sentence13">Der nächste Satz lautet: Nach dem Essen sollst du ruhen  </string>
+
+
+    <string name="bg_sentence1_correct">Die richtige Antwort lautet: Aller Anfang ist schwer. </string>
+    <string name="bg_sentence2_correct">Die richtige Antwort lautet: Alelr guten Dinge sind drei. </string>
+    <string name="bg_sentence3_correct">Die richtige Antwort lautet: Aufgeschoben ist nicht aufgehoben. </string>
+    <string name="bg_sentence4_correct">Die richtige Antwort lautet: Der Apfel fällt nicht weit vom Stamm. </string>
+    <string name="bg_sentence5_correct">Die richtige Antwort lautet: Wunder kommen zu denen, die an sie glauben. </string>
+    <string name="bg_sentence10_correct">Die richtige Antwort lautet: Dem Glücklichen schlägt keine Stunde. </string>
+    <string name="bg_sentence11_correct">Die richtige Antwort lautet: Der Mensch denkt und Gott lenkt. </string>
+    <string name="bg_sentence12_correct">Die richtige Antwort lautet: Man muss das Eisen schmieden, solange es heiß ist. </string>
+    <string name="bg_sentence13_correct">Die richtige Antwort lautet: Nach dem Essen sollst du ruhen oder tausend Schritte tun. </string>
 -->
+
     <!-- ViviInteraction Sequence String -->
     <string name="vi_transition">Im nächsten Schritt würde ich Ihnen gerne ein weiteres Sprachassistenzsystem vorstellen, welches hier in der A A L Musterwohung eingerichtet ist.
         Wenn Sie aber zunächst eine kurze Pause machen möchten, um vielleicht noch etwas zu trinken ist das auch kein Problem. Wenn Sie bereit sind weiterzumachen sagen Sie
