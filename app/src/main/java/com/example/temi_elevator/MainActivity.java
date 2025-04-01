@@ -64,9 +64,6 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-
-
-
 public class MainActivity extends AppCompatActivity implements
         OnRobotReadyListener,
         Robot.AsrListener,
@@ -97,7 +94,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     enum Sequence {UNDEFINED, GREETING, SEQUENCE_ALEXA, AAL_SEQUENCE, SEQUENCE_BRAIN_GAME, QUESTIONNAIRE,
-        KITCHEN, ASSISTANCE_QUESTIONAIRE, ALEXA_INTERACTION, VIVI_INTERACTION, SEQUENCE_KAFFEE_TREFFEN}
+        KITCHEN, ASSISTANCE_QUESTIONAIRE, ALEXA_INTERACTION, VIVI_INTERACTION, SEQUENCE_KAFFEE_TREFFEN, SEQUENCE_REZEPT}
     private Sequence currentSequence;
     int currentSequenceStep = 0;
     private boolean flagWaitingForTemiToArrive = false;
@@ -402,8 +399,6 @@ public class MainActivity extends AppCompatActivity implements
         switch (status) {
             case IDLE:
                 Log.i(TAG, "Status: IDLE | Text: " + myAsrResultString);
-                //showTranscription("Status: IDLE | Text: " + myAsrResultString);
-                //showFace(R.drawable.sleeping_crop);
                 findViewById(R.id.isRecordingImg).setVisibility(View.INVISIBLE);
                 break;
             case LISTENING:
@@ -428,7 +423,6 @@ public class MainActivity extends AppCompatActivity implements
                 showFace(R.drawable.sleeping_crop);
                 break;
         }
-
 
         if(flagWaitingForUserResponse & status == IDLE)
         {
@@ -503,6 +497,11 @@ public class MainActivity extends AppCompatActivity implements
         });
         commandsMap.put(new String[]{"sequenz vivi", "sequenz video", "sequenz vivaicare", "sequenz stationäres assistenzsystem" }, command -> {
             currentSequence = Sequence.VIVI_INTERACTION;
+            currentSequenceStep = 0;
+            chooseCurrentSequence();
+        });
+        commandsMap.put(new String[]{"rezept", "abendessen", "suppe", "gemüsesuppe"}, command -> {
+            currentSequence = Sequence.SEQUENCE_REZEPT;
             currentSequenceStep = 0;
             chooseCurrentSequence();
         });
@@ -605,6 +604,11 @@ public class MainActivity extends AppCompatActivity implements
                 showFace(R.drawable.smileblink_crop);
                 handleSequenceKaffeTreffen();
                 break;
+            case SEQUENCE_REZEPT:
+                scrollToBottom();
+                showFace(R.drawable.smileblink_crop);
+                handleSequenceRezept();
+                break;
             default:
                 showTranscription("Error: No sequence chosen.");
                 showFace(R.drawable.sleeping_crop);
@@ -622,7 +626,7 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-    public void handleSequenceGreeting() //version from 28.05 saved in the commit and on the desktop txt file
+    public void handleSequenceGreeting() //version from 28.05.24 saved in the commit and on the desktop txt file
     {
         String nextSentence;
         switch (currentSequenceStep)
@@ -1101,7 +1105,7 @@ public class MainActivity extends AppCompatActivity implements
                 showTranscription("Temi: " + goodbye_string);
                 flagWaitingForTemiToFinishSpeaking = true;
                 speak(goodbye_string);
-
+                break;
             case 37:
                 showTranscription("\nSystem: Ende Sequenz Fragebogen\n-------------------------------\n");
                 stopCurrentSequence();
@@ -1513,6 +1517,126 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
+    private void handleSequenceRezept() {
+        String nextSentence;
+        switch(currentSequenceStep) {
+            case 0:
+                showTranscription("\n-------------------------------\nSystem: Start Rezept-Assistenz\n");
+                String introduction = getString(R.string.rezept_intro) +
+                        getString(R.string.rezept_zutaten) +
+                        getString(R.string.rezept_schritte) +
+                        getString(R.string.rezept_offer_help);
+                showTranscription("Temi: " + introduction);
+                flagWaitingForTemiToFinishSpeaking = true;
+                speak(introduction);
+                break;
+            case 1:
+            case 4:
+            case 6:
+            case 8:
+            case 10:
+                temi.wakeup(Collections.singletonList(SttLanguage.SYSTEM));
+                findViewById(R.id.isRecordingImg).setVisibility(View.VISIBLE);
+                flagWaitingForUserResponse = true;
+                currentSequenceStep++;
+                break;
+            case 2:
+                if(myAsrResultString.contains("ja") || myAsrResultString.contains("hilfe") || myAsrResultString.contains("bitte")) {
+                    nextSentence = getString(R.string.rezept_accept_help);
+                    currentSequenceStep = 3; // Skip to step 3 if help is accepted
+                } else {
+                    nextSentence = getString(R.string.rezept_decline_help);
+                    currentSequenceStep = 12; // Skip to end if help is declined
+                }
+                showTranscription("Temi: " + nextSentence);
+                flagWaitingForTemiToFinishSpeaking = true;
+                speak(nextSentence);
+                break;
+            case 3:
+                nextSentence = getString(R.string.rezept_step1);
+                showTranscription("Temi: " + nextSentence);
+                flagWaitingForTemiToFinishSpeaking = true;
+                speak(nextSentence);
+                break;
+            case 5:
+                if(checkRepeatRequest()) {
+                    currentSequenceStep = 3; // Go back to previous step
+                    chooseCurrentSequence();
+                    break;
+                }
+                if(checkForContinueNextSequence()) {
+                    nextSentence = getString(R.string.rezept_step2);
+                } else {
+                    nextSentence = getString(R.string.rezept_step_repeat);
+                    currentSequenceStep = 4; // Stay on same step
+                }
+                showTranscription("Temi: " + nextSentence);
+                flagWaitingForTemiToFinishSpeaking = true;
+                speak(nextSentence);
+                break;
+            case 7:
+                if(checkRepeatRequest()) {
+                    currentSequenceStep = 5; // Go back to previous step
+                    flagRepeatSentenceRequest = true;
+                    myAsrResultString = "";
+                    chooseCurrentSequence();
+                    break;
+                }
+                if(checkForContinueNextSequence()) {
+                    nextSentence = getString(R.string.rezept_step3);
+                } else {
+                    nextSentence = getString(R.string.rezept_step_repeat);
+                }
+                showTranscription("Temi: " + nextSentence);
+                flagWaitingForTemiToFinishSpeaking = true;
+                speak(nextSentence);
+                break;
+            case 9:
+                if(checkRepeatRequest()) {
+                    currentSequenceStep = 7; // Go back to previous step
+                    flagRepeatSentenceRequest = true;
+                    myAsrResultString = "";
+                    chooseCurrentSequence();
+                    break;
+                }
+                if(checkForContinueNextSequence()) {
+                    nextSentence = getString(R.string.rezept_step4);
+                } else {
+                    nextSentence = getString(R.string.rezept_step_repeat);
+                }
+                showTranscription("Temi: " + nextSentence);
+                flagWaitingForTemiToFinishSpeaking = true;
+                speak(nextSentence);
+                break;
+            case 11:
+                if(checkRepeatRequest()) {
+                    currentSequenceStep = 9; // Go back to previous step
+                    flagRepeatSentenceRequest = true;
+                    myAsrResultString = "";
+                    chooseCurrentSequence();
+                    break;
+                }
+                if(checkForContinueNextSequence()) {
+                    nextSentence = getString(R.string.rezept_step5);
+                } else {
+                    nextSentence = getString(R.string.rezept_step_repeat);
+                }
+                showTranscription("Temi: " + nextSentence);
+                flagWaitingForTemiToFinishSpeaking = true;
+                speak(nextSentence);
+                break;
+            case 12:
+                showTranscription("\nSystem: Ende Rezept-Assistenz\n-------------------------------\n");
+                currentSequence = Sequence.UNDEFINED;
+                currentSequenceStep = 0;
+                break;
+            default:
+                showTranscription("Error: Default in Sequenz REZEPT!");
+                currentSequenceStep = 0;
+                break;
+        }
+    }
+
     public void relocateTemi()
     {
         if(myAsrResultString.contains("tür"))
@@ -1716,12 +1840,6 @@ public class MainActivity extends AppCompatActivity implements
                     if(DEBUG) showTranscription("Skipped null user or user with null name");
                 }
             }
-        /*  Contact: Mario : 638fb4837f2a4210c3313a5c89be0747 : 0
-            Contact: sander991 : 5ecc126841b0af8f6cc72feadc090fa3 : 1
-            Contact: Hristo : 58c5f1e537525756a295857c7bce8e91 : 1
-            Contact: Chris : 17b6a96e6079f842f6e1684a15a7c0cc : 0
-            Contact: eric : 4730f86644ae309b1d097002ff075da3 : 0
-            Contact: Orlando Gtz : 2378ee1e0716e6cf4e5f2f0ed10b2a44 : 1 */
 
             // Log contacts for debugging
             if(DEBUG) showTranscription("Total contacts added: " + contactNames.size());
