@@ -284,6 +284,7 @@ public class MainActivity extends AppCompatActivity implements
 
     private AlertDialog dialog; // Declare the AlertDialog as a field to keep its state
 
+    /** @noinspection deprecation*/
     private void displayCommandPreview(boolean show) {
 
         // Only create the dialog if it hasn't been initialized
@@ -299,6 +300,30 @@ public class MainActivity extends AppCompatActivity implements
             } else if (currentSequence == Sequence.ALEXA_INTERACTION) {
                 @SuppressLint("UseCompatLoadingForDrawables")
                 Drawable drawable = getResources().getDrawable(R.drawable.alexa_commands_preview);
+                imageView.setImageDrawable(drawable);
+            } else if (currentSequence == Sequence.SEQUENCE_REZEPT && currentSequenceStep == 0) {
+                @SuppressLint("UseCompatLoadingForDrawables")
+                Drawable drawable = getResources().getDrawable(R.drawable.suppe_zutaten);
+                imageView.setImageDrawable(drawable);
+            } else if (currentSequence == Sequence.SEQUENCE_REZEPT && currentSequenceStep == 2) {
+                @SuppressLint("UseCompatLoadingForDrawables")
+                Drawable drawable = getResources().getDrawable(R.drawable.suppe_step1);
+                imageView.setImageDrawable(drawable);
+            } else if (currentSequence == Sequence.SEQUENCE_REZEPT && currentSequenceStep == 3) {
+                @SuppressLint("UseCompatLoadingForDrawables")
+                Drawable drawable = getResources().getDrawable(R.drawable.suppe_step2);
+                imageView.setImageDrawable(drawable);
+            } else if (currentSequence == Sequence.SEQUENCE_REZEPT && currentSequenceStep == 4) {
+                @SuppressLint("UseCompatLoadingForDrawables")
+                Drawable drawable = getResources().getDrawable(R.drawable.suppe_step3);
+                imageView.setImageDrawable(drawable);
+            } else if (currentSequence == Sequence.SEQUENCE_REZEPT && currentSequenceStep == 5) {
+                @SuppressLint("UseCompatLoadingForDrawables")
+                Drawable drawable = getResources().getDrawable(R.drawable.suppe_step4);
+                imageView.setImageDrawable(drawable);
+            } else if (currentSequence == Sequence.SEQUENCE_REZEPT && currentSequenceStep == 6) {
+                @SuppressLint("UseCompatLoadingForDrawables")
+                Drawable drawable = getResources().getDrawable(R.drawable.suppe_step5);
                 imageView.setImageDrawable(drawable);
             }
 
@@ -1350,7 +1375,8 @@ public class MainActivity extends AppCompatActivity implements
                 | myAsrResultString.contains("weiter")
                 | myAsrResultString.contains("was nun")
                 | myAsrResultString.contains("was jetzt")
-                | myAsrResultString.contains("los");
+                | myAsrResultString.contains("los")
+                | myAsrResultString.contains("fertig");
     }
 
     private void handleSequenceAssistanceQuestionaire() {
@@ -1519,8 +1545,13 @@ public class MainActivity extends AppCompatActivity implements
 
     private void handleSequenceRezept() {
         String nextSentence;
+        showTranscription("In handle: currentStep: " + currentSequenceStep);
+
         switch(currentSequenceStep) {
             case 0:
+                displayCommandPreview(true);
+                showTranscription("currentSequenceStep: " + currentSequenceStep);
+
                 showTranscription("\n-------------------------------\nSystem: Start Rezept-Assistenz\n");
                 String introduction = getString(R.string.rezept_intro) +
                         getString(R.string.rezept_zutaten) +
@@ -1529,112 +1560,88 @@ public class MainActivity extends AppCompatActivity implements
                 showTranscription("Temi: " + introduction);
                 flagWaitingForTemiToFinishSpeaking = true;
                 speak(introduction);
+                showTranscription("currentSequenceStep: " + currentSequenceStep);
                 break;
             case 1:
-            case 4:
-            case 6:
-            case 8:
-            case 10:
                 temi.wakeup(Collections.singletonList(SttLanguage.SYSTEM));
                 findViewById(R.id.isRecordingImg).setVisibility(View.VISIBLE);
                 flagWaitingForUserResponse = true;
                 currentSequenceStep++;
                 break;
             case 2:
-                if(myAsrResultString.contains("ja") || myAsrResultString.contains("hilfe") || myAsrResultString.contains("bitte")) {
-                    nextSentence = getString(R.string.rezept_accept_help);
-                    currentSequenceStep = 3; // Skip to step 3 if help is accepted
-                } else {
-                    nextSentence = getString(R.string.rezept_decline_help);
-                    currentSequenceStep = 12; // Skip to end if help is declined
-                }
+                displayCommandPreview(false);
+                displayCommandPreview(true);
+                nextSentence = getString(R.string.rezept_accept_help) + getString(R.string.rezept_step1);
                 showTranscription("Temi: " + nextSentence);
                 flagWaitingForTemiToFinishSpeaking = true;
                 speak(nextSentence);
                 break;
             case 3:
-                nextSentence = getString(R.string.rezept_step1);
-                showTranscription("Temi: " + nextSentence);
-                flagWaitingForTemiToFinishSpeaking = true;
-                speak(nextSentence);
+                if(checkForContinueNextSequence()) {
+                    myAsrResultString = "";
+                    displayCommandPreview(false);
+                    displayCommandPreview(true);
+                    nextSentence = getString(R.string.rezept_step2);
+                    showTranscription("Temi: " + nextSentence);
+                    //flagWaitingForTemiToFinishSpeaking = true;
+                    speak(nextSentence);
+                    currentSequenceStep++;
+                }
+                break;
+            case 4:
+                if(checkForContinueNextSequence()) {
+                    myAsrResultString = "";
+                    displayCommandPreview(false);
+                    displayCommandPreview(true);
+                    nextSentence = getString(R.string.rezept_step3);
+                    showTranscription("Temi: " + nextSentence);
+                    //flagWaitingForTemiToFinishSpeaking = true;
+                    speak(nextSentence);
+                    currentSequenceStep++;
+                }
                 break;
             case 5:
-                if(checkRepeatRequest()) {
-                    currentSequenceStep = 3; // Go back to previous step
-                    chooseCurrentSequence();
-                    break;
-                }
                 if(checkForContinueNextSequence()) {
-                    nextSentence = getString(R.string.rezept_step2);
-                } else {
-                    nextSentence = getString(R.string.rezept_step_repeat);
-                    currentSequenceStep = 4; // Stay on same step
-                }
-                showTranscription("Temi: " + nextSentence);
-                flagWaitingForTemiToFinishSpeaking = true;
-                speak(nextSentence);
-                break;
-            case 7:
-                if(checkRepeatRequest()) {
-                    currentSequenceStep = 5; // Go back to previous step
-                    flagRepeatSentenceRequest = true;
                     myAsrResultString = "";
-                    chooseCurrentSequence();
-                    break;
-                }
-                if(checkForContinueNextSequence()) {
-                    nextSentence = getString(R.string.rezept_step3);
-                } else {
-                    nextSentence = getString(R.string.rezept_step_repeat);
-                }
-                showTranscription("Temi: " + nextSentence);
-                flagWaitingForTemiToFinishSpeaking = true;
-                speak(nextSentence);
-                break;
-            case 9:
-                if(checkRepeatRequest()) {
-                    currentSequenceStep = 7; // Go back to previous step
-                    flagRepeatSentenceRequest = true;
-                    myAsrResultString = "";
-                    chooseCurrentSequence();
-                    break;
-                }
-                if(checkForContinueNextSequence()) {
+                    displayCommandPreview(false);
+                    displayCommandPreview(true);
                     nextSentence = getString(R.string.rezept_step4);
-                } else {
-                    nextSentence = getString(R.string.rezept_step_repeat);
+                    showTranscription("Temi: " + nextSentence);
+                    //flagWaitingForTemiToFinishSpeaking = true;
+                    speak(nextSentence);
+                    currentSequenceStep++;
                 }
-                showTranscription("Temi: " + nextSentence);
-                flagWaitingForTemiToFinishSpeaking = true;
-                speak(nextSentence);
                 break;
-            case 11:
-                if(checkRepeatRequest()) {
-                    currentSequenceStep = 9; // Go back to previous step
-                    flagRepeatSentenceRequest = true;
-                    myAsrResultString = "";
-                    chooseCurrentSequence();
-                    break;
-                }
+            case 6:
                 if(checkForContinueNextSequence()) {
+                    myAsrResultString = "";
+                    displayCommandPreview(false);
+                    displayCommandPreview(true);
                     nextSentence = getString(R.string.rezept_step5);
-                } else {
-                    nextSentence = getString(R.string.rezept_step_repeat);
+                    showTranscription("Temi: " + nextSentence);
+                    //flagWaitingForTemiToFinishSpeaking = true;
+                    speak(nextSentence);
+                    currentSequenceStep++;
+                    new Handler().postDelayed(() -> {
+                        displayCommandPreview(false);
+                        showTranscription("\nSystem: Ende Rezept-Assistenz\n-------------------------------\n");
+                    }, 5000); // Adjust the delay as needed
                 }
-                showTranscription("Temi: " + nextSentence);
-                flagWaitingForTemiToFinishSpeaking = true;
-                speak(nextSentence);
                 break;
-            case 12:
-                showTranscription("\nSystem: Ende Rezept-Assistenz\n-------------------------------\n");
+            /*case 7:
+                displayCommandPreview(false);
+
+                currentSequence = Sequence.UNDEFINED;
+                currentSequenceStep = 0;
+                break;*/
+            default:
+                showTranscription("Error: Default in Sequenz REZEPT!");
                 currentSequence = Sequence.UNDEFINED;
                 currentSequenceStep = 0;
                 break;
-            default:
-                showTranscription("Error: Default in Sequenz REZEPT!");
-                currentSequenceStep = 0;
-                break;
+
         }
+
     }
 
     public void relocateTemi()

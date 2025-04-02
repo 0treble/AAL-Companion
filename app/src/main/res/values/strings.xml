@@ -236,16 +236,16 @@
     <string name="rezept_offer_help">Möchten Sie, dass ich Sie Schritt für Schritt durch die Zubereitung begleite?</string>
     <string name="rezept_accept_help">Alles klar! Ich begleite Sie durch die Zubereitung.</string>
     <string name="rezept_decline_help">Kein Problem. Falls Sie später Hilfe brauchen, sagen Sie einfach Bescheid.</string>
-    <string name="rezept_step1">Legen Sie ein Schneidebrett und ein Messer bereit. Waschen Sie alle Gemüsesorten gründlich. Sagen Sie „weiter“, wenn Sie fertig sind.</string>
+    <string name="rezept_step1">Legen Sie ein Schneidebrett und ein Messer bereit. Waschen Sie alle Gemüsesorten gründlich. Sagen Sie „Hey Temi, weiter“, wenn Sie fertig sind.</string>
     <string name="rezept_step2">Schälen und schneiden Sie die Karotten in kleine Würfel, die Zwiebel in feine Würfel und die Kartoffeln in etwas größere Würfel.
-        Sagen Sie „weiter“, wenn Sie fertig sind.</string>
+        Sagen Sie „Hey Temi, weiter“, wenn Sie fertig sind.</string>
     <string name="rezept_step3">Erhitzen Sie einen Esslöffel Öl in einem großen Topf bei mittlerer Hitze.
         Dünsten Sie die Zwiebelwürfel glasig.
         Geben Sie dann Karotten- und Kartoffelwürfel hinzu und dünsten Sie sie 2-3 Minuten mit.
-        Sagen Sie „weiter“, wenn Sie bereit sind.</string>
+        Sagen Sie „Hey Temi, weiter“, wenn Sie bereit sind.</string>
     <string name="rezept_step4">Gießen Sie 1 Liter Gemüsebrühe in den Topf und bringen Sie alles zum Kochen.
         Reduzieren Sie die Hitze und lassen Sie die Suppe 20 Minuten köcheln, bis das Gemüse weich ist.
-        Sagen Sie „weiter“, wenn Sie bereit sind.</string>
+        Sagen Sie „Hey Temi, weiter“, wenn Sie bereit sind.</string>
     <string name="rezept_step5">Schmecken Sie die Suppe mit Salz, Pfeffer und frischen Kräutern ab. Die Suppe ist nun fertig! Guten Appetit.</string>
     <string name="rezept_step_repeat">Soll ich den letzten Schritt wiederholen?</string>
 
