@@ -47,6 +47,20 @@
         app:layout_constraintVertical_bias="0.421" />
 
     <Button
+        android:id="@+id/sequence10Button"
+        android:layout_width="400dp"
+        android:layout_height="100dp"
+        android:layout_marginStart="628dp"
+        android:backgroundTint="?attr/colorPrimary"
+        android:text="@string/sequence10"
+        android:textColor="?attr/colorOnPrimary"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/sequence9Button"
+        app:layout_constraintTop_toBottomOf="@+id/sequence7Button"
+        app:layout_constraintVertical_bias="0.421" />
+
+    <Button
         android:id="@+id/sequence4Button"
         android:layout_width="600dp"
         android:layout_height="100dp"

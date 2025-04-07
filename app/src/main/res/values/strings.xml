@@ -1,17 +1,14 @@
 <resources>
 
-    <string name="survey_title_for_transcript">"\n\t-------------------------------------------------\n
-        -------------------------------------------------\n
-        -------------------------------------------------\n
+    <string name="survey_title_for_transcript">"
+        \n\t-------------------------------------------------\n
         Forschungsprojekt Voice zur Untersuchung von Assistenzsystemen im Alltag\n
         START Untersuchungstranskript erzeugt vom Assistenzsystem Temi\n
-        -------------------------------------------------\n
         -------------------------------------------------\n\n
     </string>
-    <string name="survey_outro_for_transcript">\n-------------------------------------------------\n
-        -------------------------------------------------\n
+    <string name="survey_outro_for_transcript">
+        \n-------------------------------------------------\n
         ENDE des Untersuchungstranskript\n
-        -------------------------------------------------\n
         -------------------------------------------------\n\n</string>
 
     <string name="app_name">TemiVoice</string>
@@ -182,9 +179,6 @@
     <string name="bg_sentence4_correct">Die richtige Antwort lautet: Wenn ein Freund weggeht, muss man die Türe schließen, sonst wird es kalt.</string>
     <string name="bg_sentence5_correct">Die richtige Antwort lautet: Dienst ist Dienst und Schnaps ist Schnaps.</string>
 
-
-
-
     <!-- Braingame Sequence questions for version 2 of the game (comment the old questions above out)
     <string name="bg_sentence1">Der erste Satz lautet: Aller Anfang </string>
     <string name="bg_sentence2">Der nächste Satz lautet: Aller guten Dinge </string>
@@ -249,6 +243,19 @@
     <string name="rezept_step5">Schmecken Sie die Suppe mit Salz, Pfeffer und frischen Kräutern ab. Die Suppe ist nun fertig! Guten Appetit.</string>
     <string name="rezept_step_repeat">Soll ich den letzten Schritt wiederholen?</string>
 
+    <!-- Messe Sequence String -->
+    <string name="messe_intro">Hallo und herzlich willkommen! Mein Name ist Temi - ich bin ein Assistenzroboter und heute möchte ich Ihnen die Alltagsassistenzlösungen, kurz A A L, vorstellen.
+        A A L umfasst Technologien und Konzepte, die den Alltag sicherer, komfortabler und selbstbestimmter machen - insbesondere für ältere Menschen oder Menschen mit Unterstützungsbedarf.
+        Lassen Sie uns einen Blick auf die verschiedenen Beispiele aus unserer A A L-Musterwohnung werfen. </string>
+    <string name="aal_1">Höhenverstellbare Küchenelemente, "mitdenkende" Hitzesensoren und ein Backofen mit nach innen versenkbarer Tür,
+        nur ein paar der vielen Möglichen Anpassungen in der Küche. Aber auch kleine, kostengünstige Hilfsmittel können Sie hier anschauen und ausprobieren.</string>
+    <string name="aal_2">Neben Informationen zu Alltagsunterstützenden Assistenz Lösungen werden bei einer Führung auch Hinweise zu sofort und meist kostenfrei
+        umsetzbaren Präventionsinhalten gegeben. Ein Schwerpunkt ist hier die Sturzprävention.</string>
+    <string name="aal_3">Auch der kompakte Treppenlift erleichtert die Mobilität bei Beeinträchtigungen in der Beweglichkeit.</string>
+    <string name="aal_4">Putzroboter fahren selbständig in der Wohnung umher und halten sie sauber, Fenster wie Böden.</string>
+    <string name="aal_5">Die vernetzte Steuerung von Licht, Temperatur oder auch den Rollläden - erfahren Sie, wie Sie ganz automatisch von Ihrer Wohnung im Alltag unterstützt werden können.</string>
+    <string name="aal_6">Mit Fragen zu Anpassungen im Badezimmer beginnt meist die Suche nach Unterstützung in der selbstständigen Lebensführung.</string>
+    <string name="aal_outro">Wenn Sie die Musterwohnung persönlich besichtigen möchten, können Sie über den auf dem Bildschirm angezeigten Kontakt einen Termin vereinbaren.</string>
 
     <!-- Button Label Strings -->
     <string name="take_photo">Transport Modus</string>
@@ -270,6 +277,7 @@
     <string name="sequence7">Abschlussfragebogen</string>
     <string name="sequence8">Unterstützungsbedarf</string>
     <string name="sequence9">Vivi Interaktion</string>
+    <string name="sequence10">AAL Messe</string>
 
     <string name="back">Zurück</string>
     <string name="next">Weiter</string>
