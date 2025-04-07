@@ -38,7 +38,10 @@ public class SequenceActivity extends AppCompatActivity {
         button9.setOnClickListener(v -> setResultAndFinish(MainActivity.Sequence.VIVI_INTERACTION));
 
         Button button10 = findViewById(R.id.sequence10Button);
-        button10.setOnClickListener(v -> setResultAndFinish(MainActivity.Sequence.SEQUENCE_MESSE));
+        button10.setOnClickListener(v -> setResultAndFinish(MainActivity.Sequence.SEQUENCE_MESSE1));
+
+        Button button11 = findViewById(R.id.sequence11Button);
+        button11.setOnClickListener(v -> setResultAndFinish(MainActivity.Sequence.SEQUENCE_MESSE2));
 
         Button backButton = findViewById(R.id.backButton);
         backButton.setOnClickListener(v -> finish());

@@ -244,7 +244,7 @@
     <string name="rezept_step_repeat">Soll ich den letzten Schritt wiederholen?</string>
 
     <!-- Messe Sequence String -->
-    <string name="messe_intro">Hallo und herzlich willkommen! Mein Name ist Temi - ich bin ein Assistenzroboter und heute möchte ich Ihnen die Alltagsassistenzlösungen, kurz A A L, vorstellen.
+    <string name="messe_intro">Hallo und herzlich willkommen! Mein Name ist Temi - ich bin ein Assistenzroboter und heute möchte ich Ihnen die Alltagsunterstützende Assistenz-Lösungen, kurz A A L, vorstellen.
         A A L umfasst Technologien und Konzepte, die den Alltag sicherer, komfortabler und selbstbestimmter machen - insbesondere für ältere Menschen oder Menschen mit Unterstützungsbedarf.
         Lassen Sie uns einen Blick auf die verschiedenen Beispiele aus unserer A A L-Musterwohnung werfen. </string>
     <string name="aal_1">Höhenverstellbare Küchenelemente, "mitdenkende" Hitzesensoren und ein Backofen mit nach innen versenkbarer Tür,
@@ -277,7 +277,8 @@
     <string name="sequence7">Abschlussfragebogen</string>
     <string name="sequence8">Unterstützungsbedarf</string>
     <string name="sequence9">Vivi Interaktion</string>
-    <string name="sequence10">AAL Messe</string>
+    <string name="sequence10">Messe Pos.1</string>
+    <string name="sequence11">Messe Pos.2</string>
 
     <string name="back">Zurück</string>
     <string name="next">Weiter</string>

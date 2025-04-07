@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     enum Sequence {UNDEFINED, GREETING, SEQUENCE_ALEXA, AAL_SEQUENCE, SEQUENCE_BRAIN_GAME, QUESTIONNAIRE,
-        KITCHEN, ASSISTANCE_QUESTIONAIRE, ALEXA_INTERACTION, VIVI_INTERACTION, SEQUENCE_KAFFEE_TREFFEN, SEQUENCE_REZEPT, SEQUENCE_MESSE}
+        KITCHEN, ASSISTANCE_QUESTIONAIRE, ALEXA_INTERACTION, VIVI_INTERACTION, SEQUENCE_KAFFEE_TREFFEN, SEQUENCE_REZEPT, SEQUENCE_MESSE1, SEQUENCE_MESSE2}
     private Sequence currentSequence;
     int currentSequenceStep = 0;
     private boolean flagWaitingForTemiToArrive = false;
@@ -323,36 +323,36 @@ public class MainActivity extends AppCompatActivity implements
                 @SuppressLint("UseCompatLoadingForDrawables")
                 Drawable drawable = getResources().getDrawable(R.drawable.suppe_step5);
                 imageView.setImageDrawable(drawable);
-            } else if (currentSequence == Sequence.SEQUENCE_MESSE) {
-                if(currentSequenceStep == 0) {
+            } else if (currentSequence == Sequence.SEQUENCE_MESSE1 || currentSequence == Sequence.SEQUENCE_MESSE2) {
+                if(currentSequenceStep == 1) {
                     @SuppressLint("UseCompatLoadingForDrawables")
                     Drawable drawable = getResources().getDrawable(R.drawable.aal_preview);
                     imageView.setImageDrawable(drawable);
-                } else if(currentSequenceStep == 1) {
+                } else if(currentSequenceStep == 2) {
                     @SuppressLint("UseCompatLoadingForDrawables")
                     Drawable drawable = getResources().getDrawable(R.drawable.kueche);
                     imageView.setImageDrawable(drawable);
-                } else if(currentSequenceStep == 2) {
+                } else if(currentSequenceStep == 3) {
                     @SuppressLint("UseCompatLoadingForDrawables")
                     Drawable drawable = getResources().getDrawable(R.drawable.wohnzimmer);
                     imageView.setImageDrawable(drawable);
-                }else if(currentSequenceStep == 3) {
+                }else if(currentSequenceStep == 4) {
                     @SuppressLint("UseCompatLoadingForDrawables")
                     Drawable drawable = getResources().getDrawable(R.drawable.treppen);
                     imageView.setImageDrawable(drawable);
-                }else if(currentSequenceStep == 4) {
+                }else if(currentSequenceStep == 5) {
                     @SuppressLint("UseCompatLoadingForDrawables")
                     Drawable drawable = getResources().getDrawable(R.drawable.roboter);
                     imageView.setImageDrawable(drawable);
-                }else if(currentSequenceStep == 5) {
+                }else if(currentSequenceStep == 6) {
                     @SuppressLint("UseCompatLoadingForDrawables")
                     Drawable drawable = getResources().getDrawable(R.drawable.smart_home);
                     imageView.setImageDrawable(drawable);
-                }else if(currentSequenceStep == 6) {
+                }else if(currentSequenceStep == 7) {
                     @SuppressLint("UseCompatLoadingForDrawables")
                     Drawable drawable = getResources().getDrawable(R.drawable.bad);
                     imageView.setImageDrawable(drawable);
-                }else if(currentSequenceStep == 7) {
+                }else if(currentSequenceStep == 8) {
                     @SuppressLint("UseCompatLoadingForDrawables")
                     Drawable drawable = getResources().getDrawable(R.drawable.kontakt);
                     imageView.setImageDrawable(drawable);
@@ -562,11 +562,11 @@ public class MainActivity extends AppCompatActivity implements
             currentSequenceStep = 0;
             chooseCurrentSequence();
         });
-        commandsMap.put(new String[]{"messe", "verein", "wohnung"}, command -> {
-            currentSequence = Sequence.SEQUENCE_MESSE;
-            currentSequenceStep = 0;
-            chooseCurrentSequence();
-        });
+        //commandsMap.put(new String[]{"messe", "verein", "wohnung"}, command -> {
+        //    currentSequence = Sequence.SEQUENCE_MESSE;
+        //    currentSequenceStep = 0;
+        //   chooseCurrentSequence();
+        //});
     }
 
     private void handleUndefinedCommand() {
@@ -671,17 +671,21 @@ public class MainActivity extends AppCompatActivity implements
                 showFace(R.drawable.smileblink_crop);
                 handleSequenceRezept();
                 break;
-            case SEQUENCE_MESSE:
+            case SEQUENCE_MESSE1:
                 scrollToBottom();
                 showFace(R.drawable.smileblink_crop);
-                handleSequenceMesse();
+                handleSequenceMessePos1();
+                break;
+            case SEQUENCE_MESSE2:
+                scrollToBottom();
+                showFace(R.drawable.smileblink_crop);
+                handleSequenceMessePos2();
                 break;
             default:
                 showTranscription("Error: No sequence chosen.");
                 showFace(R.drawable.sleeping_crop);
                 break;
         }
-
     }
 
     @Override
@@ -1583,26 +1587,28 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-    private void handleSequenceMesse() {
+    private void handleSequenceMessePos1() {
         String nextSentence;
-        showTranscription("In handle: currentStep: " + currentSequenceStep);
+        //showTranscription("In handle: currentStep: " + currentSequenceStep);
 
         switch(currentSequenceStep) {
             case 0:
+                flagWaitingForTemiToArrive = true;
+                temi.goTo("wohnzimmer");
+                break;
+            case 1:
                 displayCommandPreview(true);
                 showTranscription("currentSequenceStep: " + currentSequenceStep);
-
                 showTranscription("\n-------------------------------\nSystem: Start Sequenz Messe\n");
                 String introduction = getString(R.string.messe_intro);
                 showTranscription("Temi: " + introduction);
                 flagWaitingForTemiToFinishSpeaking = true;
                 speak(introduction);
-                //currentSequenceStep++;
                 new Handler().postDelayed(() -> {
                     displayCommandPreview(false);
-                }, 7000);
+                }, 10000);
                 break;
-            case 1:
+            case 2:
                 displayCommandPreview(true);
                 showTranscription("currentSequenceStep: " + currentSequenceStep);
 
@@ -1610,88 +1616,82 @@ public class MainActivity extends AppCompatActivity implements
                 showTranscription("Temi: " + nextSentence);
                 flagWaitingForTemiToFinishSpeaking = true;
                 speak(nextSentence);
-                //currentSequenceStep++;
                 new Handler().postDelayed(() -> {
                     displayCommandPreview(false);
                 }, 10000);
                 break;
-            case 2:
-                myAsrResultString = "";
+            case 3:
                 displayCommandPreview(false);
                 displayCommandPreview(true);
                 nextSentence = getString(R.string.aal_2);
                 showTranscription("Temi: " + nextSentence);
                 flagWaitingForTemiToFinishSpeaking = true;
                 speak(nextSentence);
-                //currentSequenceStep++;
                 new Handler().postDelayed(() -> {
                     displayCommandPreview(false);
                 }, 8000);
                 break;
-            case 3:
-                myAsrResultString = "";
+            case 4:
                 displayCommandPreview(false);
                 displayCommandPreview(true);
                 nextSentence = getString(R.string.aal_3);
                 showTranscription("Temi: " + nextSentence);
                 flagWaitingForTemiToFinishSpeaking = true;
                 speak(nextSentence);
-                //currentSequenceStep++;
                 new Handler().postDelayed(() -> {
                     displayCommandPreview(false);
                 }, 6000);
                 break;
-            case 4:
-                myAsrResultString = "";
+            case 5:
                 displayCommandPreview(false);
                 displayCommandPreview(true);
                 nextSentence = getString(R.string.aal_4);
                 showTranscription("Temi: " + nextSentence);
                 flagWaitingForTemiToFinishSpeaking = true;
                 speak(nextSentence);
-                //currentSequenceStep++;
                 new Handler().postDelayed(() -> {
                     displayCommandPreview(false);
                 }, 7000);
                 break;
-            case 5:
-                myAsrResultString = "";
+            case 6:
                 displayCommandPreview(false);
                 displayCommandPreview(true);
                 nextSentence = getString(R.string.aal_5);
                 showTranscription("Temi: " + nextSentence);
                 flagWaitingForTemiToFinishSpeaking = true;
                 speak(nextSentence);
-                //currentSequenceStep++;
                 new Handler().postDelayed(() -> {
                     displayCommandPreview(false);
                 }, 9000);
                 break;
-            case 6:
-                myAsrResultString = "";
+            case 7:
                 displayCommandPreview(false);
                 displayCommandPreview(true);
                 nextSentence = getString(R.string.aal_6);
                 showTranscription("Temi: " + nextSentence);
                 flagWaitingForTemiToFinishSpeaking = true;
                 speak(nextSentence);
-                //currentSequenceStep++;
                 new Handler().postDelayed(() -> {
                     displayCommandPreview(false);
                 }, 7000);
                 break;
-            case 7:
-                myAsrResultString = "";
+            case 8:
                 displayCommandPreview(false);
                 displayCommandPreview(true);
                 nextSentence = getString(R.string.aal_outro);
                 showTranscription("Temi: " + nextSentence);
                 flagWaitingForTemiToFinishSpeaking = true;
                 speak(nextSentence);
-                //currentSequenceStep++;
                 new Handler().postDelayed(() -> {
                     displayCommandPreview(false);
+                    flagWaitingForTemiToFinishSpeaking = true;
                     speak("Vielen Dank für Ihre Aufmerksamkeit!" );
+                }, 20000);
+                break;
+            case 9:
+                new Handler().postDelayed(() -> {
+                    flagWaitingForTemiToArrive = true;
+                    temi.goTo("home base");
                     showTranscription("\nSystem: Ende Sequenz MESSE\n-------------------------------\n");
                 }, 20000);
                 break;
@@ -1700,11 +1700,123 @@ public class MainActivity extends AppCompatActivity implements
                 currentSequence = Sequence.UNDEFINED;
                 currentSequenceStep = 0;
                 break;
-
         }
-
     }
+    private void handleSequenceMessePos2() {
+        String nextSentence;
+        //showTranscription("In handle: currentStep: " + currentSequenceStep);
 
+        switch(currentSequenceStep) {
+            case 0:
+                flagWaitingForTemiToArrive = true;
+                temi.goTo("küche");
+                break;
+            case 1:
+                displayCommandPreview(true);
+                showTranscription("currentSequenceStep: " + currentSequenceStep);
+                showTranscription("\n-------------------------------\nSystem: Start Sequenz Messe\n");
+                String introduction = getString(R.string.messe_intro);
+                showTranscription("Temi: " + introduction);
+                flagWaitingForTemiToFinishSpeaking = true;
+                speak(introduction);
+                new Handler().postDelayed(() -> {
+                    displayCommandPreview(false);
+                }, 10000);
+                break;
+            case 2:
+                displayCommandPreview(true);
+                showTranscription("currentSequenceStep: " + currentSequenceStep);
+
+                nextSentence = getString(R.string.aal_1);
+                showTranscription("Temi: " + nextSentence);
+                flagWaitingForTemiToFinishSpeaking = true;
+                speak(nextSentence);
+                new Handler().postDelayed(() -> {
+                    displayCommandPreview(false);
+                }, 10000);
+                break;
+            case 3:
+                displayCommandPreview(false);
+                displayCommandPreview(true);
+                nextSentence = getString(R.string.aal_2);
+                showTranscription("Temi: " + nextSentence);
+                flagWaitingForTemiToFinishSpeaking = true;
+                speak(nextSentence);
+                new Handler().postDelayed(() -> {
+                    displayCommandPreview(false);
+                }, 8000);
+                break;
+            case 4:
+                displayCommandPreview(false);
+                displayCommandPreview(true);
+                nextSentence = getString(R.string.aal_3);
+                showTranscription("Temi: " + nextSentence);
+                flagWaitingForTemiToFinishSpeaking = true;
+                speak(nextSentence);
+                new Handler().postDelayed(() -> {
+                    displayCommandPreview(false);
+                }, 6000);
+                break;
+            case 5:
+                displayCommandPreview(false);
+                displayCommandPreview(true);
+                nextSentence = getString(R.string.aal_4);
+                showTranscription("Temi: " + nextSentence);
+                flagWaitingForTemiToFinishSpeaking = true;
+                speak(nextSentence);
+                new Handler().postDelayed(() -> {
+                    displayCommandPreview(false);
+                }, 7000);
+                break;
+            case 6:
+                displayCommandPreview(false);
+                displayCommandPreview(true);
+                nextSentence = getString(R.string.aal_5);
+                showTranscription("Temi: " + nextSentence);
+                flagWaitingForTemiToFinishSpeaking = true;
+                speak(nextSentence);
+                new Handler().postDelayed(() -> {
+                    displayCommandPreview(false);
+                }, 9000);
+                break;
+            case 7:
+                displayCommandPreview(false);
+                displayCommandPreview(true);
+                nextSentence = getString(R.string.aal_6);
+                showTranscription("Temi: " + nextSentence);
+                flagWaitingForTemiToFinishSpeaking = true;
+                speak(nextSentence);
+                new Handler().postDelayed(() -> {
+                    displayCommandPreview(false);
+                }, 7000);
+                break;
+            case 8:
+                displayCommandPreview(false);
+                displayCommandPreview(true);
+                nextSentence = getString(R.string.aal_outro);
+                showTranscription("Temi: " + nextSentence);
+                flagWaitingForTemiToFinishSpeaking = true;
+                speak(nextSentence);
+                new Handler().postDelayed(() -> {
+                    displayCommandPreview(false);
+                    flagWaitingForTemiToFinishSpeaking = true;
+                    speak("Vielen Dank für Ihre Aufmerksamkeit!" );
+                }, 20000);
+                break;
+            case 9:
+                new Handler().postDelayed(() -> {
+                    flagWaitingForTemiToArrive = true;
+                    temi.goTo("home base");
+                    showTranscription("\nSystem: Ende Sequenz MESSE\n-------------------------------\n");
+                }, 20000);
+                break;
+            default:
+                showTranscription("Error: Default in Sequenz MESSE!");
+                currentSequence = Sequence.UNDEFINED;
+                currentSequenceStep = 0;
+                break;
+        }
+    }
     private void handleSequenceRezept() {
         String nextSentence;
         showTranscription("In handle: currentStep: " + currentSequenceStep);
