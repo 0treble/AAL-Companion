@@ -2,7 +2,7 @@
 
 Android application for the [Temi](https://www.robotemi.com/) service robot, built for **VOICE — Nutzen- und Akzeptanzstudie von Sprachassistenten für AAL-Anwendungen** ("Benefit and Acceptance Study of Voice Assistants for Ambient Assisted Living Applications"), a research project at [htw saar](https://www.htwsaar.de/).
 
-![Temi robot running the app, EmRoLab](figures/temi_robot_emrolab.png)
+![Temi robot running the app, EmRoLab](temi_robot_emrolab.png)
 
 ## About the VOICE project
 
@@ -10,7 +10,7 @@ Demographic change is driving demand for technology-based assistance systems tha
 
 Selected study participants visit the AAL-Netzwerk Saar's furnished demonstration apartment, where everyday assistive technologies are presented for people of different ages and life situations. The Temi service robot (developed by [EmRoLab](https://www.htwsaar.de/), the Embedded Robotics Lab at htw saar) plays a central role: it guides participants through the study, explains each step, and presents the everyday assistants integrated into the demonstration kitchen. Through direct voice interaction with Temi and the other voice assistants, participants actively shape the course of the study.
 
-![Study participant interacting with two voice assistants](figures/participant_voice_assistant_study.png)
+![Study participant interacting with two voice assistants](participant_voice_assistant_study.png)
 *A study participant interacting with Temi and a second voice assistant during a session.*
 
 **Goal:** contribute to current research on what needs to be considered when developing voice assistants for older adults, and whether such assistants can genuinely simplify daily life — in particular, working out a validation strategy that properly accounts for effect, utility, acceptance, and data transparency.
